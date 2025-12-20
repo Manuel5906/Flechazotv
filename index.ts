@@ -1,73 +1,37 @@
 import express from 'express'
 import path from 'path'
-import fs from 'fs'
 import { fileURLToPath } from 'url'
+
+// IMPORTAMOS TUS RUTAS (Esto busca el archivo del paso 2)
+import misRutasApi from './src/routes/api.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
 
-// 1. CONFIGURACIÓN
-app.use(express.json()) // Para entender JSON si fuera necesario
-app.use(express.static(path.join(__dirname, 'src'))) // Carpeta pública
+// CONFIGURACIÓN
+app.use(express.json()) 
+app.use(express.static(path.join(__dirname, 'src'))) 
 
-// --- TRUCO DEL ICONO ---
 app.get('/favicon.ico', (req, res) => {
   res.redirect('https://i.ibb.co/v6GdVWRs/IMG-0113.png')
 })
 
-// ==========================================
-// 2. API CONECTADA A ARCHIVO JSON
-// ==========================================
-app.get('/api/contenido', (req, res) => {
-  const dbPath = path.join(__dirname, 'src/database', 'contenido.json')
-  
-  fs.readFile(dbPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err)
-      return res.status(500).json({ error: 'Error al leer la base de datos' })
-    }
-    const jsonData = JSON.parse(data)
-    res.json(jsonData)
-  })
-})
+// CONECTAR LAS RUTAS
+// Aquí decimos: "Cualquier ruta en api.js empieza con /api"
+app.use('/api', misRutasApi) 
 
-// ==========================================
-// 3. RUTAS (PÁGINAS)
-// ==========================================
+// RUTAS DE PÁGINAS (HTML)
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'src', 'index.html')))
+app.get('/inicio', (req, res) => res.sendFile(path.join(__dirname, 'src', 'inicio.html'))) 
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'src', 'admin.html')))
+app.get('/vip', (req, res) => res.sendFile(path.join(__dirname, 'src', 'vip.html')))
 
-// RUTA 1: Login (Raíz) -> index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'index.html'))
-})
-
-// RUTA 2: App Principal (Usuario) -> inicio.html
-// Aquí es donde está el reproductor y los pagos QR
-app.get('/inicio', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'inicio.html')) 
-})
-
-// RUTA 3: Panel Admin -> admin.html (¡ESTO FALTABA!)
-// Aquí entras tú para aprobar los pagos
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'admin.html'))
-})
-
-// RUTA 4: About
-app.get('/vip', function (req, res) {
-  res.sendFile(path.join(__dirname, 'src', 'vip.html'))
-})
-
-// ==========================================
-// 4. ARRANCAR SERVIDOR (¡ESTO FALTABA!)
-// ==========================================
+// ARRANCAR
 const PORT = process.env.PORT || 3000
-
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor listo!`)
-  console.log(`📱 App Usuarios: http://localhost:${PORT}/inicio`)
-  console.log(`👮 Panel Admin:  http://localhost:${PORT}/admin`)
+  console.log(`🚀 Servidor listo en http://localhost:${PORT}`)
 })
 
 export default app
