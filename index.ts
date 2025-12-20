@@ -7,30 +7,29 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-// 1. Configuración de archivos estáticos
+// 1. Configuración de archivos estáticos (CSS, Imágenes, JS)
 app.use(express.static(path.join(__dirname, 'src')))
 
-// --- LOGOTIPO EN LA PESTAÑA (Favicon) ---
+// --- TRUCO DEL ICONO ---
 app.get('/favicon.ico', (req, res) => {
   res.redirect('https://i.ibb.co/v6GdVWRs/IMG-0113.png')
 })
 
-// 2. Ruta Principal (Inicio)
+// 2. RUTA LOGIN (La raíz)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'index.html'))
 })
 
-// 3. NUEVO APARTADO (Sub-dominio/Sección)
-// Esto crea la dirección: tuweb.com/vip
-app.get('/vip', (req, res) => {
-  // Asegúrate de crear el archivo 'vip.html' dentro de la carpeta 'src'
-  res.sendFile(path.join(__dirname, 'src', 'vip.html'))
+// 3. RUTA API / INICIO (Aquí está la magia)
+// El usuario entrará a "tusitio.com/inicio" y el servidor le dará el HTML
+// sin mostrar ".html" en la barra de direcciones.
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'home.html'))
 })
 
-// 4. Ruta About (Mantenida)
+// 4. Ruta About
 app.get('/about', function (req, res) {
   res.sendFile(path.join(__dirname, '..', 'components', 'about.htm'))
 })
 
-export default app
-
+export default ap
