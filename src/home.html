@@ -1,1 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f0f1a">
 
+    <title>Flechazo TV</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-darker: #0f0f1a;
+            --primary: #ff4b4b;
+            --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
+            --gold-gradient: linear-gradient(45deg, #FFD700, #FFA500);
+            --text: #ffffff;
+            --text-sec: #a0a0a0;
+            --card-bg: #222230;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom, var(--bg-dark), var(--bg-darker));
+            color: var(--text);
+            padding-bottom: 90px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        /* UTILIDADES */
+        .hidden { display: none !important; }
+        .tab-screen { display: none; animation: fadeIn 0.3s ease; }
+        .tab-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; }
+        .header-logo { width: 35px; height: 35px; }
+        .header-title { font-size: 24px; font-weight: bold; }
+
+        /* UI GENERICA */
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px; gap: 15px; scrollbar-width: none; }
+        .horizontal-scroll::-webkit-scrollbar { display: none; }
+        .poster-card { min-width: 120px; height: 180px; border-radius: 12px; overflow: hidden; background: #222; position: relative; cursor: pointer; }
+        .poster-card img { width: 100%; height: 100%; object-fit: cover; }
+        .poster-card:active { transform: scale(0.95); transition: 0.2s; }
+        
+        /* HOME ELEMENTS */
+        .featured-container { position: relative; margin: 10px 20px 20px 20px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.4); aspect-ratio: 16/10; }
+        .slide { display: none; width: 100%; height: 100%; position: relative; }
+        .slide.active { display: block; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; background: linear-gradient(to top, #0f0f1a 10%, transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+        .btn-watch { margin-top: 5px; padding: 8px 20px; background: var(--gradient); border-radius: 20px; font-weight: bold; width: fit-content; font-size: 14px; cursor: pointer;}
+        .section-title { padding: 0 20px; margin-bottom: 10px; margin-top: 25px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; }
+        .see-all { color: var(--primary); font-size: 12px; }
+
+        /* CATEGORÍAS */
+        .categories-row { display: flex; justify-content: space-around; padding: 10px 20px; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+        .cat-circle { width: 55px; height: 55px; border-radius: 50%; background: #2a2a3a; display: flex; justify-content: center; align-items: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
+        .cat-circle:active { transform: scale(0.9); }
+        .cat-circle.shorts { background: linear-gradient(45deg, #ff0050, #00f2ea); color: white; }
+
+        /* MI LISTA & EXPLORAR */
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; }
+        .list-card { aspect-ratio: 2/3; border-radius: 10px; overflow: hidden; position: relative; background: #333; cursor: pointer; }
+        .list-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* PERFIL */
+        .profile-header { display: flex; flex-direction: column; align-items: center; padding: 30px 20px; position: relative; }
+        .avatar-container { position: relative; margin-bottom: 15px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
+        .edit-badge { position: absolute; bottom: 0; right: 0; background: #333; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f0f1a; }
+        .user-name { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
+        .user-email { font-size: 13px; color: var(--text-sec); margin-bottom: 10px; }
+        .status-badge { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: bold; letter-spacing: 1px; display: inline-block; }
+        .premium-user .status-badge { background: var(--gold-gradient); color: black; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        .premium-user .avatar { border-color: #FFD700; }
+
+        .settings-group { margin: 20px 20px 0 20px; background: var(--card-bg); border-radius: 15px; overflow: hidden; }
+        .group-title { margin: 25px 20px 5px 25px; font-size: 12px; font-weight: bold; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .menu-item:active { background: rgba(255,255,255,0.05); }
+        .menu-item:last-child { border-bottom: none; }
+        .item-left { display: flex; align-items: center; gap: 15px; font-size: 15px; }
+        .item-icon { width: 24px; text-align: center; color: var(--text-sec); font-size: 18px; }
+        
+        /* SWITCH */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* MODALES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: flex-end; visibility: hidden; opacity: 0; transition: 0.3s; }
+        .modal-overlay.open { visibility: visible; opacity: 1; }
+        .modal-content { background: #15151f; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 25px; transform: translateY(100%); transition: transform 0.3s; max-height: 85vh; overflow-y: auto; }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        .close-btn { background: #333; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; float:right;}
+
+        /* REPRODUCTOR */
+        #video-player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: flex; opacity: 0; pointer-events: none; transition: 0.3s; }
+        #video-player-overlay.active { opacity: 1; pointer-events: all; }
+        .video-wrapper { width: 100%; height: 100%; position: relative; display: flex; align-items: center; }
+        .player-controls { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; background: rgba(0,0,0,0.5); }
+        video { width: 100%; height: 100%; }
+
+        /* MENU INFERIOR */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; border-top: 1px solid #2a2a3a; display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; }
+        .nav-item { text-align: center; color: #777; font-size: 10px; position: relative; cursor: pointer; }
+        .nav-item.active { color: #ec407a; }
+        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        
+        /* QR Container */
+        .qr-container { background: white; padding: 10px; border-radius: 15px; margin: 15px auto; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; }
+        .qr-img { width: 100%; height: 100%; object-fit: contain; }
+        .btn-whatsapp { background: #25D366; color: white; border: none; padding: 12px; width: 100%; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-redeem { background: var(--gradient); color: white; border: none; padding: 12px; width: 100%; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+        .code-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 12px; text-align: center; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; }
+        
+        /* Avatar Grid */
+        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
+        .avatar-opt { width: 100%; border-radius: 50%; border: 2px solid transparent; opacity: 0.5; }
+        .avatar-opt.selected { border-color: var(--primary); opacity: 1; }
+        .input-dark { width: 100%; padding: 15px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="tab-home" class="tab-screen active">
+        <header class="header">
+            <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" class="header-logo" alt="Logo">
+            <i class="fa-solid fa-bell"></i>
+        </header>
+
+        <div id="featured-carousel" class="featured-container"></div>
+
+        <div class="categories-row">
+            <div class="cat-item" onclick="openPlayer('Shorts Flechazo', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4')">
+                <div class="cat-circle shorts"><i class="fa-solid fa-play"></i></div><span style="font-size: 10px;">Shorts</span>
+            </div>
+            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-heart"></i></div><span style="font-size: 10px;">Romance</span></div>
+            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-fire"></i></div><span style="font-size: 10px;">Acción</span></div>
+            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-plus"></i></div><span style="font-size: 10px;">Más</span></div>
+        </div>
+
+        <div class="section-title"><span>🔥 Populares Ahora</span><span class="see-all">Ver todo</span></div>
+        <div id="popular-list" class="horizontal-scroll"></div>
+
+        <div class="section-title"><span>❤️ Romance Coreano</span><span class="see-all">Ver todo</span></div>
+        <div id="romance-list" class="horizontal-scroll"></div>
+        
+        <div class="section-title"><span>⚔️ Acción y Suspenso</span><span class="see-all">Ver todo</span></div>
+        <div id="action-list" class="horizontal-scroll"></div>
+        <br><br>
+    </div>
+
+    <div id="tab-mylist" class="tab-screen">
+        <header class="header"><div class="header-title">Mi Lista</div><i class="fa-solid fa-pen-to-square" style="color:#888"></i></header>
+        <div id="mylist-grid" class="grid-container"></div>
+        <div class="section-title" style="margin-top:30px;"><span>✨ Para Ti</span></div>
+        <div id="foryou-list" class="horizontal-scroll"></div>
+        <br><br>
+    </div>
+
+    <div id="tab-explore" class="tab-screen">
+        <header class="header"><div class="header-title">Explorar</div></header>
+        <div style="padding: 0 20px 20px 20px;">
+            <div style="background:#222; padding:12px; border-radius:12px; display:flex; align-items:center; color:#888;">
+                <i class="fa-solid fa-magnifying-glass" style="margin-right:10px;"></i>
+                <input type="text" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%; outline:none;">
+            </div>
+        </div>
+        <div id="explore-grid" class="grid-container"></div>
+        <br><br>
+    </div>
+
+    <div id="tab-profile" class="tab-screen">
+        <div class="profile-header">
+            <div class="avatar-container" onclick="openModal('edit-profile-modal')">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar" id="current-avatar">
+                <div class="edit-badge"><i class="fa-solid fa-pencil" style="font-size:12px;"></i></div>
+            </div>
+            <div class="user-name" id="display-name">Usuario</div>
+            <div class="user-email" id="display-email">cargando...</div>
+            <div class="status-badge" id="sub-badge">PLAN GRATUITO</div>
+        </div>
+
+        <div class="group-title">Cuenta</div>
+        <div class="settings-group">
+            <div class="menu-item" onclick="openModal('edit-profile-modal')">
+                <div class="item-left"><i class="fa-regular fa-user item-icon"></i> Editar Perfil</div>
+                <div class="item-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="menu-item" onclick="openModal('qr-modal')">
+                <div class="item-left"><i class="fa-solid fa-crown item-icon" style="color:#FFD700;"></i> Suscripción</div>
+                <div class="item-right" style="color:#ec407a; font-weight:bold;" id="menu-sub-status">MEJORAR</div>
+            </div>
+        </div>
+
+        <div class="group-title">App</div>
+        <div class="settings-group">
+            <div class="menu-item">
+                <div class="item-left"><i class="fa-solid fa-wifi item-icon"></i> Solo WiFi</div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="menu-item">
+                <div class="item-left"><i class="fa-regular fa-bell item-icon"></i> Notificaciones</div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="group-title">Soporte</div>
+        <div class="settings-group">
+            <div class="menu-item" onclick="openModal('help-modal')">
+                <div class="item-left"><i class="fa-regular fa-circle-question item-icon"></i> Centro de Ayuda</div>
+                <div class="item-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="menu-item" id="btnLogout">
+                <div class="item-left"><i class="fa-solid fa-arrow-right-from-bracket item-icon" style="color:#ff4b4b;"></i> <span style="color:#ff4b4b;">Cerrar Sesión</span></div>
+            </div>
+        </div>
+        <br><br>
+    </div>
+
+    <div id="video-player-overlay">
+        <div class="video-wrapper">
+            <video id="main-video" playsinline></video>
+            <div class="player-controls" id="controls-layer" onclick="toggleControls()">
+                <div style="margin-top:40px; display:flex; gap:15px; align-items:center;">
+                    <i class="fa-solid fa-arrow-left" style="font-size:24px; color:white; cursor:pointer;" onclick="closePlayer(event)"></i>
+                    <span id="player-title" style="font-weight:bold; font-size:18px;">Reproduciendo</span>
+                </div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:50px; cursor:pointer;" onclick="togglePlay(event)">
+                    <i class="fa-solid fa-pause" id="play-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-item" onclick="switchTab('mylist', this)"><i class="fa-solid fa-bookmark"></i>Mi Lista</div>
+        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+    </nav>
+
+    <div class="modal-overlay" id="qr-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('qr-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="text-align:center;">💎 Premium Mensual</h3>
+            <div style="text-align:center; color:#aaa; font-size:13px; margin-bottom:10px;">Escanea y paga <strong>S/ 15.00</strong></div>
+            <div class="qr-container"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" class="qr-img"></div>
+            <button class="btn-whatsapp" onclick="sendToWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Enviar Comprobante</button>
+            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+            <input type="text" id="activation-code" class="code-input" placeholder="CÓDIGO AQUÍ">
+            <button class="btn-redeem" onclick="redeemCode()">Activar</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="edit-profile-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('edit-profile-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Editar Perfil</h3>
+            <div class="avatar-grid">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-opt selected" onclick="selectAvatar(this)">
+                <img src="https://i.pinimg.com/564x/06/3a/0e/063a0e69d7b385e3f4e2c0420790422c.jpg" class="avatar-opt" onclick="selectAvatar(this)">
+                <img src="https://i.pinimg.com/564x/a4/64/07/a4640733d07e60155b1f3c50974e6457.jpg" class="avatar-opt" onclick="selectAvatar(this)">
+                <img src="https://i.pinimg.com/564x/5f/40/6a/5f406ab25e8942cbe0da6485afd26b71.jpg" class="avatar-opt" onclick="selectAvatar(this)">
+            </div>
+            <input type="text" id="edit-username" class="input-dark" placeholder="Nuevo nombre">
+            <button class="btn-redeem" onclick="saveProfileChanges()">Guardar Cambios</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('help-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Centro de Ayuda</h3>
+            <p style="color:#aaa; font-size:14px;">Contacta con soporte técnico si tienes problemas.</p>
+            <button class="btn-whatsapp" onclick="sendToWhatsApp()"><i class="fa-regular fa-envelope"></i> Contactar Soporte</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv", storageBucket: "flechazo-tv.firebasestorage.app", messagingSenderId: "382962164040", appId: "1:382962164040:web:6f24cad4108f824437137d" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const savedName = localStorage.getItem('flechazo_username') || user.email.split('@')[0];
+                document.getElementById('display-name').innerText = savedName;
+                document.getElementById('display-email').innerText = user.email;
+                const savedAvatar = localStorage.getItem('flechazo_avatar');
+                if(savedAvatar) document.getElementById('current-avatar').src = savedAvatar;
+                
+                if(localStorage.getItem('flechazo_premium')) {
+                    document.body.classList.add('premium-user');
+                    document.getElementById('sub-badge').innerText = "PREMIUM";
+                    document.getElementById('menu-sub-status').innerText = "ACTIVO";
+                }
+            } else { window.location.href = "index.html"; }
+        });
+        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(() => window.location.href="/"));
+    </script>
+
+    <script>
+        // --- 1. CONEXIÓN A TU API JSON ---
+        fetch('/api/contenido')
+            .then(res => res.json())
+            .then(apiData => {
+                // Carrusel
+                const feat = document.getElementById('featured-carousel');
+                apiData.featured.forEach((item, i) => {
+                    feat.innerHTML += `<div class="slide ${i===0?'active':''}"><img src="${item.img}"><div class="slide-overlay"><div style="font-size:22px; font-weight:800;">${item.title}</div><div class="btn-watch" onclick="openPlayer('${item.title}', '${item.video}')">Ver Ahora</div></div></div>`;
+                });
+
+                function fill(id, data) {
+                    const el = document.getElementById(id);
+                    if(el && data) data.forEach(item => el.innerHTML += `<div class="poster-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
+                }
+                fill('popular-list', apiData.popular);
+                fill('romance-list', apiData.romance);
+                fill('action-list', apiData.action);
+                fill('foryou-list', apiData.foryou);
+
+                // Grids
+                const grid1 = document.getElementById('mylist-grid');
+                if(apiData.mylist) apiData.mylist.forEach(item => grid1.innerHTML += `<div class="list-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
+                
+                const grid2 = document.getElementById('explore-grid');
+                const all = [...(apiData.popular||[]), ...(apiData.romance||[])];
+                all.forEach(item => grid2.innerHTML += `<div class="list-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
+            })
+            .catch(err => console.error(err));
+
+        // --- PLAYER ---
+        const player = document.getElementById('video-player-overlay');
+        const vid = document.getElementById('main-video');
+        const pTitle = document.getElementById('player-title');
+        
+        window.openPlayer = function(title, url) {
+            pTitle.innerText = title;
+            vid.src = url;
+            player.style.opacity = '1';
+            player.style.pointerEvents = 'all';
+            vid.play();
+        }
+        window.closePlayer = function(e) {
+            if(e) e.stopPropagation();
+            vid.pause();
+            player.style.opacity = '0';
+            player.style.pointerEvents = 'none';
+        }
+        window.togglePlay = function(e) {
+            e.stopPropagation();
+            if(vid.paused) { vid.play(); document.getElementById('play-icon').classList.replace('fa-play', 'fa-pause'); }
+            else { vid.pause(); document.getElementById('play-icon').classList.replace('fa-pause', 'fa-play'); }
+        }
+        window.toggleControls = function() {
+            const c = document.getElementById('controls-layer');
+            c.style.opacity = c.style.opacity === '0' ? '1' : '0';
+        }
+
+        // --- TABS & MODALS ---
+        window.switchTab = function(name, el) {
+            document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            el.classList.add('active');
+        }
+        window.openModal = function(id) { document.getElementById(id).classList.add('open'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); }
+
+        // --- PREMIUM ---
+        window.sendToWhatsApp = function() {
+            window.open(`https://wa.me/51999999999?text=Hola,%20adjunto%20comprobante`, '_blank');
+        }
+        window.redeemCode = function() {
+            const code = document.getElementById('activation-code').value.trim().toUpperCase();
+            if(["PREMIUM2025", "FLECHAZO1"].includes(code)) {
+                localStorage.setItem('flechazo_premium', 'true');
+                location.reload();
+            } else { alert("Código incorrecto"); }
+        }
+
+        // --- EDITAR PERFIL ---
+        let tempAvatar = "";
+        window.selectAvatar = function(el) {
+            document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            tempAvatar = el.src;
+        }
+        window.saveProfileChanges = function() {
+            const name = document.getElementById('edit-username').value;
+            if(name) { localStorage.setItem('flechazo_username', name); document.getElementById('display-name').innerText = name; }
+            if(tempAvatar) { localStorage.setItem('flechazo_avatar', tempAvatar); document.getElementById('current-avatar').src = tempAvatar; }
+            closeModal('edit-profile-modal');
+        }
+    </script>
+</body>
+</html>
