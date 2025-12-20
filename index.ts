@@ -3,7 +3,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 // IMPORTAMOS TUS RUTAS (Esto busca el archivo del paso 2)
-import misRutasApi from './src/routes/api.js'
+import get from './src/routes/get.js'
+import post from './src/routes/post.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -20,7 +21,8 @@ app.get('/favicon.ico', (req, res) => {
 
 // CONECTAR LAS RUTAS
 // Aquí decimos: "Cualquier ruta en api.js empieza con /api"
-app.use('/api', misRutasApi) 
+app.use('/get', get) 
+app.use('/post', post) 
 
 // RUTAS DE PÁGINAS (HTML)
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'src', 'index.html')))
