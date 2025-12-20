@@ -3,7 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 // IMPORTAMOS TUS RUTAS (Esto busca el archivo del paso 2)
-import apirest from './src/routes/apirest.js'
+import apirest from './src/routes/api.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
