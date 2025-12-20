@@ -3,202 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0f0f1a">
-    <title>Flechazo TV</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        :root { --bg-dark: #1a1a2e; --primary: #ff4b4b; --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa); --gold: #FFD700; --text: #fff; --card: #222230; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background: #0f0f1a; color: var(--text); padding-bottom: 90px; user-select: none; }
-        
-        /* UI Elements */
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.9); position: sticky; top: 0; z-index: 50; }
-        .poster-card { min-width: 120px; height: 180px; border-radius: 12px; overflow: hidden; background: #222; margin-right: 15px; position: relative; }
-        .poster-card img { width: 100%; height: 100%; object-fit: cover; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        .section-title { padding: 20px; font-weight: bold; font-size: 18px; }
-        
-        /* Profile & Premium */
-        .profile-card { background: var(--card); margin: 20px; border-radius: 20px; padding: 25px; text-align: center; position: relative; overflow: hidden; }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--card); object-fit: cover; }
-        .status-box { background: rgba(0,0,0,0.3); padding: 15px; margin-top: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Modal */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; }
-        .modal-overlay.open { display: flex; }
-        .modal-box { background: #151520; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
-        
-        /* QR Styles */
-        .qr-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .qr-tab { padding: 8px 20px; background: #222; border-radius: 20px; font-size: 12px; color: #aaa; cursor: pointer; }
-        .qr-tab.active { background: #8e2de2; color: white; }
-        .qr-display { margin: 10px auto; width: 220px; height: 280px; background: white; padding: 5px; border-radius: 10px; display: none; }
-        .qr-display.active { display: block; }
-        .qr-display img { width: 100%; height: 100%; object-fit: contain; } /* Ajuste para que se vea todo el QR */
-        
-        /* Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; border-top: 1px solid #333; }
-        .nav-item { text-align: center; color: #666; font-size: 10px; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Flechazo TV">
+    <meta name="theme-color" content="#050510">
 
-        .hidden { display: none; }
+    <title>Flechazo TV - Acceso</title>
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #ec407a;
+            --secondary: #ab47bc;
+            --bg: #050510;
+            --input-bg: #1c1c26;
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 10%, #1a1a40 0%, #000000 80%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Logo con animación suave */
+        .logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(236, 64, 122, 0.4));
+            margin-bottom: 10px;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #fff, #b3b3b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Inputs */
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 16px 16px 45px; /* Espacio para icono */
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 18px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(236, 64, 122, 0.15);
+            background: #23232e;
+        }
+
+        /* Icono de ver contraseña (Ojo) */
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Checkbox de Términos (Oculto por defecto) */
+        .terms-container {
+            display: none; /* Se activa con JS */
+            margin: 10px 0 20px 0;
+            font-size: 13px;
+            color: #aaa;
+            text-align: left;
+            padding-left: 5px;
+            align-items: center;
+        }
+        .terms-container input {
+            width: auto;
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+        .terms-container.active {
+            display: flex;
+        }
+
+        /* Botón Principal */
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(236, 64, 122, 0.3);
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-main:active { transform: scale(0.97); }
+        .btn-main:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* Loader Giratorio */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none; /* Oculto por defecto */
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Links inferiores */
+        .bottom-link {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #888;
+        }
+        .bottom-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Mensaje de error */
+        #error-box {
+            color: #ff4b4b;
+            font-size: 13px;
+            margin-top: 15px;
+            min-height: 18px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
     </style>
 </head>
 <body>
 
-    <div id="tab-home" class="screen">
-        <div class="header">
-            <h2 style="margin:0; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Flechazo TV</h2>
-            <i class="fa-regular fa-bell"></i>
-        </div>
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="Logo" class="logo">
         
-        <div class="section-title">🔥 Populares</div>
-        <div class="horizontal-scroll" id="content-list">
-            </div>
-        <br><br>
-    </div>
+        <h1 id="page-title">Bienvenido</h1>
+        <p class="subtitle" id="page-subtitle">Inicia sesión para continuar</p>
 
-    <div id="tab-profile" class="screen hidden">
-        <div class="profile-card">
-            <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar">
-            <h2 style="margin:10px 0;" id="user-email">Invitado</h2>
-            
-            <div class="status-box" id="sub-box">
-                <div style="text-align:left;">
-                    <div style="color:#aaa; font-size:10px;">ESTADO</div>
-                    <div style="font-weight:bold;" id="status-text">Gratuito</div>
-                </div>
-                <button id="btn-upgrade" onclick="openModal('premium-modal')" style="background:var(--gold); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; font-size:12px;">MEJORAR</button>
-            </div>
-            
-            <div style="margin-top:20px; text-align:left;">
-                <div style="padding:15px; border-bottom:1px solid #333;"><i class="fa-solid fa-download" style="margin-right:10px;"></i> Descargas</div>
-                <div style="padding:15px; border-bottom:1px solid #333;" onclick="location.reload()"><i class="fa-solid fa-power-off" style="margin-right:10px; color:red;"></i> Salir</div>
-            </div>
+        <div class="input-group">
+            <span class="material-icons-round input-icon">email</span>
+            <input type="email" id="email" placeholder="Correo electrónico" autocomplete="email">
+        </div>
+
+        <div class="input-group">
+            <span class="material-icons-round input-icon">lock</span>
+            <input type="password" id="password" placeholder="Contraseña">
+            <span class="material-icons-round toggle-password" onclick="togglePass()">visibility</span>
+        </div>
+
+        <label class="terms-container" id="terms-box">
+            <input type="checkbox" id="terms-check">
+            <span>Acepto los términos y condiciones</span>
+        </label>
+
+        <button class="btn-main" id="btn-action">
+            <div class="spinner" id="loading-spinner"></div>
+            <span id="btn-text">Iniciar Sesión</span>
+        </button>
+
+        <div id="error-box"></div>
+
+        <div class="bottom-link">
+            <span id="switch-text">¿No tienes cuenta?</span>
+            <a onclick="switchMode()" id="switch-link">Regístrate aquí</a>
         </div>
     </div>
-
-    <div class="modal-overlay" id="premium-modal">
-        <div class="modal-box">
-            <i class="fa-solid fa-xmark" onclick="closeModal('premium-modal')" style="position:absolute; top:15px; right:15px; font-size:20px;"></i>
-            <h2 style="color:var(--gold);">💎 Premium</h2>
-            <p style="font-size:13px; color:#ccc;">Escanea y paga S/ 15.00</p>
-
-            <div class="qr-tabs">
-                <div class="qr-tab active" onclick="switchQR('yape', this)">YAPE</div>
-                <div class="qr-tab" onclick="switchQR('plin', this)">OTROS</div>
-            </div>
-
-            <div id="qr-yape" class="qr-display active">
-                <img src="https://i.ibb.co/PGZndj1h/IMG-0316.jpg" alt="Yape QR">
-            </div>
-            <div id="qr-plin" class="qr-display">
-                <img src="https://i.ibb.co/k2wZZ7ZJ/IMG-0315.jpg" alt="Otro QR">
-            </div>
-
-            <div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
-                <p style="font-size:12px;">Sube tu comprobante:</p>
-                <input type="file" id="proof-file" accept="image/*" style="font-size:12px; width:100%;">
-                <button onclick="sendPayment()" id="btn-pay-send" style="width:100%; margin-top:10px; padding:12px; background:var(--gradient); border:none; border-radius:10px; color:white; font-weight:bold;">ENVIAR COMPROBANTE</button>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
-    </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv", storageBucket: "flechazo-tv.firebasestorage.app", messagingSenderId: "382962164040", appId: "1:382962164040:web:6f24cad4108f824437137d" };
+        // CONFIGURACIÓN FIREBASE
+        const firebaseConfig = {
+          apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ",
+          authDomain: "flechazo-tv.firebaseapp.com",
+          projectId: "flechazo-tv",
+          storageBucket: "flechazo-tv.firebasestorage.app",
+          messagingSenderId: "382962164040",
+          appId: "1:382962164040:web:6f24cad4108f824437137d",
+          measurementId: "G-2GZJT4Y983"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        let userUID = null; let userEmail = "";
 
-        // AUTH
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userUID = user.uid;
-                userEmail = user.email;
-                document.getElementById('user-email').innerText = user.email.split('@')[0];
-                listenStatus();
+        // Variables de estado
+        let isLoginMode = true;
+
+        // Elementos DOM
+        const title = document.getElementById('page-title');
+        const subtitle = document.getElementById('page-subtitle');
+        const btnAction = document.getElementById('btn-action');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('loading-spinner');
+        const termsBox = document.getElementById('terms-box');
+        const switchText = document.getElementById('switch-text');
+        const switchLink = document.getElementById('switch-link');
+        const errorBox = document.getElementById('error-box');
+        
+        // Función para ver/ocultar contraseña
+        window.togglePass = () => {
+            const passInput = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                icon.innerText = "visibility_off";
             } else {
-                // Modo demo si no hay login
-                document.getElementById('user-email').innerText = "Invitado";
+                passInput.type = "password";
+                icon.innerText = "visibility";
+            }
+        };
+
+        // Función para cambiar entre Login y Registro
+        window.switchMode = () => {
+            isLoginMode = !isLoginMode;
+            errorBox.style.opacity = '0'; // Limpiar errores
+
+            if (isLoginMode) {
+                // MODO LOGIN
+                title.innerText = "Bienvenido";
+                subtitle.innerText = "Inicia sesión para continuar";
+                btnText.innerText = "Iniciar Sesión";
+                switchText.innerText = "¿No tienes cuenta?";
+                switchLink.innerText = "Regístrate aquí";
+                termsBox.classList.remove('active');
+            } else {
+                // MODO REGISTRO
+                title.innerText = "Crear Cuenta";
+                subtitle.innerText = "Únete a Flechazo TV hoy";
+                btnText.innerText = "Registrarse";
+                switchText.innerText = "¿Ya tienes cuenta?";
+                switchLink.innerText = "Ingresa aquí";
+                termsBox.classList.add('active');
+            }
+        };
+
+        // FUNCIÓN PRINCIPAL DE AUTENTICACIÓN
+        btnAction.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const termsCheck = document.getElementById('terms-check');
+
+            // Validaciones básicas
+            if (!email || !password) {
+                showError("Por favor completa todos los campos.");
+                return;
+            }
+
+            if (!isLoginMode && !termsCheck.checked) {
+                showError("Debes aceptar los términos y condiciones.");
+                return;
+            }
+
+            // ACTIVAR ESTADO DE CARGA
+            setLoading(true);
+
+            try {
+                if (isLoginMode) {
+                    // --- LOGICA DE LOGIN ---
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // Login exitoso
+                    showError("¡Éxito! Redirigiendo...", false); // Mensaje verde
+                    setTimeout(() => {
+                        window.location.href = "/inicio"; // REDIRECCIÓN FINAL
+                    }, 1000);
+                } else {
+                    // --- LOGICA DE REGISTRO ---
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    // Registro exitoso
+                    showError("¡Cuenta creada! Entrando...", false);
+                    setTimeout(() => {
+                        window.location.href = "/inicio"; // REDIRECCIÓN FINAL
+                    }, 1500);
+                }
+
+            } catch (error) {
+                console.error(error);
+                setLoading(false); // Parar carga si hay error
+                
+                // Manejo de errores amigables
+                let msg = "Error desconocido.";
+                if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
+                if (error.code === 'auth/user-not-found') msg = "No existe una cuenta con este correo.";
+                if (error.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
+                if (error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado.";
+                if (error.code === 'auth/weak-password') msg = "La contraseña debe tener al menos 6 caracteres.";
+                
+                showError(msg);
             }
         });
 
-        // ENVIAR PAGO
-        window.sendPayment = async () => {
-            const file = document.getElementById('proof-file').files[0];
-            const btn = document.getElementById('btn-pay-send');
-            if(!file || !userUID) return alert("Sube una imagen o inicia sesión.");
-            
-            btn.innerText = "Enviando..."; btn.disabled = true;
-            try {
-                const sRef = ref(storage, `pagos/${userUID}_${Date.now()}`);
-                await uploadBytes(sRef, file);
-                const url = await getDownloadURL(sRef);
-                
-                await addDoc(collection(db, "solicitudes_pago"), {
-                    uid: userUID, email: userEmail, foto: url, fecha: new Date(), estado: "pendiente"
-                });
-                alert("¡Enviado! Espera nuestra confirmación.");
-                closeModal('premium-modal');
-            } catch(e) { alert("Error: " + e.message); }
-            btn.innerText = "ENVIAR COMPROBANTE"; btn.disabled = false;
+        // Utilidades visuales
+        function setLoading(isLoading) {
+            if (isLoading) {
+                spinner.style.display = 'block';
+                btnText.style.display = 'none';
+                btnAction.disabled = true;
+                errorBox.style.opacity = '0';
+            } else {
+                spinner.style.display = 'none';
+                btnText.style.display = 'block';
+                btnAction.disabled = false;
+            }
         }
 
-        // ESCUCHAR ESTADO
-        function listenStatus() {
-            const q = query(collection(db, "solicitudes_pago"), where("uid", "==", userUID), orderBy("fecha", "desc"));
-            onSnapshot(q, (snap) => {
-                if(!snap.empty) {
-                    const data = snap.docs[0].data();
-                    const txt = document.getElementById('status-text');
-                    const btn = document.getElementById('btn-upgrade');
-                    const box = document.getElementById('sub-box');
-
-                    if(data.estado === 'pendiente') {
-                        txt.innerText = "Verificando..."; txt.style.color = "orange"; btn.style.display="none";
-                    } else if(data.estado === 'aprobado') {
-                        txt.innerText = "PREMIUM ACTIVO"; txt.style.color = "#FFD700"; btn.style.display="none";
-                        box.style.border = "1px solid #FFD700";
-                    } else {
-                        txt.innerText = "Rechazado/Gratis"; txt.style.color = "white"; btn.style.display="block";
-                    }
-                }
-            });
+        function showError(msg, isError = true) {
+            errorBox.innerText = msg;
+            errorBox.style.color = isError ? '#ff4b4b' : '#4bff88'; // Rojo si error, Verde si éxito
+            errorBox.style.opacity = '1';
         }
-    </script>
-
-    <script>
-        // UI SIMPLE
-        const mockData = ["https://wallpapercave.com/wp/wp11899723.jpg", "https://wallpapercave.com/wp/wp8861445.jpg", "https://wallpapercave.com/wp/wp7642630.jpg"];
-        mockData.forEach(src => document.getElementById('content-list').innerHTML += `<div class="poster-card"><img src="${src}"></div>`);
-
-        window.switchTab = (id, el) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('tab-'+id).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        }
-        window.switchQR = (t, el) => {
-            document.querySelectorAll('.qr-tab').forEach(x => x.classList.remove('active')); el.classList.add('active');
-            document.querySelectorAll('.qr-display').forEach(x => x.classList.remove('active'));
-            document.getElementById('qr-'+t).classList.add('active');
-        }
-        window.openModal = (id) => document.getElementById(id).classList.add('open');
-        window.closeModal = (id) => document.getElementById(id).classList.remove('open');
     </script>
 </body>
 </html>
