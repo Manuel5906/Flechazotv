@@ -4,35 +4,49 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const router = Router()
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // ==========================================
-// RUTA GET: /api/contenido
+// 1. RUTA: Ver Contenido (JSON)
+// URL: http://localhost:3000/get/contenido
 // ==========================================
 router.get('/contenido', (req, res) => {
-  // OJO AQUÍ: Como este archivo está dentro de 'src/routes',
-  // tenemos que subir un nivel (..) para llegar a 'src/database'
   const dbPath = path.join(__dirname, '../database', 'contenido.json')
   
   fs.readFile(dbPath, 'utf8', (err, data) => {
     if (err) {
-      console.error(err)
-      return res.status(500).json({ error: 'Error al leer la base de datos' })
+      return res.status(500).json({ error: 'Error leyendo DB' })
     }
-    const jsonData = JSON.parse(data)
-    res.json(jsonData)
+    res.json(JSON.parse(data))
   })
 })
 
 // ==========================================
-// RUTA POST: /api/ia-predict (Tu futura IA)
+// 2. RUTA: Tu IA en versión GET
+// URL: http://localhost:3000/get/ia?dato=5
 // ==========================================
-router.post('/ia-predict', (req, res) => {
-    // Aquí pondremos la lógica de la IA más adelante
-    const { entrada } = req.body;
-    res.json({ mensaje: "IA recibió: " + entrada });
+router.get('/ia', (req, res) => {
+    // En GET, los datos no vienen en 'body', vienen en 'query'
+    // Ejemplo de uso: .../get/ia?dato=10
+    const { dato } = req.query;
+
+    if (!dato) {
+        return res.status(400).json({ 
+            error: "Falta el parámetro. Usa: /get/ia?dato=TU_NUMERO" 
+        })
+    }
+
+    // --- LÓGICA DE TU IA (Simulada) ---
+    // Digamos que tu red neuronal multiplica por 2.5
+    const resultado = parseFloat(dato) * 2.5;
+
+    res.json({
+        modo: "GET",
+        entrada: dato,
+        prediccion_ia: resultado,
+        mensaje: "Cálculo realizado exitosamente"
+    })
 })
 
 export default router
