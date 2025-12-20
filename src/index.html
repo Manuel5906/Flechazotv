@@ -1,1 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flechazo TV - Login</title>
+    <style>
+        /* --- ESTILOS VISUALES (CSS) --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #050510; /* Fondo muy oscuro */
+            /* Simulamos el fondo de luces de la imagen */
+            background-image: radial-gradient(circle at 20% 30%, #1a1a40 0%, #000000 60%),
+                              radial-gradient(circle at 80% 40%, #1a1a40 0%, #000000 60%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .login-container {
+            background-color: #0e0e12; /* Tarjeta oscura */
+            width: 100%;
+            max-width: 320px;
+            padding: 40px 30px;
+            border-radius: 40px; /* Bordes muy redondeados como la imagen */
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a2a;
+        }
+
+        /* Logotipo */
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            object-fit: contain;
+            /* Filtro para que brille un poco */
+            drop-shadow: 0 0 10px rgba(236, 64, 122, 0.5); 
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 10px 0 30px 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Campos de texto */
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+            background-color: #1c1c24; /* Gris oscuro */
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #ccc;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #ec407a; /* Color rosa al seleccionar */
+            color: white;
+        }
+
+        /* Botón Principal (Gradiente) */
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            /* El gradiente rosa/morado de la imagen */
+            background: linear-gradient(90deg, #ec407a, #ab47bc);
+            box-shadow: 0 4px 15px rgba(236, 64, 122, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Enlace Olvidé contraseña */
+        .forgot-pass {
+            display: block;
+            margin: 20px 0;
+            color: #888;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .forgot-pass:hover {
+            color: #fff;
+        }
+
+        /* Botón Secundario (Borde) */
+        .btn-outline {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid #444;
+            border-radius: 25px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+        }
+
+        /* Mensaje de error */
+        #error-msg {
+            color: #ff4b4b;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="Logo Flechazo TV" class="logo">
+        
+        <h1>Flechazo TV</h1>
+
+        <div class="input-group">
+            <input type="email" id="email" placeholder="Email" required>
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Contraseña" required>
+        </div>
+
+        <button class="btn-primary" id="btnLogin">Iniciar Sesión</button>
+        
+        <p id="error-msg">Error en credenciales</p>
+
+        <a href="#" class="forgot-pass">Olvidé mi contraseña</a>
+
+        <button class="btn-outline" id="btnRegister">Crear Cuenta</button>
+    </div>
+
+    <script type="module">
+        // 1. Importamos las funciones de Firebase desde la web (CDN)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 2. TU CONFIGURACIÓN DE FIREBASE
+        // ¡¡IMPORTANTE!!: Debes reemplazar esto con tus propios datos de la consola de Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ",
+          authDomain: "flechazo-tv.firebaseapp.com",
+          projectId: "flechazo-tv",
+          storageBucket: "flechazo-tv.firebasestorage.app",
+          messagingSenderId: "382962164040",
+          appId: "1:382962164040:web:6f24cad4108f824437137d",
+          measurementId: "G-2GZJT4Y983"
+        };
+
+        // 3. Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 4. Referencias a los elementos del HTML
+        const emailInput = document.getElementById('email');
+        const passInput = document.getElementById('password');
+        const btnLogin = document.getElementById('btnLogin');
+        const btnRegister = document.getElementById('btnRegister');
+        const errorMsg = document.getElementById('error-msg');
+
+        // 5. Función de INICIAR SESIÓN
+        btnLogin.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passInput.value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Login exitoso
+                    const user = userCredential.user;
+                    alert("¡Bienvenido a Flechazo TV! \nUsuario: " + user.email);
+                    // Aquí rediriges a la página principal:
+                    // window.location.href = "home.html";
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error(errorCode, errorMessage);
+                    
+                    // Mostrar error en pantalla
+                    errorMsg.style.display = "block";
+                    errorMsg.innerText = "Error: " + errorCode;
+                });
+        });
+
+        // 6. Función de CREAR CUENTA (Opcional, para el botón de abajo)
+        btnRegister.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passInput.value;
+
+            if(email && password) {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        alert("¡Cuenta creada exitosamente!");
+                    })
+                    .catch((error) => {
+                        alert("Error al crear cuenta: " + error.message);
+                    });
+            } else {
+                alert("Escribe un correo y contraseña para crear la cuenta.");
+            }
+        });
+
+    </script>
+</body>
+</html>
 
