@@ -55,8 +55,8 @@ app.get('/admin', (req, res) => {
 })
 
 // RUTA 4: About
-app.get('/about', function (req, res) {
-  res.sendFile(path.join(__dirname, 'src', 'components', 'about.htm'))
+app.get('/vip', function (req, res) {
+  res.sendFile(path.join(__dirname, 'src', 'vip.html'))
 })
 
 // ==========================================
