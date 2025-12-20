@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url'
 
 const router = Router()
 
-// Configuración de rutas
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -13,7 +12,8 @@ const __dirname = path.dirname(__filename)
 // RUTA GET: /api/contenido
 // ==========================================
 router.get('/contenido', (req, res) => {
-  // Buscamos el JSON en la carpeta database
+  // OJO AQUÍ: Como este archivo está dentro de 'src/routes',
+  // tenemos que subir un nivel (..) para llegar a 'src/database'
   const dbPath = path.join(__dirname, '../database', 'contenido.json')
   
   fs.readFile(dbPath, 'utf8', (err, data) => {
@@ -24,6 +24,15 @@ router.get('/contenido', (req, res) => {
     const jsonData = JSON.parse(data)
     res.json(jsonData)
   })
+})
+
+// ==========================================
+// RUTA POST: /api/ia-predict (Tu futura IA)
+// ==========================================
+router.post('/ia-predict', (req, res) => {
+    // Aquí pondremos la lógica de la IA más adelante
+    const { entrada } = req.body;
+    res.json({ mensaje: "IA recibió: " + entrada });
 })
 
 export default router
