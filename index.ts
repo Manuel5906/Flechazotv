@@ -21,7 +21,7 @@ app.get('/favicon.ico', (req, res) => {
 // ==========================================
 app.get('/api/contenido', (req, res) => {
   // Ruta al archivo JSON
-  const dbPath = path.join(__dirname, 'database', 'contenido.json')
+  const dbPath = path.join(__dirname, 'src/database', 'contenido.json')
   
   // Leemos el archivo
   fs.readFile(dbPath, 'utf8', (err, data) => {
