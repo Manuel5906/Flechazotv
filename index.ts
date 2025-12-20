@@ -7,17 +7,23 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-// 1. Configurar la carpeta 'src' como estática
-// Esto permite que el index.html cargue su CSS e imágenes correctamente.
-// NOTA: Si este archivo JS está en una subcarpeta (ej: /api), cambia la ruta a: path.join(__dirname, '..', 'src')
+// 1. Configuración de archivos estáticos
 app.use(express.static(path.join(__dirname, 'src')))
 
-// 2. Ruta Home - Servir index.html desde la carpeta src
+// --- TRUCO PARA EL LOGO (FAVICON) ---
+// Cuando el navegador busque el icono de la pestaña automáticamente,
+// lo redirigimos a tu imagen URL.
+app.get('/favicon.ico', (req, res) => {
+  res.redirect('https://i.ibb.co/v6GdVWRs/IMG-0113.png')
+})
+// -------------------------------------
+
+// 2. Ruta Home
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'index.html'))
 })
 
-// 3. Ruta About (Mantenida de tu código original)
+// 3. Ruta About
 app.get('/about', function (req, res) {
   res.sendFile(path.join(__dirname, '..', 'components', 'about.htm'))
 })
