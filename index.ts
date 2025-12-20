@@ -1,6 +1,6 @@
 import express from 'express'
 import path from 'path'
-import fs from 'fs' 
+import fs from 'fs'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -8,12 +8,9 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-// ==========================================
-// 1. CONFIGURACIÓN (LO QUE FALTABA: Middleware)
-// ==========================================
-// Esto permite que tu servidor entienda datos JSON si decides enviar cosas en el futuro
-app.use(express.json())
-app.use(express.static(path.join(__dirname, 'src')))
+// 1. CONFIGURACIÓN
+app.use(express.json()) // Para entender JSON si fuera necesario
+app.use(express.static(path.join(__dirname, 'src'))) // Carpeta pública
 
 // --- TRUCO DEL ICONO ---
 app.get('/favicon.ico', (req, res) => {
@@ -37,40 +34,40 @@ app.get('/api/contenido', (req, res) => {
 })
 
 // ==========================================
-// 3. RUTAS DE VISTAS (PÁGINAS)
+// 3. RUTAS (PÁGINAS)
 // ==========================================
 
-// Login (Raíz)
+// RUTA 1: Login (Raíz) -> index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'index.html'))
 })
 
-// Home / Inicio (App Principal)
+// RUTA 2: App Principal (Usuario) -> inicio.html
+// Aquí es donde está el reproductor y los pagos QR
 app.get('/inicio', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'inicio.html')) // Asegúrate que tu archivo se llame inicio.html o index.html según corresponda
+  res.sendFile(path.join(__dirname, 'src', 'inicio.html')) 
 })
 
-// About
-app.get('/about', function (req, res) {
-  res.sendFile(path.join(__dirname, 'src', 'components', 'about.htm')) // Ajusté la ruta para que sea más segura dentro de src
-})
-
-// ---> [AGREGADO] RUTA PARA EL ADMIN <---
-// Esta ruta sirve el archivo admin.html que te di antes
-app.get('/admin-panel', (req, res) => {
+// RUTA 3: Panel Admin -> admin.html (¡ESTO FALTABA!)
+// Aquí entras tú para aprobar los pagos
+app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'admin.html'))
 })
 
+// RUTA 4: About
+app.get('/about', function (req, res) {
+  res.sendFile(path.join(__dirname, 'src', 'components', 'about.htm'))
+})
 
 // ==========================================
-// 4. ARRANCAR EL SERVIDOR (LO QUE FALTABA)
+// 4. ARRANCAR SERVIDOR (¡ESTO FALTABA!)
 // ==========================================
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en: http://localhost:${PORT}`)
-  console.log(`📱 App: http://localhost:${PORT}/inicio`)
-  console.log(`👮 Admin: http://localhost:${PORT}/admin-panel`)
+  console.log(`🚀 Servidor listo!`)
+  console.log(`📱 App Usuarios: http://localhost:${PORT}/inicio`)
+  console.log(`👮 Panel Admin:  http://localhost:${PORT}/admin`)
 })
 
 export default app
