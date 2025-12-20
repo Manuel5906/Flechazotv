@@ -45,18 +45,18 @@
             text-align: center;
             position: relative;
             z-index: 2;
+            transition: all 0.3s ease;
         }
 
-        /* Logo con animación suave */
+        /* Logo */
         .logo {
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             object-fit: contain;
             filter: drop-shadow(0 0 20px rgba(236, 64, 122, 0.4));
             margin-bottom: 10px;
             animation: float 5s ease-in-out infinite;
         }
-
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
@@ -74,7 +74,8 @@
         p.subtitle {
             color: #888;
             font-size: 14px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            min-height: 20px;
         }
 
         /* Inputs */
@@ -82,6 +83,7 @@
             position: relative;
             margin-bottom: 16px;
             text-align: left;
+            transition: all 0.3s ease;
         }
 
         .input-icon {
@@ -95,7 +97,7 @@
 
         input {
             width: 100%;
-            padding: 16px 16px 16px 45px; /* Espacio para icono */
+            padding: 16px 16px 16px 45px;
             background: var(--input-bg);
             border: 1px solid #333;
             border-radius: 18px;
@@ -111,7 +113,6 @@
             background: #23232e;
         }
 
-        /* Icono de ver contraseña (Ojo) */
         .toggle-password {
             position: absolute;
             right: 15px;
@@ -122,10 +123,15 @@
             padding: 5px;
         }
 
-        /* Checkbox de Términos (Oculto por defecto) */
+        /* Elementos Ocultables (Para animaciones) */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Checkbox Términos */
         .terms-container {
-            display: none; /* Se activa con JS */
-            margin: 10px 0 20px 0;
+            display: none;
+            margin: 5px 0 20px 0;
             font-size: 13px;
             color: #aaa;
             text-align: left;
@@ -137,8 +143,17 @@
             margin-right: 10px;
             accent-color: var(--primary);
         }
-        .terms-container.active {
-            display: flex;
+
+        /* Link Olvidé Contraseña */
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            color: #888;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            cursor: pointer;
         }
 
         /* Botón Principal */
@@ -162,7 +177,7 @@
         .btn-main:active { transform: scale(0.97); }
         .btn-main:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* Loader Giratorio */
+        /* Loader */
         .spinner {
             width: 20px;
             height: 20px;
@@ -170,11 +185,11 @@
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Links inferiores */
+        /* Links Inferiores */
         .bottom-link {
             margin-top: 25px;
             font-size: 14px;
@@ -187,7 +202,6 @@
             cursor: pointer;
         }
 
-        /* Mensaje de error */
         #error-box {
             color: #ff4b4b;
             font-size: 13px;
@@ -211,11 +225,13 @@
             <input type="email" id="email" placeholder="Correo electrónico" autocomplete="email">
         </div>
 
-        <div class="input-group">
+        <div class="input-group" id="group-password">
             <span class="material-icons-round input-icon">lock</span>
             <input type="password" id="password" placeholder="Contraseña">
             <span class="material-icons-round toggle-password" onclick="togglePass()">visibility</span>
         </div>
+
+        <a class="forgot-link" id="link-forgot" onclick="setMode('recover')">¿Olvidaste tu contraseña?</a>
 
         <label class="terms-container" id="terms-box">
             <input type="checkbox" id="terms-check">
@@ -229,17 +245,21 @@
 
         <div id="error-box"></div>
 
-        <div class="bottom-link">
+        <div class="bottom-link" id="bottom-nav">
             <span id="switch-text">¿No tienes cuenta?</span>
-            <a onclick="switchMode()" id="switch-link">Regístrate aquí</a>
+            <a onclick="toggleLoginRegister()" id="switch-link">Regístrate aquí</a>
+        </div>
+        
+        <div class="bottom-link hidden" id="back-nav">
+            <a onclick="setMode('login')">Volver al Inicio de Sesión</a>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIGURACIÓN FIREBASE
+        // --- TU CONFIGURACIÓN ---
         const firebaseConfig = {
           apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ",
           authDomain: "flechazo-tv.firebaseapp.com",
@@ -253,130 +273,164 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Variables de estado
-        let isLoginMode = true;
+        // ESTADOS: 'login', 'register', 'recover'
+        let currentMode = 'login';
 
         // Elementos DOM
-        const title = document.getElementById('page-title');
-        const subtitle = document.getElementById('page-subtitle');
-        const btnAction = document.getElementById('btn-action');
-        const btnText = document.getElementById('btn-text');
-        const spinner = document.getElementById('loading-spinner');
-        const termsBox = document.getElementById('terms-box');
-        const switchText = document.getElementById('switch-text');
-        const switchLink = document.getElementById('switch-link');
-        const errorBox = document.getElementById('error-box');
-        
-        // Función para ver/ocultar contraseña
+        const els = {
+            title: document.getElementById('page-title'),
+            subtitle: document.getElementById('page-subtitle'),
+            btnAction: document.getElementById('btn-action'),
+            btnText: document.getElementById('btn-text'),
+            spinner: document.getElementById('loading-spinner'),
+            passGroup: document.getElementById('group-password'),
+            forgotLink: document.getElementById('link-forgot'),
+            termsBox: document.getElementById('terms-box'),
+            bottomNav: document.getElementById('bottom-nav'),
+            backNav: document.getElementById('back-nav'),
+            switchText: document.getElementById('switch-text'),
+            switchLink: document.getElementById('switch-link'),
+            errorBox: document.getElementById('error-box'),
+            email: document.getElementById('email'),
+            password: document.getElementById('password'),
+            termsCheck: document.getElementById('terms-check')
+        };
+
+        // Cambiar visibilidad de contraseña
         window.togglePass = () => {
-            const passInput = document.getElementById('password');
             const icon = document.querySelector('.toggle-password');
-            if (passInput.type === "password") {
-                passInput.type = "text";
+            if (els.password.type === "password") {
+                els.password.type = "text";
                 icon.innerText = "visibility_off";
             } else {
-                passInput.type = "password";
+                els.password.type = "password";
                 icon.innerText = "visibility";
             }
         };
 
-        // Función para cambiar entre Login y Registro
-        window.switchMode = () => {
-            isLoginMode = !isLoginMode;
-            errorBox.style.opacity = '0'; // Limpiar errores
+        // Alternar Login/Registro
+        window.toggleLoginRegister = () => {
+            setMode(currentMode === 'login' ? 'register' : 'login');
+        };
 
-            if (isLoginMode) {
-                // MODO LOGIN
-                title.innerText = "Bienvenido";
-                subtitle.innerText = "Inicia sesión para continuar";
-                btnText.innerText = "Iniciar Sesión";
-                switchText.innerText = "¿No tienes cuenta?";
-                switchLink.innerText = "Regístrate aquí";
-                termsBox.classList.remove('active');
-            } else {
-                // MODO REGISTRO
-                title.innerText = "Crear Cuenta";
-                subtitle.innerText = "Únete a Flechazo TV hoy";
-                btnText.innerText = "Registrarse";
-                switchText.innerText = "¿Ya tienes cuenta?";
-                switchLink.innerText = "Ingresa aquí";
-                termsBox.classList.add('active');
+        // GESTOR DE ESTADOS (La magia visual)
+        window.setMode = (mode) => {
+            currentMode = mode;
+            els.errorBox.style.opacity = '0'; // Limpiar errores
+
+            // Resetear visibilidad por defecto
+            els.passGroup.classList.remove('hidden');
+            els.forgotLink.style.display = 'none';
+            els.termsBox.style.display = 'none';
+            els.bottomNav.classList.remove('hidden');
+            els.backNav.classList.add('hidden');
+
+            if (mode === 'login') {
+                els.title.innerText = "Bienvenido";
+                els.subtitle.innerText = "Inicia sesión para continuar";
+                els.btnText.innerText = "Iniciar Sesión";
+                els.switchText.innerText = "¿No tienes cuenta?";
+                els.switchLink.innerText = "Regístrate aquí";
+                els.forgotLink.style.display = 'block'; // Mostrar "¿Olvidaste?"
+            
+            } else if (mode === 'register') {
+                els.title.innerText = "Crear Cuenta";
+                els.subtitle.innerText = "Únete a Flechazo TV hoy";
+                els.btnText.innerText = "Registrarse";
+                els.switchText.innerText = "¿Ya tienes cuenta?";
+                els.switchLink.innerText = "Ingresa aquí";
+                els.termsBox.style.display = 'flex'; // Mostrar "La cosa" (Checkbox)
+
+            } else if (mode === 'recover') {
+                els.title.innerText = "Recuperar";
+                els.subtitle.innerText = "Te enviaremos un enlace a tu correo";
+                els.btnText.innerText = "Enviar Correo";
+                els.passGroup.classList.add('hidden'); // Ocultar password
+                els.bottomNav.classList.add('hidden'); // Ocultar switch login/register
+                els.backNav.classList.remove('hidden'); // Mostrar botón volver
             }
         };
 
-        // FUNCIÓN PRINCIPAL DE AUTENTICACIÓN
-        btnAction.addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const termsCheck = document.getElementById('terms-check');
+        // ACCIÓN DEL BOTÓN PRINCIPAL
+        els.btnAction.addEventListener('click', async () => {
+            const email = els.email.value;
+            const password = els.password.value;
 
-            // Validaciones básicas
-            if (!email || !password) {
-                showError("Por favor completa todos los campos.");
+            // Validación solo Email (para Recuperar)
+            if (!email) {
+                showError("Por favor escribe tu correo electrónico.");
                 return;
             }
 
-            if (!isLoginMode && !termsCheck.checked) {
+            // Validación Password (para Login/Register)
+            if (currentMode !== 'recover' && !password) {
+                showError("Por favor escribe tu contraseña.");
+                return;
+            }
+
+            // Validación Términos (Solo Register)
+            if (currentMode === 'register' && !els.termsCheck.checked) {
                 showError("Debes aceptar los términos y condiciones.");
                 return;
             }
 
-            // ACTIVAR ESTADO DE CARGA
             setLoading(true);
 
             try {
-                if (isLoginMode) {
-                    // --- LOGICA DE LOGIN ---
+                if (currentMode === 'login') {
+                    // LOGIN
                     await signInWithEmailAndPassword(auth, email, password);
-                    // Login exitoso
-                    showError("¡Éxito! Redirigiendo...", false); // Mensaje verde
-                    setTimeout(() => {
-                        window.location.href = "/inicio"; // REDIRECCIÓN FINAL
-                    }, 1000);
-                } else {
-                    // --- LOGICA DE REGISTRO ---
+                    showError("¡Bienvenido! Redirigiendo...", false);
+                    setTimeout(() => window.location.href = "/inicio", 1000);
+
+                } else if (currentMode === 'register') {
+                    // REGISTRO
                     await createUserWithEmailAndPassword(auth, email, password);
-                    // Registro exitoso
                     showError("¡Cuenta creada! Entrando...", false);
-                    setTimeout(() => {
-                        window.location.href = "/inicio"; // REDIRECCIÓN FINAL
-                    }, 1500);
+                    setTimeout(() => window.location.href = "/inicio", 1500);
+
+                } else if (currentMode === 'recover') {
+                    // RECUPERACIÓN
+                    await sendPasswordResetEmail(auth, email);
+                    showError("¡Correo enviado! Revisa tu bandeja.", false);
+                    // Volver al login después de 3 segundos
+                    setTimeout(() => setMode('login'), 3000);
                 }
 
             } catch (error) {
                 console.error(error);
-                setLoading(false); // Parar carga si hay error
+                setLoading(false);
+                let msg = "Ocurrió un error.";
                 
-                // Manejo de errores amigables
-                let msg = "Error desconocido.";
-                if (error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
-                if (error.code === 'auth/user-not-found') msg = "No existe una cuenta con este correo.";
-                if (error.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
-                if (error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado.";
-                if (error.code === 'auth/weak-password') msg = "La contraseña debe tener al menos 6 caracteres.";
+                // Errores comunes traducidos
+                if(error.code === 'auth/invalid-email') msg = "El correo no es válido.";
+                if(error.code === 'auth/user-not-found') msg = "Usuario no encontrado.";
+                if(error.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
+                if(error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
+                if(error.code === 'auth/weak-password') msg = "La contraseña es muy débil.";
                 
                 showError(msg);
             }
         });
 
-        // Utilidades visuales
+        // Utilidades
         function setLoading(isLoading) {
             if (isLoading) {
-                spinner.style.display = 'block';
-                btnText.style.display = 'none';
-                btnAction.disabled = true;
-                errorBox.style.opacity = '0';
+                els.spinner.style.display = 'block';
+                els.btnText.style.display = 'none';
+                els.btnAction.disabled = true;
+                els.errorBox.style.opacity = '0';
             } else {
-                spinner.style.display = 'none';
-                btnText.style.display = 'block';
-                btnAction.disabled = false;
+                els.spinner.style.display = 'none';
+                els.btnText.style.display = 'block';
+                els.btnAction.disabled = false;
             }
         }
 
         function showError(msg, isError = true) {
-            errorBox.innerText = msg;
-            errorBox.style.color = isError ? '#ff4b4b' : '#4bff88'; // Rojo si error, Verde si éxito
-            errorBox.style.opacity = '1';
+            els.errorBox.innerText = msg;
+            els.errorBox.style.color = isError ? '#ff4b4b' : '#4bff88';
+            els.errorBox.style.opacity = '1';
         }
     </script>
 </body>
