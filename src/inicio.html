@@ -5,348 +5,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
-
-    <title>Flechazo TV Pro</title>
+    <title>Flechazo TV</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        :root {
-            --bg-dark: #1a1a2e;
-            --bg-darker: #0f0f1a;
-            --primary: #ff4b4b;
-            --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
-            --gold-gradient: linear-gradient(45deg, #FFD700, #FFA500);
-            --text: #ffffff;
-            --card-bg: #222230;
-        }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(to bottom, var(--bg-dark), var(--bg-darker)); color: var(--text); padding-bottom: 90px; padding-top: env(safe-area-inset-top); min-height: 100vh; user-select: none; overflow-x: hidden; }
-
-        /* UTILIDADES */
-        .hidden { display: none !important; }
-        .tab-screen { display: none; animation: fadeIn 0.3s ease; }
-        .tab-screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
-        .header-logo { width: 35px; height: 35px; }
-        .header-title { font-size: 22px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* COMPONENTS */
-        .poster-card { min-width: 120px; height: 180px; border-radius: 12px; overflow: hidden; background: #222; position: relative; cursor: pointer; margin-right: 15px; }
+        :root { --bg-dark: #1a1a2e; --primary: #ff4b4b; --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa); --gold: #FFD700; --text: #fff; --card: #222230; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background: #0f0f1a; color: var(--text); padding-bottom: 90px; user-select: none; }
+        
+        /* UI Elements */
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.9); position: sticky; top: 0; z-index: 50; }
+        .poster-card { min-width: 120px; height: 180px; border-radius: 12px; overflow: hidden; background: #222; margin-right: 15px; position: relative; }
         .poster-card img { width: 100%; height: 100%; object-fit: cover; }
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        .horizontal-scroll::-webkit-scrollbar { display: none; }
+        .section-title { padding: 20px; font-weight: bold; font-size: 18px; }
         
-        .featured-container { position: relative; margin: 10px 20px 25px 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); aspect-ratio: 16/9; }
-        .slide { display: none; width: 100%; height: 100%; }
-        .slide.active { display: block; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
-        .slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0f0f1a, transparent); padding: 20px; }
-        .section-title { padding: 0 20px; margin: 30px 0 15px 0; font-weight: 700; font-size: 17px; display: flex; justify-content: space-between; }
-
-        /* EXPLORAR */
-        .search-container { padding: 10px 20px; position: sticky; top: 0; z-index: 40; background: var(--bg-dark); }
-        .search-box { background: #2a2a3a; padding: 12px 15px; border-radius: 15px; display: flex; align-items: center; gap: 10px; }
-        .search-box input { background: transparent; border: none; color: white; width: 100%; font-size: 15px; }
-        .tags-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; scrollbar-width: none; }
-        .tag-chip { padding: 8px 18px; background: #2a2a3a; border-radius: 20px; font-size: 13px; color: #ccc; white-space: nowrap; border: 1px solid transparent; }
-        .tag-chip.active { background: rgba(255, 75, 75, 0.15); color: var(--primary); border-color: var(--primary); font-weight: bold; }
-        .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px; }
-        .explore-item { aspect-ratio: 2/3; background: #333; border-radius: 8px; overflow: hidden; position: relative; }
-        .explore-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* PERFIL (CORREGIDO) */
-        .profile-card { background: var(--card-bg); margin: 20px; border-radius: 20px; padding: 25px; text-align: center; position: relative; overflow: hidden; }
-        .profile-card::before { content:''; position: absolute; top:0; left:0; width: 100%; height: 80px; background: var(--gradient); opacity: 0.2; }
-        .avatar-wrapper { position: relative; display: inline-block; margin-top: 10px; cursor: pointer; }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--card-bg); object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .edit-icon { position: absolute; bottom: 0; right: 0; background: #333; padding: 6px; border-radius: 50%; border: 2px solid #222230; font-size: 12px; color: white; }
+        /* Profile & Premium */
+        .profile-card { background: var(--card); margin: 20px; border-radius: 20px; padding: 25px; text-align: center; position: relative; overflow: hidden; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--card); object-fit: cover; }
+        .status-box { background: rgba(0,0,0,0.3); padding: 15px; margin-top: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        .sub-status-box { background: rgba(0,0,0,0.3); padding: 15px; margin-top: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .menu-list { margin: 0 20px; }
-        .menu-row { display: flex; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .menu-row i { width: 35px; color: #888; font-size: 18px; }
-
-        /* MODALES */
+        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; }
         .modal-overlay.open { display: flex; }
-        .modal-box { background: #222; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #888; font-size: 20px; }
+        .modal-box { background: #151520; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
         
-        /* Avatar Grid */
-        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
-        .avatar-opt { width: 100%; border-radius: 50%; border: 2px solid transparent; opacity: 0.5; }
-        .avatar-opt.selected { border-color: var(--primary); opacity: 1; }
-        .input-dark { width: 100%; padding: 12px; background: #333; border: 1px solid #444; border-radius: 10px; color: white; margin-bottom: 15px; }
-
-        /* REPRODUCTOR */
-        #video-player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; opacity: 0; pointer-events: none; transition: 0.3s; flex-direction: column; justify-content: center; }
-        #video-player-overlay.active { opacity: 1; pointer-events: all; }
-        .video-container { width: 100%; position: relative; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: black; }
-        video { width: 100%; }
-        .controls-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.3s; }
-        .controls-layer.fade-out { opacity: 0; pointer-events: none; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; }
+        /* QR Styles */
+        .qr-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .qr-tab { padding: 8px 20px; background: #222; border-radius: 20px; font-size: 12px; color: #aaa; cursor: pointer; }
+        .qr-tab.active { background: #8e2de2; color: white; }
+        .qr-display { margin: 10px auto; width: 220px; height: 280px; background: white; padding: 5px; border-radius: 10px; display: none; }
+        .qr-display.active { display: block; }
+        .qr-display img { width: 100%; height: 100%; object-fit: contain; } /* Ajuste para que se vea todo el QR */
+        
+        /* Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; border-top: 1px solid #333; }
         .nav-item { text-align: center; color: #666; font-size: 10px; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="tab-home" class="tab-screen active">
-        <header class="header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" class="header-logo">
-                <span class="header-title">Flechazo TV</span>
+    <div id="tab-home" class="screen">
+        <div class="header">
+            <h2 style="margin:0; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Flechazo TV</h2>
+            <i class="fa-regular fa-bell"></i>
+        </div>
+        
+        <div class="section-title">🔥 Populares</div>
+        <div class="horizontal-scroll" id="content-list">
             </div>
-            <i class="fa-regular fa-bell" style="font-size:20px;"></i>
-        </header>
-
-        <div id="featured-carousel" class="featured-container"></div>
-        
-        <div class="section-title"><span>🔥 Tendencias</span></div>
-        <div id="popular-list" class="horizontal-scroll"></div>
-        
-        <div class="section-title"><span>❤️ Romance Asiático</span></div>
-        <div id="romance-list" class="horizontal-scroll"></div>
-        <br><br><br>
+        <br><br>
     </div>
 
-    <div id="tab-explore" class="tab-screen">
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#777;"></i>
-                <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filterExplore()">
-            </div>
-        </div>
-        <div class="tags-scroll">
-            <div class="tag-chip active" onclick="filterTag('todos', this)">Todos</div>
-            <div class="tag-chip" onclick="filterTag('accion', this)">Acción</div>
-            <div class="tag-chip" onclick="filterTag('romance', this)">Romance</div>
-        </div>
-        <div id="explore-grid" class="explore-grid" style="margin-top:10px;"></div>
-        <br><br><br>
-    </div>
-
-    <div id="tab-profile" class="tab-screen">
+    <div id="tab-profile" class="screen hidden">
         <div class="profile-card">
-            <div class="avatar-wrapper" onclick="openModal('edit-profile-modal')">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar" id="current-avatar">
-                <div class="edit-icon"><i class="fa-solid fa-pencil"></i></div>
-            </div>
-            <h2 style="margin:10px 0 5px 0;" id="display-name">Cargando...</h2>
-            <p style="margin:0; color:#888; font-size:13px;" id="display-email">...</p>
-
-            <div class="sub-status-box" id="sub-box">
+            <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar">
+            <h2 style="margin:10px 0;" id="user-email">Invitado</h2>
+            
+            <div class="status-box" id="sub-box">
                 <div style="text-align:left;">
-                    <div style="color:#aaa; font-size:12px;">PLAN ACTUAL</div>
-                    <div style="font-weight:bold; color:white;">Gratuito</div>
+                    <div style="color:#aaa; font-size:10px;">ESTADO</div>
+                    <div style="font-weight:bold;" id="status-text">Gratuito</div>
                 </div>
-                <button onclick="openModal('premium-modal')" style="background:var(--gold-gradient); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; font-size:12px; color:black;">MEJORAR</button>
+                <button id="btn-upgrade" onclick="openModal('premium-modal')" style="background:var(--gold); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; font-size:12px;">MEJORAR</button>
             </div>
-        </div>
-
-        <div class="menu-list">
-            <div class="menu-row" onclick="openModal('edit-profile-modal')">
-                <i class="fa-regular fa-user"></i>
-                <span>Editar Perfil</span>
+            
+            <div style="margin-top:20px; text-align:left;">
+                <div style="padding:15px; border-bottom:1px solid #333;"><i class="fa-solid fa-download" style="margin-right:10px;"></i> Descargas</div>
+                <div style="padding:15px; border-bottom:1px solid #333;" onclick="location.reload()"><i class="fa-solid fa-power-off" style="margin-right:10px; color:red;"></i> Salir</div>
             </div>
-            <div class="menu-row">
-                <i class="fa-solid fa-download"></i>
-                <span>Descargas</span>
-            </div>
-            <div class="menu-row" id="btnLogout">
-                <i class="fa-solid fa-power-off" style="color:var(--primary);"></i>
-                <span style="color:var(--primary);">Cerrar Sesión</span>
-            </div>
-        </div>
-        <br><br><br>
-    </div>
-
-    <div id="video-player-overlay">
-        <div class="video-container" id="video-wrapper">
-            <video id="main-video" playsinline></video>
-            <div class="controls-layer" id="controls-layer" onclick="toggleControls()">
-                <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-                    <i class="fa-solid fa-chevron-down" style="font-size:24px; color:white;" onclick="closePlayer(event)"></i>
-                    <span id="player-title" style="font-weight:bold;">Reproduciendo</span>
-                    <i class="fa-solid fa-sliders"></i>
-                </div>
-                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:50px;" onclick="togglePlay(event)">
-                    <i class="fa-solid fa-play" id="play-icon"></i>
-                </div>
-                <div style="padding:20px;">
-                    <input type="range" id="seek-bar" value="0" style="width:100%;">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="edit-profile-modal">
-        <div class="modal-box">
-            <button class="close-btn" onclick="closeModal('edit-profile-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h3>Editar Perfil</h3>
-            <div class="avatar-grid">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/06/3a/0e/063a0e69d7b385e3f4e2c0420790422c.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/a4/64/07/a4640733d07e60155b1f3c50974e6457.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/5f/40/6a/5f406ab25e8942cbe0da6485afd26b71.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-            </div>
-            <input type="text" id="edit-username" class="input-dark" placeholder="Nuevo nombre de usuario">
-            <button onclick="saveProfileChanges()" style="background:var(--primary); width:100%; padding:12px; border:none; border-radius:12px; color:white; font-weight:bold;">Guardar Cambios</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="premium-modal">
         <div class="modal-box">
-            <button class="close-btn" onclick="closeModal('premium-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2 style="color:#FFD700;">💎 Premium</h2>
-            <p style="color:#ccc;">Desbloquea contenido exclusivo.</p>
-            <button onclick="activatePremium()" style="background:var(--gradient); width:100%; padding:12px; border:none; border-radius:12px; color:white; font-weight:bold;">Activar 30 Días</button>
+            <i class="fa-solid fa-xmark" onclick="closeModal('premium-modal')" style="position:absolute; top:15px; right:15px; font-size:20px;"></i>
+            <h2 style="color:var(--gold);">💎 Premium</h2>
+            <p style="font-size:13px; color:#ccc;">Escanea y paga S/ 15.00</p>
+
+            <div class="qr-tabs">
+                <div class="qr-tab active" onclick="switchQR('yape', this)">YAPE</div>
+                <div class="qr-tab" onclick="switchQR('plin', this)">OTROS</div>
+            </div>
+
+            <div id="qr-yape" class="qr-display active">
+                <img src="https://i.ibb.co/PGZndj1h/IMG-0316.jpg" alt="Yape QR">
+            </div>
+            <div id="qr-plin" class="qr-display">
+                <img src="https://i.ibb.co/k2wZZ7ZJ/IMG-0315.jpg" alt="Otro QR">
+            </div>
+
+            <div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
+                <p style="font-size:12px;">Sube tu comprobante:</p>
+                <input type="file" id="proof-file" accept="image/*" style="font-size:12px; width:100%;">
+                <button onclick="sendPayment()" id="btn-pay-send" style="width:100%; margin-top:10px; padding:12px; background:var(--gradient); border:none; border-radius:10px; color:white; font-weight:bold;">ENVIAR COMPROBANTE</button>
+            </div>
         </div>
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
         <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // TU CONFIGURACIÓN ORIGINAL
         const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv", storageBucket: "flechazo-tv.firebasestorage.app", messagingSenderId: "382962164040", appId: "1:382962164040:web:6f24cad4108f824437137d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        let userUID = null; let userEmail = "";
 
-        // 1. ESCUCHADOR DE USUARIO (Lógica recuperada)
+        // AUTH
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Cargar datos guardados
-                const savedName = localStorage.getItem('flechazo_username') || user.email.split('@')[0];
-                const savedAvatar = localStorage.getItem('flechazo_avatar');
-                
-                document.getElementById('display-name').innerText = savedName;
-                document.getElementById('display-email').innerText = user.email;
-                if(savedAvatar) document.getElementById('current-avatar').src = savedAvatar;
-
-                // Verificar Premium
-                checkPremium();
-            } else { 
-                // Si no hay usuario, enviar al login (index.html)
-                // window.location.href = "index.html"; 
-                document.getElementById('display-name').innerText = "Modo Demo"; 
+                userUID = user.uid;
+                userEmail = user.email;
+                document.getElementById('user-email').innerText = user.email.split('@')[0];
+                listenStatus();
+            } else {
+                // Modo demo si no hay login
+                document.getElementById('user-email').innerText = "Invitado";
             }
         });
 
-        // Cerrar sesión
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href="/");
-        });
+        // ENVIAR PAGO
+        window.sendPayment = async () => {
+            const file = document.getElementById('proof-file').files[0];
+            const btn = document.getElementById('btn-pay-send');
+            if(!file || !userUID) return alert("Sube una imagen o inicia sesión.");
+            
+            btn.innerText = "Enviando..."; btn.disabled = true;
+            try {
+                const sRef = ref(storage, `pagos/${userUID}_${Date.now()}`);
+                await uploadBytes(sRef, file);
+                const url = await getDownloadURL(sRef);
+                
+                await addDoc(collection(db, "solicitudes_pago"), {
+                    uid: userUID, email: userEmail, foto: url, fecha: new Date(), estado: "pendiente"
+                });
+                alert("¡Enviado! Espera nuestra confirmación.");
+                closeModal('premium-modal');
+            } catch(e) { alert("Error: " + e.message); }
+            btn.innerText = "ENVIAR COMPROBANTE"; btn.disabled = false;
+        }
 
-        window.authInstance = auth; // Exponer para debug
+        // ESCUCHAR ESTADO
+        function listenStatus() {
+            const q = query(collection(db, "solicitudes_pago"), where("uid", "==", userUID), orderBy("fecha", "desc"));
+            onSnapshot(q, (snap) => {
+                if(!snap.empty) {
+                    const data = snap.docs[0].data();
+                    const txt = document.getElementById('status-text');
+                    const btn = document.getElementById('btn-upgrade');
+                    const box = document.getElementById('sub-box');
+
+                    if(data.estado === 'pendiente') {
+                        txt.innerText = "Verificando..."; txt.style.color = "orange"; btn.style.display="none";
+                    } else if(data.estado === 'aprobado') {
+                        txt.innerText = "PREMIUM ACTIVO"; txt.style.color = "#FFD700"; btn.style.display="none";
+                        box.style.border = "1px solid #FFD700";
+                    } else {
+                        txt.innerText = "Rechazado/Gratis"; txt.style.color = "white"; btn.style.display="block";
+                    }
+                }
+            });
+        }
     </script>
 
     <script>
-        // --- DATA DE EJEMPLO ---
-        const db = {
-            featured: [{ title: "El Juego del Calamar", img: "https://wallpapers.com/images/hd/squid-game-poster-computer-fqn940j0d70s4m0l.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }],
-            list: [
-                { title: "Propuesta Laboral", cat:"romance", img: "https://i.pinimg.com/564x/44/7f/05/447f05021e06f160455799a98a004664.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
-                { title: "Vincenzo", cat:"accion", img: "https://i.pinimg.com/736x/87/00/62/8700624021798679b33a7894301a24d5.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" },
-                { title: "True Beauty", cat:"romance", img: "https://i.pinimg.com/564x/72/06/15/7206152431742461944520265780521e.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" }
-            ]
-        };
+        // UI SIMPLE
+        const mockData = ["https://wallpapercave.com/wp/wp11899723.jpg", "https://wallpapercave.com/wp/wp8861445.jpg", "https://wallpapercave.com/wp/wp7642630.jpg"];
+        mockData.forEach(src => document.getElementById('content-list').innerHTML += `<div class="poster-card"><img src="${src}"></div>`);
 
-        // --- INICIALIZAR UI ---
-        const feat = document.getElementById('featured-carousel');
-        db.featured.forEach(i => feat.innerHTML += `<div class="slide active"><img src="${i.img}"><div class="slide-overlay"><div style="font-size:20px; font-weight:800;">${i.title}</div><button class="btn-watch" onclick="openPlayer('${i.title}','${i.video}')" style="background:var(--primary); border:none; color:white; padding:5px 15px; border-radius:15px; margin-top:5px;">Ver</button></div></div>`);
-
-        const pop = document.getElementById('popular-list');
-        const rom = document.getElementById('romance-list');
-        const exp = document.getElementById('explore-grid');
-
-        db.list.forEach(v => {
-            const card = `<div class="poster-card" onclick="openPlayer('${v.title}','${v.video}')"><img src="${v.img}"></div>`;
-            pop.innerHTML += card;
-            if(v.cat === 'romance') rom.innerHTML += card;
-            exp.innerHTML += `<div class="explore-item" data-cat="${v.cat}" data-title="${v.title.toLowerCase()}" onclick="openPlayer('${v.title}','${v.video}')"><img src="${v.img}"></div>`;
-        });
-
-        // --- FUNCIONES PERFIL (RECUPERADAS) ---
-        let tempAvatar = "";
-        window.selectAvatar = function(el) {
-            document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
-            el.classList.add('selected');
-            tempAvatar = el.src;
-        }
-
-        window.saveProfileChanges = function() {
-            const name = document.getElementById('edit-username').value;
-            if(name) { 
-                localStorage.setItem('flechazo_username', name); 
-                document.getElementById('display-name').innerText = name; 
-            }
-            if(tempAvatar) { 
-                localStorage.setItem('flechazo_avatar', tempAvatar); 
-                document.getElementById('current-avatar').src = tempAvatar; 
-            }
-            closeModal('edit-profile-modal');
-        }
-
-        // --- PREMIUM EXPIRE LOGIC ---
-        window.activatePremium = function() {
-            const date = new Date();
-            date.setDate(date.getDate() + 30); // +30 Días
-            localStorage.setItem('premium_expire', date);
-            closeModal('premium-modal');
-            checkPremium();
-        }
-
-        window.checkPremium = function() {
-            const exp = localStorage.getItem('premium_expire');
-            const box = document.getElementById('sub-box');
-            if(exp) {
-                const left = Math.ceil((new Date(exp) - new Date()) / (86400000));
-                if(left > 0) {
-                    box.innerHTML = `<div style="text-align:left;"><div style="color:#FFD700; font-size:11px;">PREMIUM ACTIVO</div><div style="font-weight:bold; font-size:18px;">${left} Días Restantes</div></div><i class="fa-solid fa-crown" style="color:#FFD700; font-size:24px;"></i>`;
-                    box.style.background = "linear-gradient(45deg, rgba(255,215,0,0.2), rgba(0,0,0,0.6))";
-                    box.style.border = "1px solid #FFD700";
-                } else { localStorage.removeItem('premium_expire'); }
-            }
-        }
-
-        // --- TABS & PLAYER ---
-        window.switchTab = (n,e) => {
-            document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
+        window.switchTab = (id, el) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('tab-'+id).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('tab-'+n).classList.add('active');
-            e.classList.add('active');
+            el.classList.add('active');
+        }
+        window.switchQR = (t, el) => {
+            document.querySelectorAll('.qr-tab').forEach(x => x.classList.remove('active')); el.classList.add('active');
+            document.querySelectorAll('.qr-display').forEach(x => x.classList.remove('active'));
+            document.getElementById('qr-'+t).classList.add('active');
         }
         window.openModal = (id) => document.getElementById(id).classList.add('open');
         window.closeModal = (id) => document.getElementById(id).classList.remove('open');
-        
-        // Player simple
-        const pl = document.getElementById('video-player-overlay');
-        const vi = document.getElementById('main-video');
-        window.openPlayer = (t,u) => { document.getElementById('player-title').innerText=t; vi.src=u; pl.classList.add('active'); vi.play(); }
-        window.closePlayer = (e) => { e.stopPropagation(); vi.pause(); pl.classList.remove('active'); }
-        window.togglePlay = (e) => { e.stopPropagation(); vi.paused ? vi.play() : vi.pause(); }
-        
-        // Explorar Filter
-        window.filterExplore = () => {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('.explore-item').forEach(i => i.style.display = i.dataset.title.includes(q) ? 'block' : 'none');
-        }
-        window.filterTag = (c,e) => {
-            document.querySelectorAll('.tag-chip').forEach(t=>t.classList.remove('active')); e.classList.add('active');
-            document.querySelectorAll('.explore-item').forEach(i => i.style.display = (c==='todos'||i.dataset.cat===c)?'block':'none');
-        }
     </script>
 </body>
 </html>
