@@ -5,23 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f0f1a">
 
-    <title>Flechazo TV</title>
+    <title>Flechazo TV Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
         :root {
             --bg-dark: #1a1a2e;
             --bg-darker: #0f0f1a;
             --primary: #ff4b4b;
+            --accent: #a24bfa;
             --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
             --gold-gradient: linear-gradient(45deg, #FFD700, #FFA500);
             --text: #ffffff;
-            --text-sec: #a0a0a0;
             --card-bg: #222230;
         }
 
@@ -34,384 +33,470 @@
             padding-top: env(safe-area-inset-top);
             min-height: 100vh;
             user-select: none;
+            overflow-x: hidden;
         }
 
         /* UTILIDADES */
         .hidden { display: none !important; }
         .tab-screen { display: none; animation: fadeIn 0.3s ease; }
         .tab-screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
         .header-logo { width: 35px; height: 35px; }
-        .header-title { font-size: 24px; font-weight: bold; }
+        .header-title { font-size: 22px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* UI GENERICA */
+        /* CARRUSEL Y LISTAS */
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px; gap: 15px; scrollbar-width: none; }
         .horizontal-scroll::-webkit-scrollbar { display: none; }
         .poster-card { min-width: 120px; height: 180px; border-radius: 12px; overflow: hidden; background: #222; position: relative; cursor: pointer; }
-        .poster-card img { width: 100%; height: 100%; object-fit: cover; }
-        .poster-card:active { transform: scale(0.95); transition: 0.2s; }
+        .poster-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        .poster-card:active img { transform: scale(1.1); opacity: 0.7; }
         
-        /* HOME ELEMENTS */
-        .featured-container { position: relative; margin: 10px 20px 20px 20px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.4); aspect-ratio: 16/10; }
-        .slide { display: none; width: 100%; height: 100%; position: relative; }
-        .slide.active { display: block; }
+        .featured-container { position: relative; margin: 10px 20px 25px 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); aspect-ratio: 16/9; }
+        .slide { display: none; width: 100%; height: 100%; }
+        .slide.active { display: block; animation: fadeSlide 0.5s; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
-        .slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; background: linear-gradient(to top, #0f0f1a 10%, transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
-        .btn-watch { margin-top: 5px; padding: 8px 20px; background: var(--gradient); border-radius: 20px; font-weight: bold; width: fit-content; font-size: 14px; cursor: pointer;}
-        .section-title { padding: 0 20px; margin-bottom: 10px; margin-top: 25px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; }
-        .see-all { color: var(--primary); font-size: 12px; }
+        .slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0f0f1a, transparent); padding: 20px; }
+        .btn-watch { margin-top: 8px; padding: 8px 25px; background: var(--gradient); border-radius: 30px; font-weight: bold; font-size: 13px; border: none; color: white; box-shadow: 0 4px 15px rgba(255, 75, 75, 0.4); }
 
-        /* CATEGORÍAS */
-        .categories-row { display: flex; justify-content: space-around; padding: 10px 20px; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .cat-circle { width: 55px; height: 55px; border-radius: 50%; background: #2a2a3a; display: flex; justify-content: center; align-items: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
-        .cat-circle:active { transform: scale(0.9); }
-        .cat-circle.shorts { background: linear-gradient(45deg, #ff0050, #00f2ea); color: white; }
+        .section-title { padding: 0 20px; margin: 30px 0 15px 0; font-weight: 700; font-size: 17px; display: flex; justify-content: space-between; align-items: center; }
+        .see-all { color: var(--primary); font-size: 12px; font-weight: 600; }
 
-        /* MI LISTA & EXPLORAR */
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; }
-        .list-card { aspect-ratio: 2/3; border-radius: 10px; overflow: hidden; position: relative; background: #333; cursor: pointer; }
-        .list-card img { width: 100%; height: 100%; object-fit: cover; }
+        /* EXPLORAR MEJORADO */
+        .search-container { padding: 10px 20px; position: sticky; top: 0; z-index: 40; background: var(--bg-dark); }
+        .search-box { background: #2a2a3a; padding: 12px 15px; border-radius: 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .search-box input { background: transparent; border: none; color: white; width: 100%; font-size: 15px; }
+        
+        .tags-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; scrollbar-width: none; }
+        .tag-chip { padding: 8px 18px; background: #2a2a3a; border-radius: 20px; font-size: 13px; color: #ccc; white-space: nowrap; border: 1px solid transparent; transition: 0.3s; }
+        .tag-chip.active { background: rgba(255, 75, 75, 0.15); color: var(--primary); border-color: var(--primary); font-weight: bold; }
+
+        .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px; }
+        .explore-item { aspect-ratio: 2/3; background: #333; border-radius: 8px; overflow: hidden; position: relative; }
+        .explore-item img { width: 100%; height: 100%; object-fit: cover; }
+        .explore-overlay { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); font-size: 10px; opacity: 0; transition: 0.2s; }
+        .explore-item:active .explore-overlay { opacity: 1; }
 
         /* PERFIL */
-        .profile-header { display: flex; flex-direction: column; align-items: center; padding: 30px 20px; position: relative; }
-        .avatar-container { position: relative; margin-bottom: 15px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
-        .edit-badge { position: absolute; bottom: 0; right: 0; background: #333; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f0f1a; }
-        .user-name { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
-        .user-email { font-size: 13px; color: var(--text-sec); margin-bottom: 10px; }
-        .status-badge { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: bold; letter-spacing: 1px; display: inline-block; }
-        .premium-user .status-badge { background: var(--gold-gradient); color: black; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
-        .premium-user .avatar { border-color: #FFD700; }
-
-        .settings-group { margin: 20px 20px 0 20px; background: var(--card-bg); border-radius: 15px; overflow: hidden; }
-        .group-title { margin: 25px 20px 5px 25px; font-size: 12px; font-weight: bold; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
-        .menu-item { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-        .menu-item:active { background: rgba(255,255,255,0.05); }
-        .menu-item:last-child { border-bottom: none; }
-        .item-left { display: flex; align-items: center; gap: 15px; font-size: 15px; }
-        .item-icon { width: 24px; text-align: center; color: var(--text-sec); font-size: 18px; }
+        .profile-card { background: var(--card-bg); margin: 20px; border-radius: 20px; padding: 25px; text-align: center; position: relative; overflow: hidden; }
+        .profile-card::before { content:''; position: absolute; top:0; left:0; width: 100%; height: 80px; background: var(--gradient); opacity: 0.2; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--card-bg); margin-top: 10px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* SWITCH */
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        .sub-status-box { background: rgba(0,0,0,0.3); padding: 15px; margin-top: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .days-left { font-size: 20px; font-weight: bold; color: var(--primary); }
+        .days-label { font-size: 11px; color: #aaa; text-transform: uppercase; }
 
-        /* MODALES */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: flex-end; visibility: hidden; opacity: 0; transition: 0.3s; }
-        .modal-overlay.open { visibility: visible; opacity: 1; }
-        .modal-content { background: #15151f; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 25px; transform: translateY(100%); transition: transform 0.3s; max-height: 85vh; overflow-y: auto; }
-        .modal-overlay.open .modal-content { transform: translateY(0); }
-        .close-btn { background: #333; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; float:right;}
-
-        /* REPRODUCTOR */
-        #video-player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: flex; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .menu-list { margin: 0 20px; }
+        .menu-row { display: flex; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .menu-row i { width: 35px; color: var(--text-sec); font-size: 18px; }
+        
+        /* REPRODUCTOR PRO */
+        #video-player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; opacity: 0; pointer-events: none; transition: 0.3s; flex-direction: column; justify-content: center; }
         #video-player-overlay.active { opacity: 1; pointer-events: all; }
-        .video-wrapper { width: 100%; height: 100%; position: relative; display: flex; align-items: center; }
-        .player-controls { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; background: rgba(0,0,0,0.5); }
-        video { width: 100%; height: 100%; }
-
-        /* MENU INFERIOR */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; border-top: 1px solid #2a2a3a; display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; }
-        .nav-item { text-align: center; color: #777; font-size: 10px; position: relative; cursor: pointer; }
-        .nav-item.active { color: #ec407a; }
+        
+        .video-container { width: 100%; position: relative; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: black; }
+        video { width: 100%; max-height: 100vh; }
+        
+        /* Controles Personalizados */
+        .controls-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.3s; opacity: 1; }
+        .controls-layer.fade-out { opacity: 0; }
+        
+        .player-header { padding: 20px; display: flex; align-items: center; gap: 15px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .player-footer { padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        
+        .progress-area { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .time-text { font-size: 12px; font-family: monospace; color: #ddd; min-width: 80px; text-align: center; }
+        
+        /* Seek Bar Customization */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 4px; border-radius: 2px; cursor: pointer; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--primary); margin-top: -5px; box-shadow: 0 0 10px rgba(255,75,75,0.5); }
+        
+        .main-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 45px; color: rgba(255,255,255,0.9); pointer-events: none; }
+        .loading-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+        
+        /* Animación Doble Toque */
+        .double-tap-overlay { position: absolute; top: 0; bottom: 0; width: 35%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; color: white; font-size: 14px; background: rgba(255,255,255,0.1); font-weight: bold; pointer-events: none;}
+        .dt-left { left: 0; border-radius: 0 50% 50% 0; }
+        .dt-right { right: 0; border-radius: 50% 0 0 50%; }
+        
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #151520; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 100; backdrop-filter: blur(5px); }
+        .nav-item { text-align: center; color: #666; font-size: 10px; position: relative; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+
+        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         
-        /* QR Container */
-        .qr-container { background: white; padding: 10px; border-radius: 15px; margin: 15px auto; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; }
-        .qr-img { width: 100%; height: 100%; object-fit: contain; }
-        .btn-whatsapp { background: #25D366; color: white; border: none; padding: 12px; width: 100%; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .btn-redeem { background: var(--gradient); color: white; border: none; padding: 12px; width: 100%; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px;}
-        .code-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 12px; text-align: center; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        /* Avatar Grid */
-        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
-        .avatar-opt { width: 100%; border-radius: 50%; border: 2px solid transparent; opacity: 0.5; }
-        .avatar-opt.selected { border-color: var(--primary); opacity: 1; }
-        .input-dark { width: 100%; padding: 15px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; }
+        /* Modal simple */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: #222; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="tab-home" class="tab-screen active">
         <header class="header">
-            <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" class="header-logo" alt="Logo">
-            <i class="fa-solid fa-bell"></i>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" class="header-logo" alt="Logo">
+                <span class="header-title">Flechazo TV</span>
+            </div>
+            <i class="fa-regular fa-bell" style="font-size:20px;"></i>
         </header>
 
-        <div id="featured-carousel" class="featured-container"></div>
-
-        <div class="categories-row">
-            <div class="cat-item" onclick="openPlayer('Shorts Flechazo', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4')">
-                <div class="cat-circle shorts"><i class="fa-solid fa-play"></i></div><span style="font-size: 10px;">Shorts</span>
+        <div id="featured-carousel" class="featured-container">
             </div>
-            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-heart"></i></div><span style="font-size: 10px;">Romance</span></div>
-            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-fire"></i></div><span style="font-size: 10px;">Acción</span></div>
-            <div class="cat-item"><div class="cat-circle"><i class="fa-solid fa-plus"></i></div><span style="font-size: 10px;">Más</span></div>
-        </div>
 
-        <div class="section-title"><span>🔥 Populares Ahora</span><span class="see-all">Ver todo</span></div>
+        <div class="section-title"><span>🔥 Tendencias</span><span class="see-all">Ver más</span></div>
         <div id="popular-list" class="horizontal-scroll"></div>
 
-        <div class="section-title"><span>❤️ Romance Coreano</span><span class="see-all">Ver todo</span></div>
+        <div class="section-title"><span>❤️ Romance Asiático</span><span class="see-all">Ver más</span></div>
         <div id="romance-list" class="horizontal-scroll"></div>
-        
-        <div class="section-title"><span>⚔️ Acción y Suspenso</span><span class="see-all">Ver todo</span></div>
-        <div id="action-list" class="horizontal-scroll"></div>
-        <br><br>
-    </div>
-
-    <div id="tab-mylist" class="tab-screen">
-        <header class="header"><div class="header-title">Mi Lista</div><i class="fa-solid fa-pen-to-square" style="color:#888"></i></header>
-        <div id="mylist-grid" class="grid-container"></div>
-        <div class="section-title" style="margin-top:30px;"><span>✨ Para Ti</span></div>
-        <div id="foryou-list" class="horizontal-scroll"></div>
-        <br><br>
+        <br><br><br>
     </div>
 
     <div id="tab-explore" class="tab-screen">
-        <header class="header"><div class="header-title">Explorar</div></header>
-        <div style="padding: 0 20px 20px 20px;">
-            <div style="background:#222; padding:12px; border-radius:12px; display:flex; align-items:center; color:#888;">
-                <i class="fa-solid fa-magnifying-glass" style="margin-right:10px;"></i>
-                <input type="text" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%; outline:none;">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color:#777;"></i>
+                <input type="text" id="searchInput" placeholder="Buscar doramas, películas..." onkeyup="filterExplore()">
             </div>
         </div>
-        <div id="explore-grid" class="grid-container"></div>
-        <br><br>
+
+        <div class="tags-scroll">
+            <div class="tag-chip active" onclick="filterTag('todos', this)">Todos</div>
+            <div class="tag-chip" onclick="filterTag('accion', this)">Acción</div>
+            <div class="tag-chip" onclick="filterTag('romance', this)">Romance</div>
+            <div class="tag-chip" onclick="filterTag('drama', this)">Drama</div>
+            <div class="tag-chip" onclick="filterTag('suspenso', this)">Suspenso</div>
+        </div>
+
+        <div id="explore-grid" class="explore-grid">
+            </div>
+        <div id="no-results" style="text-align:center; padding:40px; color:#666; display:none;">
+            <i class="fa-regular fa-face-sad-tear" style="font-size:40px; margin-bottom:10px;"></i><br>
+            Sin resultados
+        </div>
+        <br><br><br>
     </div>
 
     <div id="tab-profile" class="tab-screen">
-        <div class="profile-header">
-            <div class="avatar-container" onclick="openModal('edit-profile-modal')">
+        <div class="profile-card">
+            <div style="position:relative; display:inline-block;">
                 <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar" id="current-avatar">
-                <div class="edit-badge"><i class="fa-solid fa-pencil" style="font-size:12px;"></i></div>
+                <div style="position:absolute; bottom:0; right:0; background:#333; padding:5px; border-radius:50%; border:2px solid #222230;">
+                    <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+                </div>
             </div>
-            <div class="user-name" id="display-name">Usuario</div>
-            <div class="user-email" id="display-email">cargando...</div>
-            <div class="status-badge" id="sub-badge">PLAN GRATUITO</div>
-        </div>
+            <h2 style="margin:10px 0 5px 0;">Usuario</h2>
+            <p style="margin:0; color:#888; font-size:13px;">usuario@email.com</p>
 
-        <div class="group-title">Cuenta</div>
-        <div class="settings-group">
-            <div class="menu-item" onclick="openModal('edit-profile-modal')">
-                <div class="item-left"><i class="fa-regular fa-user item-icon"></i> Editar Perfil</div>
-                <div class="item-right"><i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-            <div class="menu-item" onclick="openModal('qr-modal')">
-                <div class="item-left"><i class="fa-solid fa-crown item-icon" style="color:#FFD700;"></i> Suscripción</div>
-                <div class="item-right" style="color:#ec407a; font-weight:bold;" id="menu-sub-status">MEJORAR</div>
+            <div class="sub-status-box" id="sub-box">
+                <div style="text-align:left;">
+                    <div style="color:#aaa; font-size:12px;">PLAN ACTUAL</div>
+                    <div style="font-weight:bold; color:white;">Gratuito</div>
+                </div>
+                <button onclick="openModal('premium-modal')" style="background:var(--gold-gradient); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; font-size:12px;">MEJORAR</button>
             </div>
         </div>
 
-        <div class="group-title">App</div>
-        <div class="settings-group">
-            <div class="menu-item">
-                <div class="item-left"><i class="fa-solid fa-wifi item-icon"></i> Solo WiFi</div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        <div class="menu-list">
+            <div class="menu-row">
+                <i class="fa-solid fa-download"></i>
+                <span>Descargas</span>
             </div>
-            <div class="menu-item">
-                <div class="item-left"><i class="fa-regular fa-bell item-icon"></i> Notificaciones</div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            <div class="menu-row">
+                <i class="fa-solid fa-gear"></i>
+                <span>Configuración</span>
             </div>
-        </div>
-
-        <div class="group-title">Soporte</div>
-        <div class="settings-group">
-            <div class="menu-item" onclick="openModal('help-modal')">
-                <div class="item-left"><i class="fa-regular fa-circle-question item-icon"></i> Centro de Ayuda</div>
-                <div class="item-right"><i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-            <div class="menu-item" id="btnLogout">
-                <div class="item-left"><i class="fa-solid fa-arrow-right-from-bracket item-icon" style="color:#ff4b4b;"></i> <span style="color:#ff4b4b;">Cerrar Sesión</span></div>
+            <div class="menu-row" onclick="location.reload()">
+                <i class="fa-solid fa-power-off" style="color:var(--primary);"></i>
+                <span style="color:var(--primary);">Cerrar Sesión</span>
             </div>
         </div>
-        <br><br>
+        <br><br><br>
     </div>
 
     <div id="video-player-overlay">
-        <div class="video-wrapper">
-            <video id="main-video" playsinline></video>
-            <div class="player-controls" id="controls-layer" onclick="toggleControls()">
-                <div style="margin-top:40px; display:flex; gap:15px; align-items:center;">
-                    <i class="fa-solid fa-arrow-left" style="font-size:24px; color:white; cursor:pointer;" onclick="closePlayer(event)"></i>
-                    <span id="player-title" style="font-weight:bold; font-size:18px;">Reproduciendo</span>
+        <div class="video-container" id="video-container">
+            <video id="main-video" playsinline webkit-playsinline></video>
+            
+            <div class="loading-spinner" id="loading-spinner"></div>
+            
+            <div class="double-tap-overlay dt-left" id="dt-left"><i class="fa-solid fa-backward"></i> -10s</div>
+            <div class="double-tap-overlay dt-right" id="dt-right">+10s <i class="fa-solid fa-forward"></i></div>
+
+            <div class="controls-layer" id="controls-layer">
+                <div class="player-header">
+                    <i class="fa-solid fa-chevron-down" style="font-size:22px; cursor:pointer;" onclick="closePlayer()"></i>
+                    <div style="flex:1;">
+                        <div style="font-weight:bold; font-size:14px;" id="player-title">Título del Video</div>
+                        <div style="font-size:11px; color:#aaa;">Capítulo 1</div>
+                    </div>
+                    <i class="fa-solid fa-sliders" style="font-size:18px;"></i>
                 </div>
-                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:50px; cursor:pointer;" onclick="togglePlay(event)">
-                    <i class="fa-solid fa-pause" id="play-icon"></i>
+
+                <div class="main-play-btn">
+                    <i class="fa-solid fa-play" id="center-play-icon"></i>
+                </div>
+
+                <div class="player-footer">
+                    <div class="progress-area">
+                        <span class="time-text" id="current-time">00:00</span>
+                        <input type="range" id="seek-bar" value="0" min="0" step="1">
+                        <span class="time-text" id="duration-time">00:00</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-around; align-items:center; font-size:20px;">
+                        <i class="fa-solid fa-backward-step" onclick="skip(-10)"></i>
+                        <i class="fa-solid fa-pause" id="play-pause-btn" onclick="togglePlay(event)" style="font-size:35px; width:50px; height:50px; background:white; color:black; border-radius:50%; display:flex; align-items:center; justify-content:center;"></i>
+                        <i class="fa-solid fa-forward-step" onclick="skip(10)"></i>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="premium-modal" onclick="closeModal('premium-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h2 style="color:#FFD700;">💎 Premium</h2>
+            <p>Accede a todo el contenido sin límites.</p>
+            <button onclick="activatePremium()" style="background:var(--primary); color:white; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; width:100%;">Activar por 30 Días</button>
         </div>
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
         <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-item" onclick="switchTab('mylist', this)"><i class="fa-solid fa-bookmark"></i>Mi Lista</div>
-        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-regular fa-user"></i>Perfil</div>
     </nav>
 
-    <div class="modal-overlay" id="qr-modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('qr-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h3 style="text-align:center;">💎 Premium Mensual</h3>
-            <div style="text-align:center; color:#aaa; font-size:13px; margin-bottom:10px;">Escanea y paga <strong>S/ 15.00</strong></div>
-            <div class="qr-container"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" class="qr-img"></div>
-            <button class="btn-whatsapp" onclick="sendToWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Enviar Comprobante</button>
-            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-            <input type="text" id="activation-code" class="code-input" placeholder="CÓDIGO AQUÍ">
-            <button class="btn-redeem" onclick="redeemCode()">Activar</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="edit-profile-modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('edit-profile-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h3>Editar Perfil</h3>
-            <div class="avatar-grid">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-opt selected" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/06/3a/0e/063a0e69d7b385e3f4e2c0420790422c.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/a4/64/07/a4640733d07e60155b1f3c50974e6457.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/564x/5f/40/6a/5f406ab25e8942cbe0da6485afd26b71.jpg" class="avatar-opt" onclick="selectAvatar(this)">
-            </div>
-            <input type="text" id="edit-username" class="input-dark" placeholder="Nuevo nombre">
-            <button class="btn-redeem" onclick="saveProfileChanges()">Guardar Cambios</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="help-modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('help-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h3>Centro de Ayuda</h3>
-            <p style="color:#aaa; font-size:14px;">Contacta con soporte técnico si tienes problemas.</p>
-            <button class="btn-whatsapp" onclick="sendToWhatsApp()"><i class="fa-regular fa-envelope"></i> Contactar Soporte</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv", storageBucket: "flechazo-tv.firebasestorage.app", messagingSenderId: "382962164040", appId: "1:382962164040:web:6f24cad4108f824437137d" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const savedName = localStorage.getItem('flechazo_username') || user.email.split('@')[0];
-                document.getElementById('display-name').innerText = savedName;
-                document.getElementById('display-email').innerText = user.email;
-                const savedAvatar = localStorage.getItem('flechazo_avatar');
-                if(savedAvatar) document.getElementById('current-avatar').src = savedAvatar;
-                
-                if(localStorage.getItem('flechazo_premium')) {
-                    document.body.classList.add('premium-user');
-                    document.getElementById('sub-badge').innerText = "PREMIUM";
-                    document.getElementById('menu-sub-status').innerText = "ACTIVO";
-                }
-            } else { window.location.href = "index.html"; }
-        });
-        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(() => window.location.href="/"));
-    </script>
-
     <script>
-        // --- 1. CONEXIÓN A TU API JSON ---
-        fetch('/api/contenido')
-            .then(res => res.json())
-            .then(apiData => {
-                // Carrusel
-                const feat = document.getElementById('featured-carousel');
-                apiData.featured.forEach((item, i) => {
-                    feat.innerHTML += `<div class="slide ${i===0?'active':''}"><img src="${item.img}"><div class="slide-overlay"><div style="font-size:22px; font-weight:800;">${item.title}</div><div class="btn-watch" onclick="openPlayer('${item.title}', '${item.video}')">Ver Ahora</div></div></div>`;
-                });
+        // --- 1. DATOS FALSOS (MOCK) ---
+        const db = {
+            featured: [
+                { title: "El Juego del Calamar", img: "https://wallpapers.com/images/hd/squid-game-poster-computer-fqn940j0d70s4m0l.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+                { title: "Alquimia de Almas", img: "https://i.pinimg.com/originals/e5/a1/38/e5a13872221087e5989d97a06c52a0a3.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" }
+            ],
+            videos: [
+                { title: "Propuesta Laboral", category: "romance", img: "https://i.pinimg.com/564x/44/7f/05/447f05021e06f160455799a98a004664.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+                { title: "Vincenzo", category: "accion", img: "https://i.pinimg.com/736x/87/00/62/8700624021798679b33a7894301a24d5.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" },
+                { title: "True Beauty", category: "romance", img: "https://i.pinimg.com/564x/72/06/15/7206152431742461944520265780521e.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" },
+                { title: "All of Us Are Dead", category: "suspenso", img: "https://i.pinimg.com/564x/c3/00/18/c30018a1a970e70258d4a973d489955e.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+                { title: "The Glory", category: "drama", img: "https://i.pinimg.com/564x/d1/8a/cc/d18acc2999d3d4b6797960d96d274530.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
+                { title: "My Name", category: "accion", img: "https://i.pinimg.com/564x/31/36/53/31365313264426544521456241355252.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" }
+            ]
+        };
 
-                function fill(id, data) {
-                    const el = document.getElementById(id);
-                    if(el && data) data.forEach(item => el.innerHTML += `<div class="poster-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
-                }
-                fill('popular-list', apiData.popular);
-                fill('romance-list', apiData.romance);
-                fill('action-list', apiData.action);
-                fill('foryou-list', apiData.foryou);
+        // --- 2. INICIALIZAR UI ---
+        function init() {
+            // Cargar Carrusel
+            const feat = document.getElementById('featured-carousel');
+            db.featured.forEach((item, i) => {
+                feat.innerHTML += `<div class="slide ${i===0?'active':''}"><img src="${item.img}"><div class="slide-overlay"><div style="font-size:22px; font-weight:800; text-shadow:0 2px 4px rgba(0,0,0,0.8);">${item.title}</div><button class="btn-watch" onclick="openPlayer('${item.title}', '${item.video}')"><i class="fa-solid fa-play"></i> VER AHORA</button></div></div>`;
+            });
 
-                // Grids
-                const grid1 = document.getElementById('mylist-grid');
-                if(apiData.mylist) apiData.mylist.forEach(item => grid1.innerHTML += `<div class="list-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
+            // Cargar Listas Horizontales
+            const popList = document.getElementById('popular-list');
+            const romList = document.getElementById('romance-list');
+            const expGrid = document.getElementById('explore-grid');
+
+            db.videos.forEach(v => {
+                const card = `<div class="poster-card" onclick="openPlayer('${v.title}', '${v.video}')"><img src="${v.img}"></div>`;
+                popList.innerHTML += card;
+                if(v.category === 'romance') romList.innerHTML += card;
                 
-                const grid2 = document.getElementById('explore-grid');
-                const all = [...(apiData.popular||[]), ...(apiData.romance||[])];
-                all.forEach(item => grid2.innerHTML += `<div class="list-card" onclick="openPlayer('${item.title}', '${item.video}')"><img src="${item.img}"></div>`);
-            })
-            .catch(err => console.error(err));
+                // Cargar Grid Explorar
+                expGrid.innerHTML += `
+                    <div class="explore-item" data-cat="${v.category}" data-title="${v.title.toLowerCase()}" onclick="openPlayer('${v.title}', '${v.video}')">
+                        <img src="${v.img}">
+                        <div class="explore-overlay">${v.title}</div>
+                    </div>`;
+            });
 
-        // --- PLAYER ---
-        const player = document.getElementById('video-player-overlay');
-        const vid = document.getElementById('main-video');
-        const pTitle = document.getElementById('player-title');
-        
-        window.openPlayer = function(title, url) {
-            pTitle.innerText = title;
-            vid.src = url;
-            player.style.opacity = '1';
-            player.style.pointerEvents = 'all';
-            vid.play();
+            checkPremium();
         }
-        window.closePlayer = function(e) {
-            if(e) e.stopPropagation();
-            vid.pause();
-            player.style.opacity = '0';
-            player.style.pointerEvents = 'none';
-        }
-        window.togglePlay = function(e) {
-            e.stopPropagation();
-            if(vid.paused) { vid.play(); document.getElementById('play-icon').classList.replace('fa-play', 'fa-pause'); }
-            else { vid.pause(); document.getElementById('play-icon').classList.replace('fa-pause', 'fa-play'); }
-        }
-        window.toggleControls = function() {
-            const c = document.getElementById('controls-layer');
-            c.style.opacity = c.style.opacity === '0' ? '1' : '0';
-        }
+        window.onload = init;
 
-        // --- TABS & MODALS ---
+        // --- 3. LÓGICA DE PESTAÑAS (TABS) ---
         window.switchTab = function(name, el) {
             document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
             el.classList.add('active');
         }
-        window.openModal = function(id) { document.getElementById(id).classList.add('open'); }
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); }
 
-        // --- PREMIUM ---
-        window.sendToWhatsApp = function() {
-            window.open(`https://wa.me/51999999999?text=Hola,%20adjunto%20comprobante`, '_blank');
-        }
-        window.redeemCode = function() {
-            const code = document.getElementById('activation-code').value.trim().toUpperCase();
-            if(["PREMIUM2025", "FLECHAZO1"].includes(code)) {
-                localStorage.setItem('flechazo_premium', 'true');
-                location.reload();
-            } else { alert("Código incorrecto"); }
+        // --- 4. LÓGICA DE EXPLORAR Y FILTROS ---
+        window.filterTag = function(cat, el) {
+            document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            const items = document.querySelectorAll('.explore-item');
+            items.forEach(item => {
+                if(cat === 'todos' || item.dataset.cat === cat) item.classList.remove('hidden');
+                else item.classList.add('hidden');
+            });
         }
 
-        // --- EDITAR PERFIL ---
-        let tempAvatar = "";
-        window.selectAvatar = function(el) {
-            document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
-            el.classList.add('selected');
-            tempAvatar = el.src;
+        window.filterExplore = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.explore-item');
+            let found = false;
+            items.forEach(item => {
+                if(item.dataset.title.includes(query)) {
+                    item.classList.remove('hidden');
+                    found = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+            document.getElementById('no-results').style.display = found ? 'none' : 'block';
         }
-        window.saveProfileChanges = function() {
-            const name = document.getElementById('edit-username').value;
-            if(name) { localStorage.setItem('flechazo_username', name); document.getElementById('display-name').innerText = name; }
-            if(tempAvatar) { localStorage.setItem('flechazo_avatar', tempAvatar); document.getElementById('current-avatar').src = tempAvatar; }
-            closeModal('edit-profile-modal');
+
+        // --- 5. LÓGICA DEL REPRODUCTOR PRO ---
+        const playerOverlay = document.getElementById('video-player-overlay');
+        const video = document.getElementById('main-video');
+        const seekBar = document.getElementById('seek-bar');
+        const playBtnIcon = document.getElementById('play-pause-btn');
+        const centerIcon = document.getElementById('center-play-icon');
+        const loading = document.getElementById('loading-spinner');
+        const controls = document.getElementById('controls-layer');
+        let controlsTimeout;
+
+        window.openPlayer = function(title, url) {
+            document.getElementById('player-title').innerText = title;
+            video.src = url;
+            playerOverlay.classList.add('active');
+            video.play();
+            resetControlsTimer();
+        }
+
+        window.closePlayer = function() {
+            video.pause();
+            playerOverlay.classList.remove('active');
+            video.src = "";
+        }
+
+        window.togglePlay = function(e) {
+            if(e) e.stopPropagation();
+            if(video.paused) {
+                video.play();
+                playBtnIcon.classList.replace('fa-play', 'fa-pause');
+                centerIcon.classList.replace('fa-play', 'fa-pause');
+                centerIcon.style.opacity = 0;
+            } else {
+                video.pause();
+                playBtnIcon.classList.replace('fa-pause', 'fa-play');
+                centerIcon.classList.replace('fa-pause', 'fa-play');
+                centerIcon.style.opacity = 1;
+                showControls();
+            }
+        }
+
+        // Formatear tiempo
+        function formatTime(s) {
+            const min = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        // Eventos del Video
+        video.addEventListener('timeupdate', () => {
+            const val = (video.currentTime / video.duration) * 100;
+            seekBar.value = isNaN(val) ? 0 : val; // Usamos 0-100 para el range
+            document.getElementById('current-time').innerText = formatTime(video.currentTime);
+            document.getElementById('duration-time').innerText = formatTime(video.duration || 0);
+        });
+
+        video.addEventListener('waiting', () => loading.style.display = 'block');
+        video.addEventListener('playing', () => loading.style.display = 'none');
+        
+        // Seek Bar manual
+        seekBar.addEventListener('input', () => {
+            const time = (seekBar.value / 100) * video.duration;
+            video.currentTime = time;
+        });
+
+        // Ocultar controles automáticamente
+        function showControls() {
+            controls.classList.remove('fade-out');
+            resetControlsTimer();
+        }
+        function resetControlsTimer() {
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                if(!video.paused) controls.classList.add('fade-out');
+            }, 3000);
+        }
+        document.getElementById('video-container').addEventListener('click', () => {
+             if(controls.classList.contains('fade-out')) showControls();
+             else if(!video.paused) controls.classList.add('fade-out'); // Toggle
+        });
+
+        // Doble Toque (Rewind/Forward)
+        let lastTap = 0;
+        document.getElementById('video-container').addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                // Es doble toque
+                const rect = this.getBoundingClientRect();
+                const x = e.changedTouches[0].clientX - rect.left; // x position within the element.
+                if (x < rect.width / 3) skip(-10, 'left');
+                else if (x > rect.width * 2/3) skip(10, 'right');
+                else togglePlay(); // Doble toque al centro = play/pause
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+
+        window.skip = function(amount, side) {
+            video.currentTime += amount;
+            showControls();
+            if(side) {
+                const el = document.getElementById(side === 'left' ? 'dt-left' : 'dt-right');
+                el.style.opacity = 1;
+                setTimeout(() => el.style.opacity = 0, 600);
+            }
+        }
+
+        // --- 6. LÓGICA DE EXPIRACIÓN Y PREMIUM ---
+        window.openModal = (id) => document.getElementById(id).classList.add('open');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('open');
+
+        window.activatePremium = function() {
+            const expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + 30); // Sumar 30 días
+            localStorage.setItem('premium_expire', expireDate);
+            closeModal('premium-modal');
+            checkPremium();
+        }
+
+        function checkPremium() {
+            const exp = localStorage.getItem('premium_expire');
+            const box = document.getElementById('sub-box');
+            
+            if(exp) {
+                const now = new Date();
+                const end = new Date(exp);
+                const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24)); // Días restantes
+
+                if(diff > 0) {
+                    // Es premium
+                    box.innerHTML = `
+                        <div style="text-align:left;">
+                            <div class="days-label">TU SUSCRIPCIÓN CADUCA EN</div>
+                            <div class="days-left">${diff} Días</div>
+                        </div>
+                        <i class="fa-solid fa-crown" style="color:#FFD700; font-size:24px;"></i>
+                    `;
+                    box.style.background = "linear-gradient(45deg, rgba(255,215,0,0.1), rgba(0,0,0,0.4))";
+                    box.style.border = "1px solid #FFD700";
+                } else {
+                    localStorage.removeItem('premium_expire'); // Expiró
+                }
+            }
         }
     </script>
 </body>
