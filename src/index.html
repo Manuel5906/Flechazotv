@@ -2,169 +2,237 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flechazo TV - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Flechazo TV">
+    
+    <meta name="theme-color" content="#050510">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>Flechazo TV</title>
     <style>
-        /* --- ESTILOS VISUALES (CSS) --- */
+        /* --- ESTILOS VISUALES (Mobile First) --- */
+        :root {
+            --primary-color: #ec407a;
+            --secondary-color: #ab47bc;
+            --bg-dark: #050510;
+            --card-bg: #12121a;
+            --text-color: #ffffff;
+            --input-bg: #1c1c26;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Quita el brillo azul al tocar en Android */
+        }
+
         body {
             margin: 0;
             padding: 0;
+            /* Fuentes nativas de cada sistema (San Francisco en iOS, Roboto en Android) */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #050510; /* Fondo muy oscuro */
-            /* Simulamos el fondo de luces de la imagen */
-            background-image: radial-gradient(circle at 20% 30%, #1a1a40 0%, #000000 60%),
-                              radial-gradient(circle at 80% 40%, #1a1a40 0%, #000000 60%);
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 10% 20%, #1a1a40 0%, #000000 70%);
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: var(--text-color);
+            overflow: hidden; /* Evita scroll innecesario */
+            
+            /* Soporte para el Notch del iPhone */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .login-container {
-            background-color: #0e0e12; /* Tarjeta oscura */
             width: 100%;
-            max-width: 320px;
-            padding: 40px 30px;
-            border-radius: 40px; /* Bordes muy redondeados como la imagen */
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid #2a2a2a;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            max-width: 450px; /* Límite para tablets */
+            position: relative;
+            z-index: 10;
         }
 
-        /* Logotipo */
+        /* Logotipo Animado */
+        .logo-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
         .logo {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 10px;
+            width: 110px;
+            height: 110px;
             object-fit: contain;
-            /* Filtro para que brille un poco */
-            drop-shadow: 0 0 10px rgba(236, 64, 122, 0.5); 
+            filter: drop-shadow(0 0 15px rgba(236, 64, 122, 0.6));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
 
         h1 {
-            font-size: 24px;
-            margin: 10px 0 30px 0;
-            font-weight: 600;
+            font-size: 28px;
+            margin: 10px 0 40px 0;
+            font-weight: 700;
             letter-spacing: 0.5px;
+            background: linear-gradient(to right, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         /* Campos de texto */
         .input-group {
-            margin-bottom: 15px;
-            text-align: left;
+            width: 100%;
+            margin-bottom: 18px;
+            position: relative;
         }
 
         input {
             width: 100%;
-            padding: 15px;
-            box-sizing: border-box;
-            background-color: #1c1c24; /* Gris oscuro */
+            padding: 18px 20px; /* Área táctil grande */
+            background-color: var(--input-bg);
             border: 1px solid #333;
-            border-radius: 12px;
-            color: #ccc;
-            font-size: 14px;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px; /* 16px evita zoom automático en iPhone */
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
         input:focus {
-            border-color: #ec407a; /* Color rosa al seleccionar */
-            color: white;
+            border-color: var(--primary-color);
+            background-color: #252530;
+            box-shadow: 0 0 10px rgba(236, 64, 122, 0.2);
         }
 
-        /* Botón Principal (Gradiente) */
+        input::placeholder {
+            color: #777;
+        }
+
+        /* Botón Principal */
         .btn-primary {
             width: 100%;
-            padding: 15px;
-            margin-top: 20px;
+            padding: 18px;
+            margin-top: 25px;
             border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
             color: white;
             cursor: pointer;
-            /* El gradiente rosa/morado de la imagen */
-            background: linear-gradient(90deg, #ec407a, #ab47bc);
-            box-shadow: 0 4px 15px rgba(236, 64, 122, 0.4);
-            transition: transform 0.2s;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 5px 20px rgba(236, 64, 122, 0.4);
+            transition: transform 0.2s, opacity 0.2s;
+            -webkit-appearance: none; /* Estilo nativo iOS reset */
         }
 
         .btn-primary:active {
-            transform: scale(0.98);
+            transform: scale(0.96); /* Efecto de pulsación */
+            opacity: 0.9;
         }
 
         /* Enlace Olvidé contraseña */
         .forgot-pass {
-            display: block;
-            margin: 20px 0;
-            color: #888;
-            font-size: 13px;
+            margin: 25px 0;
+            color: #aaa;
+            font-size: 14px;
             text-decoration: none;
-        }
-        .forgot-pass:hover {
-            color: #fff;
+            padding: 10px; /* Área táctil extra */
         }
 
-        /* Botón Secundario (Borde) */
+        /* Botón Crear Cuenta */
         .btn-outline {
             width: 100%;
-            padding: 14px;
-            background: transparent;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid #444;
-            border-radius: 25px;
+            border-radius: 30px;
             color: white;
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s;
+            backdrop-filter: blur(10px);
         }
 
-        .btn-outline:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: #fff;
+        .btn-outline:active {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Mensaje de error */
-        #error-msg {
+        /* Feedback de errores */
+        #status-msg {
             color: #ff4b4b;
-            font-size: 13px;
-            margin-top: 10px;
-            display: none;
+            font-size: 14px;
+            margin-top: 15px;
+            min-height: 20px;
+            text-align: center;
         }
+        
+        /* Loader simple */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
 
     <div class="login-container">
-        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="Logo Flechazo TV" class="logo">
+        <div class="logo-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="Flechazo TV" class="logo">
+        </div>
         
         <h1>Flechazo TV</h1>
 
         <div class="input-group">
-            <input type="email" id="email" placeholder="Email" required>
+            <input type="email" id="email" placeholder="Correo electrónico" required autocomplete="email">
         </div>
         <div class="input-group">
-            <input type="password" id="password" placeholder="Contraseña" required>
+            <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
         </div>
 
-        <button class="btn-primary" id="btnLogin">Iniciar Sesión</button>
+        <button class="btn-primary" id="btnLogin">
+            <span class="btn-text">Iniciar Sesión</span>
+        </button>
         
-        <p id="error-msg">Error en credenciales</p>
+        <div id="status-msg"></div>
 
-        <a href="#" class="forgot-pass">Olvidé mi contraseña</a>
+        <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
 
-        <button class="btn-outline" id="btnRegister">Crear Cuenta</button>
+        <button class="btn-outline" id="btnRegister">Crear Cuenta Nueva</button>
     </div>
 
     <script type="module">
-        // 1. Importamos las funciones de Firebase desde la web (CDN)
+        // Importamos desde CDN porque en un archivo HTML simple no funcionan los imports directos sin instalador
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. TU CONFIGURACIÓN DE FIREBASE
-        // ¡¡IMPORTANTE!!: Debes reemplazar esto con tus propios datos de la consola de Firebase
+        // --- TU CONFIGURACIÓN ---
         const firebaseConfig = {
           apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ",
           authDomain: "flechazo-tv.firebaseapp.com",
@@ -175,60 +243,76 @@
           measurementId: "G-2GZJT4Y983"
         };
 
-        // 3. Inicializar Firebase
+        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app); // Necesario para el login
 
-        // 4. Referencias a los elementos del HTML
+        // Referencias al DOM
         const emailInput = document.getElementById('email');
         const passInput = document.getElementById('password');
         const btnLogin = document.getElementById('btnLogin');
         const btnRegister = document.getElementById('btnRegister');
-        const errorMsg = document.getElementById('error-msg');
+        const statusMsg = document.getElementById('status-msg');
 
-        // 5. Función de INICIAR SESIÓN
-        btnLogin.addEventListener('click', () => {
+        // Función para mostrar mensajes
+        function showMessage(msg, isError = true) {
+            statusMsg.style.color = isError ? '#ff4b4b' : '#4bff88';
+            statusMsg.innerText = msg;
+        }
+
+        // --- INICIAR SESIÓN ---
+        btnLogin.addEventListener('click', async () => {
             const email = emailInput.value;
             const password = passInput.value;
+            
+            // Animación de botón
+            btnLogin.style.opacity = "0.7";
+            btnLogin.innerText = "Entrando...";
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Login exitoso
-                    const user = userCredential.user;
-                    alert("¡Bienvenido a Flechazo TV! \nUsuario: " + user.email);
-                    // Aquí rediriges a la página principal:
-                    // window.location.href = "home.html";
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.error(errorCode, errorMessage);
-                    
-                    // Mostrar error en pantalla
-                    errorMsg.style.display = "block";
-                    errorMsg.innerText = "Error: " + errorCode;
-                });
-        });
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                showMessage("¡Bienvenido! Entrando...", false);
+                
+                // Redirigir después de 1 segundo
+                setTimeout(() => {
+                    alert("Login Correcto: " + userCredential.user.email);
+                    // AQUÍ PONES LA REDIRECCIÓN A TU APP
+                    // window.location.href = "/home.html";
+                }, 1000);
 
-        // 6. Función de CREAR CUENTA (Opcional, para el botón de abajo)
-        btnRegister.addEventListener('click', () => {
-            const email = emailInput.value;
-            const password = passInput.value;
-
-            if(email && password) {
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        alert("¡Cuenta creada exitosamente!");
-                    })
-                    .catch((error) => {
-                        alert("Error al crear cuenta: " + error.message);
-                    });
-            } else {
-                alert("Escribe un correo y contraseña para crear la cuenta.");
+            } catch (error) {
+                console.error(error);
+                let msg = "Error al entrar.";
+                if(error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
+                if(error.code === 'auth/invalid-email') msg = "El correo no es válido.";
+                showMessage(msg);
+                btnLogin.innerText = "Iniciar Sesión";
+                btnLogin.style.opacity = "1";
             }
         });
 
+        // --- CREAR CUENTA ---
+        btnRegister.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passInput.value;
+
+            if(!email || !password) {
+                showMessage("Escribe un correo y contraseña para crear la cuenta.");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                showMessage("¡Cuenta creada! Ya puedes entrar.", false);
+            } catch (error) {
+                console.error(error);
+                let msg = "Error al crear cuenta.";
+                if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado.";
+                if(error.code === 'auth/weak-password') msg = "La contraseña debe tener al menos 6 caracteres.";
+                showMessage(msg);
+            }
+        });
     </script>
 </body>
 </html>
-
