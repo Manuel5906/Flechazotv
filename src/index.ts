@@ -7,46 +7,19 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-// Home route - HTML
+// 1. Configurar la carpeta 'src' como estática
+// Esto permite que el index.html cargue su CSS e imágenes correctamente.
+// NOTA: Si este archivo JS está en una subcarpeta (ej: /api), cambia la ruta a: path.join(__dirname, '..', 'src')
+app.use(express.static(path.join(__dirname, 'src')))
+
+// 2. Ruta Home - Servir index.html desde la carpeta src
 app.get('/', (req, res) => {
-  res.type('html').send(`
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8"/>
-        <title>Express on Vercel</title>
-        <link rel="stylesheet" href="/style.css" />
-      </head>
-      <body>
-        <nav>
-          <a href="/">Home</a>
-          <a href="/about">About</a>
-          <a href="/api-data">API Data</a>
-          <a href="/healthz">Health</a>
-        </nav>
-        <h1>Welcome to Express on Vercel 🚀</h1>
-        <p>This is a minimal example without a database or forms.</p>
-        <img src="/logo.png" alt="Logo" width="120" />
-      </body>
-    </html>
-  `)
+  res.sendFile(path.join(__dirname, 'src', 'index.html'))
 })
 
+// 3. Ruta About (Mantenida de tu código original)
 app.get('/about', function (req, res) {
   res.sendFile(path.join(__dirname, '..', 'components', 'about.htm'))
-})
-
-// Example API endpoint - JSON
-app.get('/api-data', (req, res) => {
-  res.json({
-    message: 'Here is some sample API data',
-    items: ['apple', 'banana', 'cherry'],
-  })
-})
-
-// Health check
-app.get('/healthz', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
 export default app
