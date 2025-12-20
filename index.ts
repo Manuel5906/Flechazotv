@@ -10,22 +10,27 @@ const app = express()
 // 1. Configuración de archivos estáticos
 app.use(express.static(path.join(__dirname, 'src')))
 
-// --- TRUCO PARA EL LOGO (FAVICON) ---
-// Cuando el navegador busque el icono de la pestaña automáticamente,
-// lo redirigimos a tu imagen URL.
+// --- LOGOTIPO EN LA PESTAÑA (Favicon) ---
 app.get('/favicon.ico', (req, res) => {
   res.redirect('https://i.ibb.co/v6GdVWRs/IMG-0113.png')
 })
-// -------------------------------------
 
-// 2. Ruta Home
+// 2. Ruta Principal (Inicio)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'index.html'))
 })
 
-// 3. Ruta About
+// 3. NUEVO APARTADO (Sub-dominio/Sección)
+// Esto crea la dirección: tuweb.com/vip
+app.get('/vip', (req, res) => {
+  // Asegúrate de crear el archivo 'vip.html' dentro de la carpeta 'src'
+  res.sendFile(path.join(__dirname, 'src', 'vip.html'))
+})
+
+// 4. Ruta About (Mantenida)
 app.get('/about', function (req, res) {
   res.sendFile(path.join(__dirname, '..', 'components', 'about.htm'))
 })
 
 export default app
+
