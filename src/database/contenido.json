@@ -1,0 +1,104 @@
+{
+  "featured": [
+    {
+      "title": "Amor Bajo la Lluvia",
+      "img": "https://image.tmdb.org/t/p/w500/rktDFPbfHfUbArZ6OOOKsXcv0Bm.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "title": "El Rey Eterno",
+      "img": "https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    }
+  ],
+  "popular": [
+    {
+      "title": "Propuesta Laboral",
+      "img": "https://image.tmdb.org/t/p/w200/xUfRZu248k27q885tL2k2b78Wn6.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "title": "Vincenzo",
+      "img": "https://image.tmdb.org/t/p/w200/dvXJgEDSa54lDM24sF0H0D00o7l.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "title": "True Beauty",
+      "img": "https://image.tmdb.org/t/p/w200/s9O3m6a02qQp3T4H7bO5k9.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "title": "Squid Game",
+      "img": "https://image.tmdb.org/t/p/w200/dDlEqlJe0BhUrE5fWZgr9eMoW7j.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    }
+  ],
+  "romance": [
+    {
+      "title": "Alquimia de Almas",
+      "img": "https://image.tmdb.org/t/p/w200/q22J4GZ0E7B7k0.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
+    },
+    {
+      "title": "Start-Up",
+      "img": "https://image.tmdb.org/t/p/w200/u3bZgnGQ9TWA75EGybkUShbhVsu.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "title": "Hometown Cha-Cha",
+      "img": "https://image.tmdb.org/t/p/w200/thLAF6C4Zba1e9Vz9fK2sKqpq9g.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    }
+  ],
+  "action": [
+    {
+      "title": "Kingdom",
+      "img": "https://image.tmdb.org/t/p/w200/AsqUSUq1921Db99fMaHMNQMIwwO.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "title": "My Name",
+      "img": "https://image.tmdb.org/t/p/w200/b0Y9VzV8R5H2lT5nQ9g2f2.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "title": "Vagabond",
+      "img": "https://image.tmdb.org/t/p/w200/k9r6p5t5nQ9g2f2.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    }
+  ],
+  "mylist": [
+    {
+      "title": "Amor Bajo la Lluvia",
+      "img": "https://image.tmdb.org/t/p/w200/rktDFPbfHfUbArZ6OOOKsXcv0Bm.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "title": "Mirrors and Heroes",
+      "img": "https://image.tmdb.org/t/p/w200/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "title": "La Flor Perdida",
+      "img": "https://image.tmdb.org/t/p/w200/5.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "title": "Mi Destino",
+      "img": "https://image.tmdb.org/t/p/w200/27.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
+    }
+  ],
+  "foryou": [
+    {
+      "title": "Cielo Rosa",
+      "img": "https://image.tmdb.org/t/p/w200/9.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "title": "Amor y Héroes",
+      "img": "https://image.tmdb.org/t/p/w200/7.jpg",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    }
+  ]
+}
