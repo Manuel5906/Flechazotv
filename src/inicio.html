@@ -4,193 +4,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f0f1a">
-    <title>Flechazo TV</title>
+    <title>Flechazo TV - Ultimate</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILOS VISUALES (PREMIUM) --- */
+        /* --- ESTILOS CORE --- */
         :root { 
-            --bg: #0f0f1a; 
-            --card: #1c1c2a; 
-            --primary: #E50914; 
-            --text-main: #fff;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
+            --bg: #0f0f1a; --card: #1c1c2a; --primary: #E50914; --text-main: #fff;
+            --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
         }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text-main); 
-            padding-bottom: calc(80px + var(--safe-bottom)); 
-            overflow-x: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* Header Flotante */
-        .header { 
-            position: fixed; top: 0; width: 100%; 
-            padding: calc(15px + var(--safe-top)) 20px 15px; 
-            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%); 
-            z-index: 1000; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
-        .logo { color: var(--primary); font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; padding: calc(15px + var(--safe-top)) 20px 15px; background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, transparent 100%); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--primary); font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
-        /* Hero (Portada) */
+        /* HERO */
         .hero-wrap { height: 75vh; position: relative; display: flex; align-items: flex-end; }
-        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: opacity 0.5s; }
-        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.2) 60%, rgba(15,15,26,0.6) 100%); }
-        
-        .hero-content { padding: 20px; z-index: 2; width: 100%; position: relative; }
-        .hero-badge { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block; margin-bottom: 8px; text-transform: uppercase; }
+        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: opacity 0.4s; }
+        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.4) 60%, rgba(15,15,26,0.8) 100%); }
+        .hero-content { padding: 20px; z-index: 2; width: 100%; }
         .hero-title { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 10px; text-shadow: 0 2px 15px #000; }
-        .hero-desc { color: #ddd; font-size: 14px; margin-bottom: 20px; line-height: 1.4; max-width: 90%; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 2px #000; }
-
+        .hero-desc { color: #ddd; font-size: 14px; margin-bottom: 20px; line-height: 1.4; max-width: 90%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 2px #000; }
+        
         .btn-group { display: flex; gap: 12px; }
         .btn { flex: 1; height: 48px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.1s; }
         .btn:active { transform: scale(0.96); }
         .btn-play { background: #fff; color: #000; }
         .btn-list { background: rgba(255,255,255,0.25); color: #fff; backdrop-filter: blur(4px); }
 
-        /* Categorías (Pills) */
+        /* PILLS */
         .pills-container { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px; margin-top: -10px; position: relative; z-index: 10; scrollbar-width: none; }
         .pill { padding: 8px 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; white-space: nowrap; font-size: 13px; backdrop-filter: blur(5px); }
         .pill.active { background: #fff; color: #000; font-weight: 700; border-color: #fff; }
 
-        /* Secciones y Listas */
-        .section { margin-top: 35px; }
+        /* SECCIONES */
+        .section { margin-top: 40px; }
         .sec-header { padding: 0 20px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .sec-title { font-size: 18px; font-weight: 700; color: #fff; }
+        .sec-title { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
         
         .h-list { display: flex; overflow-x: auto; gap: 12px; padding: 0 20px; scrollbar-width: none; }
+        
+        /* CARD NORMAL */
         .card { width: 120px; flex-shrink: 0; position: relative; cursor: pointer; }
-        .card-img { width: 100%; height: 175px; border-radius: 8px; object-fit: cover; background: #222; transition: opacity 0.2s; }
-        .card:active .card-img { opacity: 0.7; }
+        .card-img { width: 100%; height: 175px; border-radius: 8px; object-fit: cover; background: #222; }
 
-        /* Reproductor (Overlay) */
+        /* CARD CONTINUAR VIENDO (WIDE) */
+        .wide-card { width: 200px; flex-shrink: 0; position: relative; cursor: pointer; }
+        .wide-img-box { position: relative; height: 110px; border-radius: 8px; overflow: hidden; }
+        .wide-img { width: 100%; height: 100%; object-fit: cover; }
+        .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+        .play-icon { width: 35px; height: 35px; background: rgba(0,0,0,0.6); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        
+        .progress-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.3); }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; }
+        
+        .wide-info { margin-top: 6px; display: flex; justify-content: space-between; font-size: 11px; color: #bbb; }
+
+        /* REPRODUCTOR */
         .player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; font-size: 24px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; color: #fff; z-index: 5002; cursor: pointer; backdrop-filter: blur(4px); }
-        
         #dynamic-player { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; }
         video { width: 100%; max-height: 100vh; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Navegación */
+        /* NAV */
         .nav { position: fixed; bottom: 0; width: 100%; background: #0f0f1a; border-top: 1px solid #2a2a3a; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; }
         .nav-btn { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-        .nav-btn i { font-size: 22px; }
         .nav-btn.active { color: #fff; }
+        .nav-btn i { font-size: 22px; }
 
-        /* Estados de carga */
-        .loading { display: flex; justify-content: center; padding: 20px; color: #666; }
         .hidden { display: none !important; }
+        .loading { padding: 20px; color: #666; font-size: 13px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="player-overlay" class="player-fs">
         <i class="fa-solid fa-xmark close-player" onclick="closePlayer()"></i>
-        <div id="dynamic-player">
-            </div>
+        <div id="dynamic-player"></div>
     </div>
 
     <div id="app">
-        
         <header class="header">
             <div class="logo">Flechazo TV</div>
-            <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
+            <div style="font-size:12px; font-weight:bold; background:#333; padding:5px 10px; border-radius:15px;">
+                <i class="fa-solid fa-crown" style="color:#FFD700; margin-right:4px;"></i> VIP
+            </div>
         </header>
 
         <div id="hero-container">
-            <div style="height:75vh; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
-                <i class="fa-solid fa-circle-notch fa-spin" style="font-size:30px; color:#333;"></i>
+            <div style="height:75vh; background:#111; display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-spinner fa-spin" style="color:#333; font-size:30px;"></i>
             </div>
         </div>
 
         <div class="pills-container">
             <div class="pill active" onclick="filterBy('Todos', this)">Todos</div>
             <div class="pill" onclick="filterBy('Acción', this)">Acción</div>
-            <div class="pill" onclick="filterBy('Romance', this)">Romance</div>
             <div class="pill" onclick="filterBy('Drama', this)">Drama</div>
             <div class="pill" onclick="filterBy('Anime', this)">Anime</div>
+            <div class="pill" onclick="filterBy('Romance', this)">Romance</div>
+        </div>
+
+        <div id="section-continue" class="section hidden">
+            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-clock-rotate-left" style="font-size:16px; color:var(--primary);"></i> Continuar Viendo</span></div>
+            <div class="h-list" id="continue-list"></div>
+        </div>
+
+        <div id="section-mylist" class="section hidden">
+            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-check" style="font-size:16px; color:#46d369;"></i> Mi Lista</span></div>
+            <div class="h-list" id="mylist-list"></div>
         </div>
 
         <div class="section">
             <div class="sec-header"><span class="sec-title">Tendencias</span></div>
-            <div class="h-list" id="trends-list"><div class="loading">Cargando...</div></div>
+            <div class="h-list" id="trends-list"><div class="loading">Cargando contenido...</div></div>
         </div>
 
         <div class="section">
-            <div class="sec-header"><span class="sec-title">Nuevos Lanzamientos</span></div>
-            <div class="h-list" id="new-list"><div class="loading">Cargando...</div></div>
+            <div class="sec-header"><span class="sec-title">Para ti</span></div>
+            <div class="h-list" id="rec-list"><div class="loading">Cargando...</div></div>
         </div>
 
         <br><br><br>
-
     </div>
 
     <nav class="nav">
         <div class="nav-btn active"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-btn"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-btn"><i class="fa-solid fa-magnifying-glass"></i>Buscar</div>
         <div class="nav-btn"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-btn"><i class="fa-solid fa-user"></i>Perfil</div>
+        <div class="nav-btn" onclick="clearData()"><i class="fa-solid fa-trash"></i>Limpiar</div>
     </nav>
 
     <script>
-        // === CONFIGURACIÓN CLAVE ===
-        // Aquí conectamos con tu backend en Vercel
-        const API_URL = 'https://flechazotv.vercel.app/api'; 
-        
-        let allMovies = []; // Guardamos localmente para filtrar rápido sin recargar
+        const API_URL = 'https://flechazotv.vercel.app/api/movies';
+        let allMovies = [];
+        let currentVideoElement = null;
 
-        // === 1. LÓGICA DE INICIO ===
+        // --- 1. INICIALIZACIÓN ---
         async function initApp() {
             try {
-                const res = await fetch(`${API_URL}/movies`);
-                
-                if (!res.ok) throw new Error('Error al conectar con el servidor');
-                
+                // Fetch datos de la API
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
                 
-                if (data.length > 0) {
+                if(data.length > 0) {
                     allMovies = data;
-                    renderHero(data[0]); // La primera peli va al Hero
+                    renderHero(data[0]); // Peli destacada
                     renderList('trends-list', data);
-                    renderList('new-list', [...data].reverse()); // Invertimos para simular "Nuevos"
-                } else {
-                    alert("La base de datos está vacía. Agrega contenido en movies.json");
+                    renderList('rec-list', [...data].reverse());
+                    
+                    // Renderizar listas personalizadas
+                    renderContinueWatching();
+                    renderMyList();
                 }
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById('trends-list').innerHTML = `<p style="color:#e50914; padding:0 20px;">Error: Verifica que tu API en Vercel esté activa.</p>`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('trends-list').innerHTML = `<p class="loading">Error de conexión. Verifica la API.</p>`;
             }
         }
 
-        // === 2. RENDERIZADO VISUAL ===
+        // --- 2. RENDERIZADO VISUAL ---
         function renderHero(movie) {
-            const container = document.getElementById('hero-container');
-            // Usamos una imagen de alta calidad si la tienes, sino la normal
-            const bgImage = movie.img; 
+            const isListed = isInMyList(movie.id);
+            const btnText = isListed ? 'En mi lista' : 'Mi Lista';
+            const btnIcon = isListed ? 'fa-check' : 'fa-plus';
 
-            container.innerHTML = `
+            document.getElementById('hero-container').innerHTML = `
                 <div class="hero-wrap">
-                    <img src="${bgImage}" class="hero-bg">
+                    <img src="${movie.img}" class="hero-bg">
                     <div class="hero-gradient"></div>
                     <div class="hero-content">
-                        <div class="hero-badge">Nº 1 HOY</div>
+                        <div style="color:#46d369; font-weight:bold; margin-bottom:5px;">98% Coincidencia</div>
                         <h1 class="hero-title">${movie.title}</h1>
-                        <p class="hero-desc">${movie.desc || 'Disfruta de la mejor selección de películas y series en Flechazo TV.'}</p>
+                        <p class="hero-desc">${movie.desc || 'Una historia increíble te espera.'}</p>
                         <div class="btn-group">
-                            <button class="btn btn-play" onclick="openPlayer('${movie.videoUrl}')">
-                                <i class="fa-solid fa-play"></i> Ver
+                            <button class="btn btn-play" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
+                                <i class="fa-solid fa-play"></i> Reproducir
                             </button>
-                            <button class="btn btn-list">
-                                <i class="fa-solid fa-plus"></i> Mi Lista
+                            <button class="btn btn-list" onclick="toggleMyList(${movie.id}, this)">
+                                <i class="fa-solid ${btnIcon}"></i> ${btnText}
                             </button>
                         </div>
                     </div>
@@ -198,88 +197,187 @@
             `;
         }
 
-        function renderList(containerId, list) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = list.map(m => `
-                <div class="card" onclick="openPlayer('${m.videoUrl}')">
+        function renderList(id, list) {
+            document.getElementById(id).innerHTML = list.map(m => `
+                <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
                     <img src="${m.img}" class="card-img" loading="lazy">
                 </div>
             `).join('');
         }
 
-        function filterBy(cat, element) {
-            // Activar estilo visual del botón
-            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-            element.classList.add('active');
+        // --- 3. LOGICA CONTINUAR VIENDO (LocalStorage) ---
+        function renderContinueWatching() {
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            const ids = Object.keys(history).sort((a,b) => history[b].date - history[a].date);
+            const container = document.getElementById('continue-list');
+            const section = document.getElementById('section-continue');
 
-            // Filtrar lógica
-            if (cat === 'Todos') {
-                renderList('trends-list', allMovies);
-            } else {
-                const filtered = allMovies.filter(m => m.cat && m.cat.includes(cat));
-                renderList('trends-list', filtered.length ? filtered : []);
-                if(filtered.length === 0) {
-                    document.getElementById('trends-list').innerHTML = `<p style="padding:20px; color:#777;">No hay contenido en esta categoría aún.</p>`;
-                }
+            if (ids.length === 0) {
+                section.classList.add('hidden');
+                return;
             }
+
+            section.classList.remove('hidden');
+            container.innerHTML = ids.map(id => {
+                const movie = allMovies.find(m => m.id == id);
+                if (!movie) return '';
+
+                const data = history[id];
+                let pct = 0;
+                
+                // Calculamos porcentaje
+                if (data.duration > 0) pct = (data.time / data.duration) * 100;
+                else if (data.isEmbed) pct = 100; // Si es embed, mostramos lleno o a medias según prefieras
+
+                const left = data.duration ? Math.floor((data.duration - data.time) / 60) + ' min' : 'Continuar';
+
+                return `
+                <div class="wide-card" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
+                    <div class="wide-img-box">
+                        <img src="${movie.img}" class="wide-img">
+                        <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px; color:#fff; margin-left:2px;"></i></div></div>
+                        <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+                    </div>
+                    <div class="wide-info">
+                        <span>${movie.title}</span>
+                        <span>${left}</span>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        // === 3. REPRODUCTOR UNIVERSAL (EL CEREBRO) ===
-        // Esta función detecta automáticamente qué tipo de enlace es
-        function openPlayer(url) {
-            if (!url) return alert("Video no disponible");
+        function saveProgress(id, time, duration, isEmbed = false) {
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            history[id] = {
+                time: time,
+                duration: duration,
+                isEmbed: isEmbed,
+                date: Date.now()
+            };
+            localStorage.setItem('f_history', JSON.stringify(history));
+            renderContinueWatching(); // Actualizar UI en tiempo real
+        }
 
+        // --- 4. LOGICA MI LISTA (LocalStorage) ---
+        function renderMyList() {
+            const listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            const container = document.getElementById('mylist-list');
+            const section = document.getElementById('section-mylist');
+
+            if (listIds.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            // Filtramos las pelis que están en la lista
+            const myListMovies = allMovies.filter(m => listIds.includes(m.id));
+            
+            container.innerHTML = myListMovies.map(m => `
+                <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
+                    <img src="${m.img}" class="card-img">
+                </div>
+            `).join('');
+        }
+
+        function toggleMyList(id, btnElement) {
+            let listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            if (listIds.includes(id)) {
+                listIds = listIds.filter(x => x !== id);
+                if(btnElement) btnElement.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
+            } else {
+                listIds.push(id);
+                if(btnElement) btnElement.innerHTML = '<i class="fa-solid fa-check"></i> En mi lista';
+            }
+            localStorage.setItem('f_mylist', JSON.stringify(listIds));
+            renderMyList();
+        }
+
+        function isInMyList(id) {
+            const listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            return listIds.includes(id);
+        }
+
+        // --- 5. REPRODUCTOR INTELIGENTE ---
+        function openPlayer(url, id) {
             const overlay = document.getElementById('player-overlay');
             const container = document.getElementById('dynamic-player');
-            container.innerHTML = ''; // Limpiar anterior
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            const savedData = history[id];
 
-            let content = '';
+            container.innerHTML = ''; 
 
-            // A. YOUTUBE (Detecta enlaces cortos, largos y embeds)
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                let videoId = '';
-                if (url.includes('youtu.be')) {
-                    videoId = url.split('/').pop();
-                } else if (url.includes('v=')) {
-                    videoId = url.split('v=')[1].split('&')[0];
-                } else if (url.includes('embed/')) {
-                    videoId = url.split('embed/')[1].split('?')[0];
+            // A. YOUTUBE / VIMEO / EMBED
+            if (url.includes('youtube') || url.includes('youtu.be') || url.includes('vimeo') || !url.match(/\.(mp4|webm|ogg)$/i)) {
+                
+                // Intentamos extraer ID de Youtube
+                let embedUrl = url;
+                if (url.includes('youtube') || url.includes('youtu.be')) {
+                    let vId = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
+                    embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1&rel=0&modestbranding=1`;
                 }
                 
-                content = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
-            }
-            
-            // B. VIMEO
-            else if (url.includes('vimeo.com')) {
-                const videoId = url.split('/').pop();
-                content = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
-            }
-
-            // C. ARCHIVOS DE VIDEO DIRECTOS (MP4, MKV, WEBM, HLS)
-            else if (url.match(/\.(mp4|webm|ogg|mkv|mov)$/i)) {
-                content = `<video src="${url}" controls autoplay playsinline></video>`;
-            }
-
-            // D. ENLACES GENÉRICOS / EMBEDS (Cualquier otra URL se trata como iframe)
+                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay"></iframe>`;
+                
+                // Guardamos que se abrió (no podemos saber el segundo exacto en iframe simple)
+                saveProgress(id, 100, 100, true);
+            } 
+            // B. MP4 NATIVO (Permite guardar segundo exacto)
             else {
-                // Asumimos que es un embed player de otro sitio
-                content = `<iframe src="${url}" allowfullscreen allow="autoplay"></iframe>`;
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = true;
+                video.autoplay = true;
+                video.playsInline = true;
+
+                // Restaurar tiempo
+                if(savedData && savedData.time && !savedData.isEmbed) {
+                    video.currentTime = savedData.time;
+                }
+
+                // Guardar cada 2 segundos
+                video.addEventListener('timeupdate', () => {
+                    if(video.currentTime > 5 && !video.paused) {
+                        saveProgress(id, video.currentTime, video.duration, false);
+                    }
+                });
+
+                container.appendChild(video);
+                currentVideoElement = video;
             }
 
-            container.innerHTML = content;
             overlay.style.display = 'flex';
         }
 
         function closePlayer() {
-            const overlay = document.getElementById('player-overlay');
-            const container = document.getElementById('dynamic-player');
-            container.innerHTML = ''; // Importante: Destruye el iframe para detener el audio
-            overlay.style.display = 'none';
+            if(currentVideoElement) {
+                currentVideoElement.pause();
+                currentVideoElement = null;
+            }
+            document.getElementById('dynamic-player').innerHTML = '';
+            document.getElementById('player-overlay').style.display = 'none';
         }
 
-        // Iniciar App
-        initApp();
+        // --- 6. UTILIDADES ---
+        function filterBy(cat, el) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            if(cat === 'Todos') renderList('trends-list', allMovies);
+            else {
+                const filtered = allMovies.filter(m => m.cat == cat);
+                renderList('trends-list', filtered);
+            }
+        }
 
+        function clearData() {
+            if(confirm('¿Borrar historial y favoritos?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Iniciar
+        initApp();
     </script>
 </body>
 </html>
