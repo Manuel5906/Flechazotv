@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
-
-    <title>Flechazo TV - Ultimate Custom</title>
-    
+    <title>Flechazo TV - Pro Ultimate</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. SISTEMA DE TEMAS DINÁMICOS --- */
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
             --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
@@ -20,230 +17,181 @@
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
+        /* Temas */
         .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(135deg, #ff3300, #ff9900); }
         .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(135deg, #00ff88, #00ccff); }
-        .theme-ocean { --bg: #050a1a; --card: #0d152d; --primary: #0088ff; --gradient: linear-gradient(135deg, #0088ff, #00ffff); }
-        .theme-gold { --bg: #1a1505; --card: #2d250d; --primary: #ffcc00; --gradient: linear-gradient(135deg, #ffcc00, #ff6600); }
-        .theme-sakura { --bg: #1a0510; --card: #2d0d1e; --primary: #ff69b4; --gradient: linear-gradient(135deg, #ff69b4, #ffb6c1); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg); color: var(--text); 
-            padding-bottom: calc(100px + var(--safe-bottom));
-            transition: background 0.4s, color 0.4s; overflow-x: hidden;
-        }
+        body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(100px + var(--safe-bottom)); transition: 0.4s; overflow-x: hidden; }
 
-        /* --- UI COMPONENTS --- */
-        .header { 
-            padding: calc(15px + var(--safe-top)) 25px 15px; 
-            background: rgba(15,15,26,0.95); position: sticky; top: 0; 
-            z-index: 1000; display: flex; justify-content: space-between; 
-            align-items: center; backdrop-filter: blur(15px);
-        }
+        /* --- UI BASE --- */
+        .header { padding: calc(15px + var(--safe-top)) 25px 15px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(15px); }
         .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; gap: 15px; scrollbar-width: none; }
+        .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
 
-        /* --- PERFIL ELITE --- */
-        .profile-container { padding: calc(20px + var(--safe-top)) 20px 20px; }
+        /* --- MODAL DE INFORMACIÓN (EL QUE FALTABA) --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: flex-end; backdrop-filter: blur(8px); }
+        .modal-sheet { 
+            width: 100%; background: var(--card); border-radius: 30px 30px 0 0; 
+            padding-bottom: calc(40px + var(--safe-bottom)); animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden; max-height: 90vh;
+        }
+        .modal-hero { width: 100%; height: 250px; position: relative; }
+        .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--card), transparent); }
         
-        .user-info { text-align: center; margin-bottom: 30px; }
-        .avatar-wrapper { width: 110px; height: 110px; margin: 0 auto 15px; position: relative; }
-        .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); padding: 3px; object-fit: cover; }
-        
-        .xp-container { width: 220px; height: 8px; background: #333; margin: 10px auto; border-radius: 10px; overflow: hidden; }
-        .xp-fill { height: 100%; width: 65%; background: var(--gradient); transition: 1.5s; }
+        .modal-body { padding: 20px 25px; }
+        .btn-play { background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
+        .btn-list { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; }
 
-        /* Agrupadores de Opciones (Cards) */
-        .settings-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .setting-item { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer; transition: 0.2s;
-        }
-        .setting-item:last-child { border: none; }
-        .setting-item:active { background: rgba(255,255,255,0.05); }
-        .setting-left { display: flex; align-items: center; gap: 15px; }
-        .setting-left i { width: 20px; text-align: center; color: var(--primary); font-size: 18px; }
-        
-        /* Selectores de Lista */
-        select { 
-            background: transparent; border: none; color: var(--primary); 
-            font-weight: bold; font-size: 14px; appearance: none; text-align: right;
-            cursor: pointer;
-        }
+        /* --- REPRODUCTOR FULLSCREEN --- */
+        #player-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; align-items: center; }
+        .close-player { position: absolute; top: calc(30px + var(--safe-top)); left: 20px; font-size: 24px; color: #fff; z-index: 10001; padding: 10px; }
 
-        /* --- NAV INFERIOR --- */
-        .nav { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); 
-            display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); 
-            z-index: 2000; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px);
-        }
-        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; transition: 0.3s; }
+        /* --- NAV --- */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); z-index: 1500; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px); }
+        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
         .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
 
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="player-overlay" style="position:fixed; inset:0; background:#000; z-index:9999; display:none; align-items:center;">
-        <i class="fa-solid fa-xmark" onclick="stopVideo()" style="position:absolute; top:40px; right:25px; font-size:30px; color:white; z-index:10001;"></i>
+    <div id="player-overlay">
+        <i class="fa-solid fa-arrow-left close-player" onclick="stopVideo()"></i>
         <video id="main-video" controls style="width:100%;"></video>
+    </div>
+
+    <div id="info-modal" class="modal-overlay" onclick="if(event.target.id==='info-modal') closeInfo()">
+        <div class="modal-sheet" id="info-content">
+            </div>
     </div>
 
     <div id="app">
         <header id="main-header" class="header">
             <h2 class="logo">Flechazo TV</h2>
-            <div style="position:relative;">
-                <i class="fa-solid fa-bell" style="font-size:24px;"></i>
-                <span id="notif-dot" style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; border:2px solid var(--bg); display:none;"></span>
-            </div>
+            <i class="fa-solid fa-bell" style="font-size:24px;"></i>
         </header>
 
         <div id="screen-home" class="screen">
-            <div class="section-title">🔥 Tendencias</div>
-            <div class="horizontal-scroll" id="trends-list">
-                <img class="poster" src="https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-                <img class="poster" src="https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-            </div>
+            <div class="section-title">🔥 Tendencias Semanales</div>
+            <div class="horizontal-scroll" id="trends-list"></div>
+            <div class="section-title">✨ Recomendados</div>
+            <div class="horizontal-scroll" id="rec-list"></div>
         </div>
 
         <div id="screen-explore" class="screen hidden">
             <div style="padding: 20px;">
-                <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px;">
+                <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px; border:1px solid #333;">
                     <i class="fa-solid fa-search" style="color:var(--primary);"></i>
-                    <input type="text" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%;">
+                    <input type="text" id="search-inp" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%;">
                 </div>
             </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
         </div>
 
         <div id="screen-profile" class="screen hidden">
-            <div class="profile-container">
-                <div class="user-info">
-                    <div class="avatar-wrapper">
-                        <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
+            <div style="text-align: center; padding: 40px;">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:100px; border-radius:50%; border:3px solid var(--primary);">
+                <h3>Gamer Flechazo</h3>
+                <div style="background:var(--card); border-radius:20px; padding:10px; margin-top:20px;">
+                    <div class="setting-item" style="padding:15px; display:flex; justify-content:space-between;" onclick="setTheme('fire')">
+                        <span>Tema Fuego</span><i class="fa-solid fa-fire" style="color:red"></i>
                     </div>
-                    <h2 id="txt-user">Gamer Flechazo</h2>
-                    <div class="xp-container"><div class="xp-fill"></div></div>
-                    <p style="color:var(--text-sec); font-size:12px;" id="txt-level">Nivel 15 • 850/1000 XP</p>
-                </div>
-
-                <div class="section-title">🎨 Personalización</div>
-                <div class="settings-card">
-                    <div class="setting-item">
-                        <div class="setting-left">
-                            <i class="fa-solid fa-palette"></i>
-                            <span id="txt-theme-label">Tema de la App</span>
-                        </div>
-                        <select id="theme-selector" onchange="setTheme(this.value)">
-                            <option value="default">Noche Azul</option>
-                            <option value="fire">Fuego Carmesí</option>
-                            <option value="emerald">Esmeralda</option>
-                            <option value="ocean">Océano Profundo</option>
-                            <option value="gold">Oro Real</option>
-                            <option value="sakura">Sakura Pink</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <div class="setting-left">
-                            <i class="fa-solid fa-language"></i>
-                            <span id="txt-lang-label">Idioma</span>
-                        </div>
-                        <select id="lang-selector" onchange="setLanguage(this.value)">
-                            <option value="es">Español</option>
-                            <option value="en">English</option>
-                            <option value="pt">Português</option>
-                            <option value="ko">한국어 (Coreano)</option>
-                        </select>
+                    <div class="setting-item" style="padding:15px; display:flex; justify-content:space-between;" onclick="setTheme('default')">
+                        <span>Tema Noche</span><i class="fa-solid fa-moon"></i>
                     </div>
                 </div>
-
-                <div class="section-title">🛡️ Cuenta</div>
-                <div class="settings-card">
-                    <div class="setting-item">
-                        <div class="setting-left">
-                            <i class="fa-solid fa-crown"></i>
-                            <span>Mi Suscripción</span>
-                        </div>
-                        <span style="color:var(--gold); font-weight:bold; font-size:12px;">PREMIUM</span>
-                    </div>
-                    <div class="setting-item" onclick="location.reload()">
-                        <div class="setting-left">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span style="color:var(--primary);">Cerrar Sesión</span>
-                        </div>
-                    </div>
-                </div>
+                <button onclick="location.reload()" style="margin-top:30px; color:red; background:none; border:none; font-weight:bold;">CERRAR SESIÓN</button>
             </div>
         </div>
 
         <nav class="nav">
             <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
             <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user-gear"></i>Perfil</div>
+            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
         </nav>
     </div>
 
     <script>
-        // --- LOGICA DE IDIOMAS ---
-        const translations = {
-            es: { user: "Gamer Flechazo", theme: "Tema de la App", lang: "Idioma", level: "Nivel 15 • 850/1000 XP" },
-            en: { user: "Flechazo Gamer", theme: "App Theme", lang: "Language", level: "Level 15 • 850/1000 XP" },
-            pt: { user: "Flechazo Jogador", theme: "Tema do App", lang: "Idioma", level: "Nível 15 • 850/1000 XP" },
-            ko: { user: "플레차조 게이머", theme: "앱 테마", lang: "언어", level: "레벨 15 • 850/1000 XP" }
+        // --- DATOS ---
+        const movies = [
+            { id: 1, title: "Amor Prohibido", desc: "Un romance intenso que desafía todas las reglas sociales y familiares.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", cat: "Romance" },
+            { id: 2, title: "Booyah Master", desc: "El camino de un jugador de Free Fire hasta convertirse en leyenda mundial.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", cat: "Acción" },
+            { id: 3, title: "Venganza Coreana", desc: "Tras perderlo todo, un hombre busca justicia en las calles de Seúl.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", cat: "Drama" }
+        ];
+
+        // --- INICIALIZAR ---
+        window.onload = () => {
+            const hList = document.getElementById('trends-list');
+            const eGrid = document.getElementById('explore-grid');
+            
+            movies.forEach(m => {
+                const img = `<img class="poster" src="${m.img}" onclick="openInfo(${m.id})">`;
+                hList.innerHTML += img;
+                eGrid.innerHTML += img;
+            });
+            document.getElementById('rec-list').innerHTML = hList.innerHTML;
         };
 
-        function setLanguage(lang) {
-            const t = translations[lang];
-            document.getElementById('txt-user').innerText = t.user;
-            document.getElementById('txt-theme-label').innerText = t.theme;
-            document.getElementById('txt-lang-label').innerText = t.lang;
-            document.getElementById('txt-level').innerText = t.level;
-            localStorage.setItem('f_lang', lang);
+        // --- FUNCIONES INFO MODAL ---
+        function openInfo(id) {
+            const m = movies.find(x => x.id === id);
+            document.getElementById('info-content').innerHTML = `
+                <div class="modal-hero">
+                    <img src="${m.img}">
+                </div>
+                <div class="modal-body">
+                    <h2 style="margin:0 0 10px;">${m.title}</h2>
+                    <p style="color:var(--primary); font-size:13px; font-weight:bold; margin-bottom:10px;">${m.cat} • 98% Match</p>
+                    <p style="color:var(--text-sec); font-size:14px; line-height:1.5; margin-bottom:25px;">${m.desc}</p>
+                    <button class="btn-play" onclick="playVideo('${m.video}')">
+                        <i class="fa-solid fa-play"></i> VER AHORA
+                    </button>
+                    <button class="btn-list" onclick="alert('Agregado a tu lista')">
+                        <i class="fa-solid fa-plus"></i> MI LISTA
+                    </button>
+                </div>
+            `;
+            document.getElementById('info-modal').style.display = 'flex';
         }
 
-        // --- LÓGICA DE TEMAS ---
-        function setTheme(t) {
-            document.body.className = (t === 'default') ? '' : 'theme-' + t;
-            localStorage.setItem('f_theme', t);
-            document.getElementById('theme-selector').value = t;
+        function closeInfo() {
+            document.getElementById('info-modal').style.display = 'none';
         }
 
-        // --- NAVEGACIÓN ---
-        function switchTab(tab, el) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('screen-'+tab).classList.remove('hidden');
-            
-            // Header solo en inicio
-            document.getElementById('main-header').style.display = (tab === 'home') ? 'flex' : 'none';
-
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        // --- VIDEO ---
+        // --- VIDEO PLAYER ---
         function playVideo(url) {
             const p = document.getElementById('player-overlay');
             const v = document.getElementById('main-video');
             v.src = url;
             p.style.display = 'flex';
             v.play();
+            closeInfo(); // Cierra el modal de info al empezar el video
         }
+
         function stopVideo() {
             document.getElementById('main-video').pause();
             document.getElementById('player-overlay').style.display = 'none';
         }
 
-        // --- INIT ---
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('f_theme') || 'default';
-            const savedLang = localStorage.getItem('f_lang') || 'es';
-            setTheme(savedTheme);
-            setLanguage(savedLang);
-            document.getElementById('lang-selector').value = savedLang;
-        };
+        // --- NAVEGACIÓN ---
+        function switchTab(tab, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('screen-'+tab).classList.remove('hidden');
+            document.getElementById('main-header').style.display = (tab === 'home') ? 'flex' : 'none';
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function setTheme(t) {
+            document.body.className = (t === 'default') ? '' : 'theme-' + t;
+        }
     </script>
 </body>
 </html>
