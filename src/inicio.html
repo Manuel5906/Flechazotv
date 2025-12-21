@@ -3,171 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    <title>Flechazo TV - V7 COSMIC</title>
+    <title>Flechazo TV - INFINITY</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
         /* --- 1. CORE & VARIABLES --- */
         :root { 
-            --bg: #050505; --card: #141414; --primary: #E50914; --text: #fff; --subtext: #a1a1a1;
-            --glass: rgba(20, 20, 20, 0.7); --border: rgba(255, 255, 255, 0.1);
+            --bg: #050505; --card: #161616; --primary: #E50914; --text: #fff; --subtext: #a1a1a1;
+            --glass: rgba(20, 20, 20, 0.6); --border: rgba(255, 255, 255, 0.08);
             --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
         }
         
         /* TEMAS */
-        body.theme-blue { --primary: #2979FF; --bg: #020b14; }
-        body.theme-neon { --primary: #00E676; --bg: #05140a; }
+        body.theme-blue { --primary: #2979FF; --bg: #020810; }
+        body.theme-neon { --primary: #00E676; --bg: #001005; }
         body.theme-gold { --primary: #FFD700; --bg: #141000; }
         body.theme-purple { --primary: #D500F9; --bg: #120014; }
+        body.kids-mode { --bg: #ffffff; --card: #f0f0f0; --primary: #FF9800; --text: #111; --subtext: #555; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(90px + var(--safe-bottom)); overflow-x: hidden; transition: background 0.4s ease; }
 
-        /* --- 2. UI ELEMENTS --- */
-        /* Splash */
+        /* --- 2. PANTALLA DE CARGA (SPLASH) --- */
         #splash { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .brand-anim { font-size: 40px; font-weight: 900; letter-spacing: -2px; background: linear-gradient(45deg, var(--primary), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: breathe 3s infinite; }
-        
-        /* Glass Header */
-        .header { position: sticky; top: 0; padding: calc(15px + var(--safe-top)) 20px 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: 0.3s; }
-        .logo { color: var(--primary); font-weight: 800; font-size: 24px; letter-spacing: -1px; text-transform: uppercase; }
+        .brand-logo { font-size: 40px; font-weight: 900; letter-spacing: -2px; background: linear-gradient(45deg, var(--primary), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: breathe 3s infinite; }
+        .loader { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
 
-        /* Nav Bar */
-        .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(30,30,30,0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 25px; display: flex; justify-content: space-around; padding: 15px 0; z-index: 2000; backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .nav-item { color: #888; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        /* --- 3. PROFILE GATE (LOGIN) --- */
+        #gate { position: fixed; inset: 0; background: var(--bg); z-index: 9500; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .gate-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
+        .p-item { text-align: center; cursor: pointer; transition: transform 0.2s; }
+        .p-item:active { transform: scale(0.95); }
+        .p-img { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid transparent; }
+        .p-item.active .p-img { border-color: var(--text); }
+        .p-name { margin-top: 10px; font-weight: 600; color: var(--subtext); }
+
+        /* --- 4. HEADER & NAV --- */
+        .header { position: sticky; top: 0; padding: calc(15px + var(--safe-top)) 20px 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .logo-txt { color: var(--primary); font-weight: 800; font-size: 22px; letter-spacing: -1px; text-transform: uppercase; }
+
+        .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(20,20,20,0.9); border: 1px solid var(--border); border-radius: 30px; display: flex; justify-content: space-around; padding: 15px 0; z-index: 2000; backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .nav-item { color: #666; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; transition: 0.3s; }
         .nav-item.active { background: var(--primary); color: #fff; transform: translateY(-5px); box-shadow: 0 5px 15px var(--primary); }
         .nav-item i { font-size: 20px; }
 
-        /* --- 3. PLAYER UNIVERSAL (GOD TIER) --- */
-        #player-fs { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; flex-direction: column; }
-        #video-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
-        video, iframe { width: 100%; height: 100%; border: none; object-fit: contain; }
+        /* --- 5. COMPONENTES PRINCIPALES --- */
+        .screen { display: none; animation: fadeIn 0.4s; padding-bottom: 20px; }
+        .screen.active { display: block; }
         
-        /* Player Controls Overlay */
-        .p-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; padding: calc(20px + var(--safe-top)) 20px 40px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        #video-container:hover .p-overlay, #video-container.show-controls .p-overlay { opacity: 1; pointer-events: auto; }
-        
-        .p-top { display: flex; justify-content: space-between; align-items: center; }
-        .p-close { font-size: 24px; color: #fff; cursor: pointer; filter: drop-shadow(0 2px 4px #000); }
-        .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 40px; align-items: center; }
-        .p-btn { color: #fff; font-size: 40px; cursor: pointer; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); opacity: 0.8; transition: 0.2s; }
-        .p-btn:active { transform: scale(0.9); opacity: 1; }
-        
-        /* Double Tap Zones */
-        .dt-zone { position: absolute; top: 0; bottom: 0; width: 35%; z-index: 5; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; color: #fff; font-weight: bold; font-size: 14px; background: rgba(255,255,255,0.1); }
-        .dt-left { left: 0; border-top-right-radius: 50%; border-bottom-right-radius: 50%; }
-        .dt-right { right: 0; border-top-left-radius: 50%; border-bottom-left-radius: 50%; }
-        .dt-zone.active { opacity: 1; }
+        .section { margin-top: 35px; }
+        .sec-head { padding: 0 20px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .sec-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .h-list { display: flex; overflow-x: auto; gap: 14px; padding: 0 20px; scrollbar-width: none; }
 
-        /* --- 4. HERO & LISTS --- */
-        .hero-wrap { height: 75vh; position: relative; display: flex; align-items: flex-end; margin-top: -70px; overflow: hidden; border-radius: 0 0 30px 30px; }
+        /* Tarjetas */
+        .card { width: 120px; flex-shrink: 0; position: relative; cursor: pointer; transition: transform 0.2s; }
+        .card:active { transform: scale(0.95); }
+        .card-img { width: 100%; height: 170px; border-radius: 10px; object-fit: cover; background: #222; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        /* Wide Card (Continue) */
+        .wide-card { width: 220px; flex-shrink: 0; position: relative; cursor: pointer; }
+        .wide-box { position: relative; height: 125px; border-radius: 10px; overflow: hidden; }
+        .wide-img { width: 100%; height: 100%; object-fit: cover; }
+        .prog-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.2); }
+        .prog-fill { height: 100%; background: var(--primary); width: 0%; }
+        .del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; backdrop-filter: blur(4px); z-index: 5; }
+
+        /* Top 10 */
+        .rank-card { width: 140px; flex-shrink: 0; position: relative; display: flex; align-items: flex-end; cursor: pointer; margin-left: 20px; }
+        .rank-num { position: absolute; left: -25px; bottom: -5px; font-size: 90px; font-weight: 900; color: #000; -webkit-text-stroke: 2px #555; font-family: impact; line-height: 0.8; z-index: -1; }
+
+        /* --- 6. HERO SECTION --- */
+        .hero-wrap { height: 70vh; position: relative; display: flex; align-items: flex-end; margin-top: -70px; overflow: hidden; border-radius: 0 0 30px 30px; }
         .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; animation: zoomIn 20s infinite alternate; }
-        .hero-grad { position: absolute; inset: 0; background: linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.6) 100%); }
+        .hero-grad { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 60%, rgba(0,0,0,0.4) 100%); }
         .hero-info { padding: 30px 20px; z-index: 2; width: 100%; }
         .h-badge { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); display: inline-block; margin-bottom: 10px; }
         .h-title { font-size: 46px; font-weight: 900; line-height: 0.95; margin-bottom: 15px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         
-        .action-row { display: flex; gap: 12px; }
-        .act-btn { flex: 1; height: 50px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .act-btn:active { transform: scale(0.97); }
-        .btn-p { background: #fff; color: #000; }
-        .btn-s { background: rgba(255,255,255,0.15); color: #fff; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .hero-btns { display: flex; gap: 12px; }
+        .h-btn { flex: 1; height: 50px; border-radius: 12px; border: none; font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .h-btn:active { transform: scale(0.97); }
+        .btn-pri { background: #fff; color: #000; }
+        .btn-sec { background: rgba(255,255,255,0.15); color: #fff; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
 
-        .h-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 0 20px; scrollbar-width: none; margin-top: 20px; }
-        .card { width: 120px; flex-shrink: 0; position: relative; cursor: pointer; transition: transform 0.2s; }
-        .card:active { transform: scale(0.95); }
-        .card img { width: 100%; height: 180px; border-radius: 12px; object-fit: cover; background: #222; }
+        /* --- 7. PLAYER UNIVERSAL (GOD MODE) --- */
+        #player-fs { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; flex-direction: column; }
+        #video-wrap { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
+        video, iframe { width: 100%; height: 100%; border: none; object-fit: contain; }
+        
+        .p-controls { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: calc(20px + var(--safe-top)) 20px 40px; opacity: 0; transition: 0.3s; pointer-events: none; }
+        #video-wrap.show-ui .p-controls { opacity: 1; pointer-events: auto; }
+        
+        .dt-zone { position: absolute; top: 0; bottom: 0; width: 35%; z-index: 5; display: flex; align-items: center; justify-content: center; opacity: 0; color: #fff; font-weight: bold; background: rgba(255,255,255,0.1); transition: 0.2s; }
+        .dt-left { left: 0; } .dt-right { right: 0; }
+        .dt-zone.active { opacity: 1; }
 
-        /* --- 5. MODULES: SHEET, GATE, TOAST --- */
-        #details-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; display: none; align-items: flex-end; backdrop-filter: blur(10px); opacity: 0; transition: 0.3s; }
-        #details-sheet.open { opacity: 1; }
+        /* --- 8. BOTTOM SHEET & MODULES --- */
+        #sheet-ol { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; display: none; align-items: flex-end; backdrop-filter: blur(10px); opacity: 0; transition: 0.3s; }
+        #sheet-ol.open { opacity: 1; }
         .sheet-box { background: #111; width: 100%; max-height: 90vh; border-radius: 30px 30px 0 0; overflow-y: auto; position: relative; transform: translateY(100%); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.8); border-top: 1px solid #333; }
-        #details-sheet.open .sheet-box { transform: translateY(0); }
-
-        #gate { position: fixed; inset: 0; background: #000; z-index: 9500; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
-        .p-icon { width: 110px; height: 110px; border-radius: 20px; object-fit: cover; border: 3px solid transparent; transition: 0.2s; }
-        .p-item:active .p-icon { border-color: #fff; transform: scale(0.95); }
+        #sheet-ol.open .sheet-box { transform: translateY(0); }
 
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(30,30,30,0.9); backdrop-filter: blur(10px); padding: 12px 20px; border-radius: 30px; display: flex; align-items: center; gap: 10px; border: 1px solid #444; z-index: 10000; animation: slideIn 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .toast i { color: var(--primary); }
 
-        /* --- 6. SHORTS & SEARCH --- */
-        .shorts-wrapper { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; background: #000; padding-bottom: 90px; }
-        .short-v { height: 100%; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
+        /* --- 9. SHORTS & SEARCH --- */
+        .shorts-wrap { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; background: #000; padding-bottom: 90px; }
+        .short-item { height: 100%; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
         .short-vid { width: 100%; height: 100%; object-fit: cover; }
         .short-ui { position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(transparent, rgba(0,0,0,0.8)); pointer-events: none; }
-        .short-actions { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; pointer-events: auto; }
-        .s-act { width: 45px; height: 45px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); color: #fff; font-size: 20px; }
-
+        
         .search-page { padding: 20px; padding-top: calc(20px + var(--safe-top)); }
-        .search-bar { background: #222; border-radius: 15px; padding: 15px; display: flex; gap: 10px; align-items: center; border: 1px solid #333; margin-bottom: 20px; }
+        .search-inp { background: #222; border-radius: 15px; padding: 15px; display: flex; gap: 10px; align-items: center; border: 1px solid #333; margin-bottom: 20px; width: 100%; color: #fff; font-size: 16px; outline: none; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
-        /* UTILS */
+        /* --- 10. PERFIL --- */
+        .profile-head { text-align: center; padding: 40px 20px 0; }
+        .vip-card { background: linear-gradient(135deg, #FFD700, #B8860B); padding: 20px; border-radius: 16px; color: #000; margin: 20px; position: relative; overflow: hidden; box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2); }
+        .vip-card::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(transparent, rgba(255,255,255,0.4), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+        
+        /* Utils */
         .hidden { display: none !important; }
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes zoomIn { from { transform: scale(1); } to { transform: scale(1.1); } }
         @keyframes slideIn { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="brand-anim">FLECHAZO TV</div>
-        <div style="margin-top:20px; color:#666; font-size:12px; letter-spacing: 2px;">COSMIC EXPERIENCE</div>
+        <div class="brand-logo">FLECHAZO TV</div>
+        <div style="margin-top:20px; color:#666; font-size:12px; letter-spacing: 2px; font-weight:700;">INFINITY V8.0</div>
+        <div class="loader"></div>
     </div>
 
     <div id="gate">
         <div style="font-size:24px; font-weight:800; letter-spacing:-1px;">¿Quién eres?</div>
-        <div class="profile-grid" id="gate-grid"></div>
+        <div class="gate-grid" id="gate-grid"></div>
+        <button onclick="alert('Función Premium')" style="margin-top:40px; background:none; border:1px solid #555; padding:10px 20px; color:#aaa; border-radius:20px;">+ Añadir Perfil</button>
     </div>
 
+    <div id="toast-container"></div>
+
     <div id="player-fs">
-        <div id="video-container" onclick="toggleControls()">
+        <div id="video-wrap" onclick="toggleControls()">
             <div class="dt-zone dt-left" id="dt-l"><i class="fa-solid fa-backward"></i> -10s</div>
             <div class="dt-zone dt-right" id="dt-r">+10s <i class="fa-solid fa-forward"></i></div>
             
-            <div class="p-overlay" id="p-controls">
-                <div class="p-top">
-                    <i class="fa-solid fa-chevron-down p-close" onclick="closePlayer()"></i>
-                    <div style="background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:5px; font-size:12px; font-weight:bold;">HD</div>
+            <div class="p-controls">
+                <div style="display:flex; justify-content:space-between;">
+                    <i class="fa-solid fa-chevron-down" style="font-size:24px; color:#fff;" onclick="closePlayer()"></i>
+                    <div style="background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:5px; font-size:12px; font-weight:bold;">LIVE / HD</div>
                 </div>
-                <div class="p-center">
-                    <i class="fa-solid fa-backward-15 p-btn" onclick="skip(-10)"></i>
-                    <i class="fa-solid fa-pause p-btn" id="p-play-btn" onclick="togglePlayState()"></i>
-                    <i class="fa-solid fa-forward-15 p-btn" onclick="skip(10)"></i>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; gap:40px; align-items:center;">
+                    <i class="fa-solid fa-backward-15" style="font-size:40px; color:#fff;" onclick="skip(-10)"></i>
+                    <i class="fa-solid fa-pause" id="p-play-btn" style="font-size:50px; color:#fff;" onclick="togglePlayState()"></i>
+                    <i class="fa-solid fa-forward-15" style="font-size:40px; color:#fff;" onclick="skip(10)"></i>
                 </div>
                 <div style="width:100%;">
-                    <div style="height:4px; background:rgba(255,255,255,0.3); border-radius:2px; width:100%;">
-                        <div style="height:100%; background:var(--primary); width:45%;"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:12px;">
-                        <span>12:40</span><span>45:00</span>
-                    </div>
+                    <div style="height:4px; background:rgba(255,255,255,0.3); border-radius:2px; width:100%;"><div style="height:100%; background:var(--primary); width:45%;"></div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="details-sheet" onclick="if(event.target===this) toggleSheet(false)">
-        <div class="sheet-box">
-            <div id="sheet-content"></div>
-        </div>
+    <div id="sheet-ol" onclick="if(event.target===this) toggleSheet(false)">
+        <div class="sheet-box"><div id="sheet-content"></div></div>
     </div>
 
     <div id="app" class="hidden">
         
         <div id="tab-home" class="screen active">
             <header class="header">
-                <div class="logo">Flechazo TV</div>
-                <div onclick="vibrate(); alert('Buscando dispositivos...')" style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                    <i class="fa-solid fa-chromecast"></i>
+                <div class="logo-txt">Flechazo TV</div>
+                <div onclick="toast('Notificaciones al día', 'bell')" style="width:36px; height:36px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-regular fa-bell"></i>
                 </div>
             </header>
 
@@ -175,58 +195,55 @@
 
             <div class="section">
                 <div class="sec-head"><span class="sec-title">Continuar Viendo</span></div>
-                <div class="h-scroll" id="list-continue"></div>
+                <div class="h-list" id="list-continue"></div>
             </div>
 
             <div class="section">
                 <div class="sec-head"><span class="sec-title">Top 10 Global</span></div>
-                <div class="h-scroll" id="list-top10"></div>
+                <div class="h-list" id="list-top10"></div>
             </div>
 
             <div class="section">
                 <div class="sec-head"><span class="sec-title">Tendencias</span></div>
-                <div class="h-scroll" id="list-trends"></div>
+                <div class="h-list" id="list-trends"></div>
             </div>
-            <br><br>
+            
+            <div id="dynamic-categories"></div> <br><br>
         </div>
 
-        <div id="tab-explore" class="screen hidden">
+        <div id="tab-explore" class="screen">
             <div class="search-page">
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass" style="color:#666;"></i>
-                    <input type="text" placeholder="¿Qué quieres ver hoy?" style="background:none; border:none; color:#fff; width:100%; font-size:16px; font-family:inherit;" onkeyup="runSearch(this.value)">
-                </div>
+                <input type="text" class="search-inp" placeholder="Buscar películas, series, anime..." onkeyup="runSearch(this.value)">
                 <h3 style="margin-bottom:15px;">Explorar Todo</h3>
                 <div class="grid-3" id="search-grid"></div>
             </div>
         </div>
 
-        <div id="tab-shorts" class="screen hidden">
-            <div class="shorts-wrapper" id="shorts-feed"></div>
+        <div id="tab-shorts" class="screen" style="padding:0;">
+            <div class="shorts-wrap" id="shorts-feed"></div>
         </div>
 
-        <div id="tab-profile" class="screen hidden">
-            <div style="padding:40px 20px; text-align:center;">
-                <div style="position:relative; display:inline-block;">
-                    <img id="p-avatar" style="width:120px; height:120px; border-radius:50%; border:4px solid var(--primary); object-fit:cover;">
-                    <div style="position:absolute; bottom:0; right:0; background:#fff; color:#000; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;"><i class="fa-solid fa-pen"></i></div>
+        <div id="tab-profile" class="screen">
+            <div class="profile-head">
+                <img id="p-avatar" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--primary); object-fit:cover;">
+                <h2 id="p-name" style="margin:10px 0 5px;">Usuario</h2>
+                <div style="color:var(--subtext); font-size:13px;">MIEMBRO INFINITY</div>
+                
+                <div class="vip-card">
+                    <div style="font-weight:900; font-size:20px;">VIP ULTIMATE</div>
+                    <div style="font-size:12px; opacity:0.8;">Acceso HLS • 4K HDR • Sin Anuncios</div>
                 </div>
-                <h1 id="p-name" style="margin:15px 0 5px;">Usuario</h1>
-                <div style="color:var(--primary); font-weight:bold; letter-spacing:1px; font-size:12px;">MIEMBRO COSMIC</div>
 
-                <div style="background:#111; border-radius:20px; padding:20px; margin-top:30px; text-align:left;">
-                    <div onclick="changeTheme()" style="padding:15px 0; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
-                        <span><i class="fa-solid fa-palette" style="margin-right:10px; color:#888;"></i> Cambiar Tema</span>
-                        <div style="display:flex; gap:5px;">
-                            <div style="width:15px; height:15px; background:#E50914; border-radius:50%;"></div>
-                            <div style="width:15px; height:15px; background:#2979FF; border-radius:50%;"></div>
-                        </div>
+                <div style="background:var(--card); border-radius:15px; margin:20px; text-align:left;">
+                    <div onclick="changeTheme()" style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+                        <span><i class="fa-solid fa-palette" style="margin-right:10px; color:#888;"></i> Tema</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px; color:#555;"></i>
                     </div>
-                    <div style="padding:15px 0; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
-                        <span><i class="fa-solid fa-download" style="margin-right:10px; color:#888;"></i> Descargas</span>
-                        <span>0 MB</span>
+                    <div onclick="toggleKids()" style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+                        <span><i class="fa-solid fa-child" style="margin-right:10px; color:#888;"></i> Modo Niños</span>
+                        <i class="fa-solid fa-toggle-off" id="kids-toggle" style="font-size:20px; color:#555;"></i>
                     </div>
-                    <div onclick="logout()" style="padding:15px 0; color:#ff4757; font-weight:bold;">
+                    <div onclick="logout()" style="padding:15px; color:#ff4444; font-weight:bold;">
                         <i class="fa-solid fa-arrow-right-from-bracket" style="margin-right:10px;"></i> Cerrar Sesión
                     </div>
                 </div>
@@ -243,52 +260,66 @@
     </div>
 
     <script>
-        // --- CONFIG ---
+        // --- 1. CONFIGURACIÓN & ESTADO ---
         const API_URL = 'https://flechazotv.vercel.app/api/movies';
-        let db = [];
+        let db = []; // Base de datos completa
         let curProfile = null;
         const profiles = [
-            { id: 1, name: 'Gamer Pro', img: 'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg' },
-            { id: 2, name: 'Kids', img: 'https://i.pinimg.com/564x/4d/9d/3e/4d9d3e8e1784534a621796d1955746f1.jpg' }
+            { id: 1, name: 'Gamer Pro', type: 'admin', img: 'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg' },
+            { id: 2, name: 'Kids', type: 'kids', img: 'https://i.pinimg.com/564x/4d/9d/3e/4d9d3e8e1784534a621796d1955746f1.jpg' }
         ];
 
-        // --- INIT ---
+        // --- 2. INICIO ---
         window.onload = async () => {
+            // Restaurar tema
+            const t = localStorage.getItem('f_theme');
+            if(t) document.body.className = t;
+
+            // Fetch API
             try {
                 const r = await fetch(API_URL);
-                db = await r.json();
-            } catch(e) { console.log('Offline'); }
+                const data = await r.json();
+                if(data && data.length > 0) db = data;
+                else throw new Error("Datos vacíos");
+            } catch(e) { 
+                console.log('Offline/Error, usando caché o vacío'); 
+                toast('Modo Offline Activado', 'wifi');
+            }
             
+            // Animación de salida
             setTimeout(() => {
                 document.getElementById('splash').style.opacity = '0';
-                setTimeout(() => document.getElementById('splash').style.display='none', 500);
+                setTimeout(() => document.getElementById('splash').style.display='none', 600);
                 renderGate();
             }, 1800);
         };
 
-        // --- PROFILES ---
+        // --- 3. PERFILES & GATE ---
         function renderGate() {
             const g = document.getElementById('gate-grid');
             g.innerHTML = profiles.map(p => `
-                <div class="p-item" style="text-align:center;" onclick="login(${p.id})">
-                    <img src="${p.img}" class="p-icon">
-                    <div style="margin-top:10px; font-weight:bold; color:#ccc;">${p.name}</div>
+                <div class="p-item" onclick="login(${p.id})">
+                    <img src="${p.img}" class="p-img">
+                    <div class="p-name">${p.name}</div>
                 </div>
             `).join('');
         }
+
         function login(id) {
             vibrate();
             curProfile = profiles.find(p => p.id === id);
+            
+            // Simular PIN si es admin
+            // if(curProfile.type === 'admin') { let pin = prompt('PIN'); if(pin !== '1234') return; }
+
             document.getElementById('gate').style.display = 'none';
             document.getElementById('app').classList.remove('hidden');
             document.getElementById('navbar').classList.remove('hidden');
             
-            // UI Setup
-            document.getElementById('p-avatar').src = curProfile.img;
-            document.getElementById('p-name').innerText = curProfile.name;
-            
-            if(db.length) initContent();
+            updateProfileUI();
+            if(db.length) initApp();
         }
+
         function logout() {
             vibrate();
             document.getElementById('app').classList.add('hidden');
@@ -296,14 +327,15 @@
             document.getElementById('gate').style.display = 'flex';
         }
 
-        // --- CONTENT ---
-        function initContent() {
-            renderHero(db[0]);
+        // --- 4. RENDERIZADO APP ---
+        function initApp() {
+            renderHero(db[0]); // Peli destacada
             renderList('list-trends', db);
             renderTop10(db);
             renderSearch(db);
             renderShorts(db);
             renderContinue();
+            renderDynamicCategories();
         }
 
         function renderHero(m) {
@@ -312,11 +344,11 @@
                     <img src="${m.img}" class="hero-bg">
                     <div class="hero-grad"></div>
                     <div class="hero-info">
-                        <div class="h-badge">Nº 1 HOY</div>
+                        <div class="h-badge">TOP 1 HOY</div>
                         <div class="h-title">${m.title}</div>
-                        <div class="action-row">
-                            <button class="act-btn btn-p" onclick="vibrate(); playVideo('${m.videoUrl}', ${m.id})"><i class="fa-solid fa-play"></i> Ver</button>
-                            <button class="act-btn btn-s" onclick="vibrate(); openSheet(${m.id})"><i class="fa-solid fa-info"></i> Info</button>
+                        <div class="hero-btns">
+                            <button class="h-btn btn-pri" onclick="vibrate(); playVideo('${m.videoUrl}', ${m.id})"><i class="fa-solid fa-play"></i> Ver</button>
+                            <button class="h-btn btn-sec" onclick="vibrate(); openSheet(${m.id})"><i class="fa-solid fa-info"></i> Info</button>
                         </div>
                     </div>
                 </div>`;
@@ -324,19 +356,35 @@
 
         function renderList(target, list) {
             document.getElementById(target).innerHTML = list.map(m => `
-                <div class="card" onclick="openSheet(${m.id})"><img src="${m.img}"></div>
+                <div class="card" onclick="openSheet(${m.id})"><img src="${m.img}" class="card-img" loading="lazy"></div>
             `).join('');
         }
 
         function renderTop10(list) {
-            document.getElementById('list-top10').innerHTML = list.slice(0, 5).map((m, i) => `
-                <div class="card" style="width:140px; display:flex; align-items:flex-end; margin-left:15px;" onclick="openSheet(${m.id})">
-                    <span style="position:absolute; left:-20px; bottom:-10px; font-size:80px; font-weight:900; -webkit-text-stroke:2px #555; color:#000; font-family:impact; line-height:1; z-index:-1;">${i+1}</span>
-                    <img src="${m.img}" style="width:110px; height:160px;">
+            document.getElementById('list-top10').innerHTML = list.slice(0,5).map((m, i) => `
+                <div class="rank-card" onclick="openSheet(${m.id})">
+                    <span class="rank-num">${i+1}</span>
+                    <img src="${m.img}" style="width:110px; height:160px; border-radius:6px; object-fit:cover;">
                 </div>`).join('');
         }
 
-        // --- SHEET ---
+        function renderDynamicCategories() {
+            // Extraer categorías únicas
+            const cats = [...new Set(db.map(m => m.cat))];
+            const container = document.getElementById('dynamic-categories');
+            container.innerHTML = cats.map(c => `
+                <div class="section">
+                    <div class="sec-head"><span class="sec-title">${c}</span></div>
+                    <div class="h-list">
+                        ${db.filter(m => m.cat === c).map(m => `
+                            <div class="card" onclick="openSheet(${m.id})"><img src="${m.img}" class="card-img" loading="lazy"></div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 5. BOTTOM SHEET (DETALLES) ---
         function openSheet(id) {
             vibrate();
             const m = db.find(x => x.id === id);
@@ -352,115 +400,122 @@
                     <div style="display:flex; gap:10px; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:20px;">
                         <span style="color:#46d369">99% Match</span>
                         <span>2025</span>
-                        <span style="border:1px solid #555; padding:0 4px; border-radius:3px;">4K</span>
+                        <span style="border:1px solid #555; padding:0 4px; border-radius:3px;">4K HDR</span>
                     </div>
                     <p style="color:#ccc; line-height:1.5; font-size:14px; margin-bottom:25px;">${m.desc}</p>
-                    
                     <button style="width:100%; background:#fff; color:#000; font-weight:bold; padding:15px; border-radius:12px; border:none; font-size:16px; margin-bottom:10px;" onclick="playVideo('${m.videoUrl}', ${m.id}); toggleSheet(false)"><i class="fa-solid fa-play"></i> Reproducir</button>
-                    <button style="width:100%; background:#222; color:#fff; font-weight:bold; padding:15px; border-radius:12px; border:none;" onclick="toast('Descargando...')"><i class="fa-solid fa-download"></i> Descargar</button>
-                </div>
-            `;
-            
+                    <button style="width:100%; background:#222; color:#fff; font-weight:bold; padding:15px; border-radius:12px; border:none;" onclick="toast('Añadido a descargas','download')"><i class="fa-solid fa-download"></i> Descargar</button>
+                </div>`;
             toggleSheet(true);
         }
         function toggleSheet(show) {
-            const el = document.getElementById('details-sheet');
+            const el = document.getElementById('sheet-ol');
             if(show) { el.style.display='block'; setTimeout(()=>el.classList.add('open'),10); }
             else { el.classList.remove('open'); setTimeout(()=>el.style.display='none',300); }
         }
 
-        // --- UNIVERSAL PLAYER ---
-        let currentVid = null;
+        // --- 6. REPRODUCTOR UNIVERSAL 2.0 (CON HLS) ---
+        let currVid = null;
         let lastTap = 0;
 
         function playVideo(url, id) {
             const p = document.getElementById('player-fs');
-            const c = document.getElementById('video-container');
-            const overlay = document.getElementById('p-controls');
-            c.innerHTML = '';
-            
-            // Clean URL & Detect Type
-            let html = '';
-            if (url.includes('youtu') || !url.match(/\.(mp4|webm)$/i)) {
+            const c = document.getElementById('video-wrap');
+            const overlay = document.querySelector('.p-controls');
+            c.innerHTML = ''; // Limpiar
+
+            // A. HLS (.m3u8) - Streaming Real
+            if (url.includes('.m3u8') && Hls.isSupported()) {
+                const vid = document.createElement('video');
+                vid.id = 'main-vid';
+                vid.style.width = '100%';
+                vid.style.height = '100%';
+                vid.controls = false; // Usamos controles custom o nativos ocultos
+                
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(vid);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+                c.appendChild(vid);
+                setupNativePlayer(vid, id);
+                overlay.style.display = 'flex';
+            }
+            // B. YouTube
+            else if (url.includes('youtu') || !url.match(/\.(mp4|webm|ogg|mkv)$/i)) {
                 let vid = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
-                html = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1&controls=0&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-                // YouTube iframe blocks click events, so overlay controls might need `pointer-events: none` on iframe or API use. 
-                // For simplicity in this "Copy Paste" version, we put a transparent div over it for controls if needed, but standard YT controls are better for iframes.
-                // We will disable custom overlay for iframes to let native controls work.
-                overlay.style.display = 'none';
-            } else {
-                // Native Video
-                html = `<video id="main-vid" src="${url}" autoplay playsinline style="width:100%;height:100%"></video>`;
+                c.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1&controls=0&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                overlay.style.display = 'none'; // YT tiene sus controles
+                if(id) saveHistory(id, 100, 100);
+            }
+            // C. MP4 Nativo
+            else {
+                const vid = document.createElement('video');
+                vid.id = 'main-vid';
+                vid.src = url;
+                vid.autoplay = true;
+                vid.playsInline = true;
+                vid.style.width = '100%';
+                vid.style.height = '100%';
+                c.appendChild(vid);
+                setupNativePlayer(vid, id);
                 overlay.style.display = 'flex';
             }
             
-            // Inject and Setup
-            c.insertAdjacentHTML('afterbegin', html); // Keep controls on top
-            p.style.display = 'flex';
-
-            if(id) saveHistory(id);
-
-            // Double Tap Logic
-            const vidEl = document.getElementById('main-vid');
-            if(vidEl) {
-                currentVid = vidEl;
-                c.addEventListener('click', (e) => {
-                    const now = new Date().getTime();
-                    const tapLength = now - lastTap;
-                    if (tapLength < 300 && tapLength > 0) {
-                        // Double Tap
-                        const width = window.innerWidth;
-                        if(e.clientX < width / 2) skip(-10);
-                        else skip(10);
-                    } else {
-                        // Single Tap -> Toggle Controls
-                        toggleControls();
-                    }
-                    lastTap = now;
-                });
+            // Inyectar UI de doble toque
+            if(!url.includes('youtu')) {
+                c.insertAdjacentHTML('beforeend', `<div class="dt-zone dt-left" id="dt-l">-10s</div><div class="dt-zone dt-right" id="dt-r">+10s</div>`);
             }
+            
+            p.style.display = 'flex';
         }
 
-        function closePlayer() {
-            document.getElementById('video-container').innerHTML = `
-                <div class="dt-zone dt-left" id="dt-l"><i class="fa-solid fa-backward"></i> -10s</div>
-                <div class="dt-zone dt-right" id="dt-r">+10s <i class="fa-solid fa-forward"></i></div>
-                <div class="p-overlay" id="p-controls">
-                    <div class="p-top"><i class="fa-solid fa-chevron-down p-close" onclick="closePlayer()"></i></div>
-                    <div class="p-center">
-                        <i class="fa-solid fa-backward-15 p-btn" onclick="skip(-10)"></i>
-                        <i class="fa-solid fa-pause p-btn" id="p-play-btn" onclick="togglePlayState()"></i>
-                        <i class="fa-solid fa-forward-15 p-btn" onclick="skip(10)"></i>
-                    </div>
-                </div>`; // Reset structure
-            document.getElementById('player-fs').style.display = 'none';
-            renderContinue();
+        function setupNativePlayer(vid, id) {
+            // Restore Progress
+            const h = JSON.parse(localStorage.getItem('f_hist')) || {};
+            if(id && h[id]) vid.currentTime = h[id].time;
+
+            // Save Progress
+            if(id) vid.addEventListener('timeupdate', () => { if(vid.currentTime>5) saveHistory(id, vid.currentTime, vid.duration); });
+
+            // Gestos
+            vid.parentElement.addEventListener('click', (e) => {
+                const now = new Date().getTime();
+                if (now - lastTap < 300) { // Doble tap
+                    const w = window.innerWidth;
+                    if(e.clientX < w/2) skip(-10); else skip(10);
+                } else { // Single tap
+                    toggleControls();
+                }
+                lastTap = now;
+            });
+            currVid = vid;
         }
 
         function skip(sec) {
             vibrate();
-            if(currentVid) currentVid.currentTime += sec;
+            if(currVid) currVid.currentTime += sec;
             const el = sec < 0 ? document.getElementById('dt-l') : document.getElementById('dt-r');
-            el.classList.add('active');
-            setTimeout(() => el.classList.remove('active'), 500);
+            el.classList.add('active'); setTimeout(()=>el.classList.remove('active'),500);
         }
 
         function togglePlayState() {
-            if(currentVid) {
-                if(currentVid.paused) { currentVid.play(); document.getElementById('p-play-btn').className = 'fa-solid fa-pause p-btn'; }
-                else { currentVid.pause(); document.getElementById('p-play-btn').className = 'fa-solid fa-play p-btn'; }
+            if(currVid) {
+                if(currVid.paused) { currVid.play(); document.getElementById('p-play-btn').className='fa-solid fa-pause'; }
+                else { currVid.pause(); document.getElementById('p-play-btn').className='fa-solid fa-play'; }
             }
         }
 
-        function toggleControls() {
-            const c = document.getElementById('video-container');
-            c.classList.toggle('show-controls');
+        function toggleControls() { document.getElementById('video-wrap').classList.toggle('show-ui'); }
+        function closePlayer() {
+            document.getElementById('video-wrap').innerHTML = ''; // Kill video
+            document.getElementById('player-fs').style.display = 'none';
+            renderContinue();
         }
 
-        // --- DATA LOGIC ---
-        function saveHistory(id) {
-            let h = JSON.parse(localStorage.getItem('f_hist')) || {};
-            h[id] = { ts: Date.now() };
+        // --- 7. DATOS & HISTORIAL ---
+        function saveHistory(id, t, d) {
+            const h = JSON.parse(localStorage.getItem('f_hist')) || {};
+            h[id] = { time: t, dur: d, ts: Date.now() };
             localStorage.setItem('f_hist', JSON.stringify(h));
         }
 
@@ -469,77 +524,84 @@
             const ids = Object.keys(h).sort((a,b) => h[b].ts - h[a].ts);
             const list = document.getElementById('list-continue');
             
-            if(ids.length === 0) { list.parentElement.classList.add('hidden'); return; }
+            if(ids.length===0) { list.parentElement.classList.add('hidden'); return; }
             list.parentElement.classList.remove('hidden');
             
             list.innerHTML = ids.map(id => {
                 const m = db.find(x => x.id == id);
                 if(!m) return '';
+                const pct = (h[id].time / h[id].dur) * 100 || 0;
                 return `
-                <div class="wide-card" style="width:200px; flex-shrink:0; position:relative;" onclick="playVideo('${m.videoUrl}', ${m.id})">
-                    <img src="${m.img}" style="width:100%; height:110px; border-radius:8px; object-fit:cover;">
-                    <div style="position:absolute; bottom:0; left:0; width:100%; height:3px; background:rgba(255,255,255,0.3);"><div style="width:60%; height:100%; background:var(--primary);"></div></div>
-                    <div style="font-size:12px; margin-top:5px; color:#aaa;">${m.title}</div>
+                <div class="wide-card" onclick="playVideo('${m.videoUrl}', ${m.id})">
+                    <div class="wide-box"><img src="${m.img}" class="wide-img"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div></div>
+                    <div class="del-btn" onclick="event.stopPropagation(); deleteHist(${id})"><i class="fa-solid fa-xmark" style="font-size:12px;"></i></div>
                 </div>`;
             }).join('');
         }
+        function deleteHist(id) {
+            const h = JSON.parse(localStorage.getItem('f_hist')) || {};
+            delete h[id]; localStorage.setItem('f_hist', JSON.stringify(h));
+            renderContinue();
+        }
 
-        // --- SHORTS & SEARCH ---
+        // --- 8. SHORTS & SEARCH ---
         function renderShorts(list) {
-            const feed = [...list, ...list];
+            const feed = [...list, ...list]; // Fake infinite
             document.getElementById('shorts-feed').innerHTML = feed.map(m => `
-                <div class="short-v">
+                <div class="short-item">
                     <video src="${m.videoUrl}" class="short-vid" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                     <div class="short-ui">
-                        <div style="margin-bottom:80px; text-align:left;">
+                        <div style="position:absolute; bottom:20px; left:15px; text-align:left;">
                             <h3 style="margin:0">${m.title}</h3>
                             <p>${m.cat}</p>
                         </div>
                     </div>
-                    <div class="short-actions">
-                        <div class="s-act" onclick="toast('Like')"><i class="fa-solid fa-heart"></i></div>
-                        <div class="s-act"><i class="fa-solid fa-comment"></i></div>
-                        <div class="s-act"><i class="fa-solid fa-share"></i></div>
-                    </div>
                 </div>`).join('');
         }
-
         function runSearch(val) {
-            const grid = document.getElementById('search-grid');
-            const l = val ? db.filter(m => m.title.toLowerCase().includes(val.toLowerCase())) : db;
-            grid.innerHTML = l.map(m => `<div onclick="openSheet(${m.id})"><img src="${m.img}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;background:#222"></div>`).join('');
+            const g = document.getElementById('search-grid');
+            const l = val ? db.filter(m => m.title.toLowerCase().includes(val.toLowerCase()) || m.desc.toLowerCase().includes(val.toLowerCase())) : db;
+            g.innerHTML = l.map(m => `<div onclick="openSheet(${m.id})"><img src="${m.img}" style="width:100%;height:150px;border-radius:8px;object-fit:cover;background:#222;"></div>`).join('');
         }
         function renderSearch(l) { runSearch(''); }
 
-        // --- UTILS ---
+        // --- 9. UTILS & SETTINGS ---
+        function updateProfileUI() {
+            document.getElementById('p-avatar').src = curProfile.img;
+            document.getElementById('p-name').innerText = curProfile.name;
+        }
         function goTab(t, el) {
             vibrate();
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.remove('hidden');
             document.getElementById('tab-'+t).classList.add('active');
-            
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
         }
-        
-        function toast(msg) {
-            const t = document.createElement('div'); t.className = 'toast';
-            t.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${msg}`;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        function vibrate() { if(navigator.vibrate) navigator.vibrate(15); }
-        
         function changeTheme() {
             const themes = ['theme-blue', 'theme-neon', 'theme-gold', 'theme-purple', ''];
-            const current = document.body.className;
-            let next = themes[(themes.indexOf(current) + 1) % themes.length];
-            document.body.className = next;
-            localStorage.setItem('f_theme', next);
-            toast('Tema actualizado');
+            const c = document.body.className.split(' ').find(cls => cls.startsWith('theme-')) || '';
+            let n = themes[(themes.indexOf(c)+1)%themes.length];
+            document.body.className = n;
+            localStorage.setItem('f_theme', n);
+            toast('Tema actualizado', 'palette');
         }
+        function toggleKids() {
+            document.body.classList.toggle('kids-mode');
+            toast('Modo Niños: ' + (document.body.classList.contains('kids-mode')?'ON':'OFF'), 'child');
+        }
+        function toast(m, i) {
+            const t = document.createElement('div'); t.className='toast';
+            t.innerHTML = `<i class="fa-solid fa-${i}"></i> ${m}`;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(()=>t.remove(),3000);
+        }
+        function vibrate() { if(navigator.vibrate) navigator.vibrate(10); }
+
+        // Add Keyframe styles
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes breathe { 0%,100% {transform:scale(1)} 50%{transform:scale(1.05)} } @keyframes zoomIn { to {transform:scale(1.1)} } @keyframes spin { to {transform:rotate(360deg)} } @keyframes fadeIn { from {opacity:0} to {opacity:1} } @keyframes slideIn { from {transform:translate(-50%,-20px);opacity:0} to {transform:translate(-50%,0);opacity:1} } @keyframes shine { 0% {transform:translateX(-100%) rotate(45deg)} 100% {transform:translateX(100%) rotate(45deg)} }`;
+        document.head.appendChild(style);
+
     </script>
 </body>
 </html>
