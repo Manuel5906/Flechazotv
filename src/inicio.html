@@ -10,78 +10,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILOS CORE --- */
+        /* --- CORE --- */
         :root { 
-            --bg: #0f0f1a; --card: #1c1c2a; --primary: #E50914; --text-main: #fff;
+            --bg: #0f0f1a; --card: #1c1c2a; --primary: #E50914; --text: #fff;
             --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* HEADER */
+        /* HEADER & HERO */
         .header { position: fixed; top: 0; width: 100%; padding: calc(15px + var(--safe-top)) 20px 15px; background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, transparent 100%); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
         .logo { color: var(--primary); font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
-        /* HERO */
         .hero-wrap { height: 75vh; position: relative; display: flex; align-items: flex-end; }
-        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: opacity 0.4s; }
-        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.4) 60%, rgba(15,15,26,0.8) 100%); }
+        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.4) 60%, rgba(15,15,26,0.9) 100%); }
         .hero-content { padding: 20px; z-index: 2; width: 100%; }
         .hero-title { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 10px; text-shadow: 0 2px 15px #000; }
-        .hero-desc { color: #ddd; font-size: 14px; margin-bottom: 20px; line-height: 1.4; max-width: 90%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 2px #000; }
+        .hero-desc { color: #ddd; font-size: 14px; margin-bottom: 20px; line-height: 1.4; max-width: 90%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
         .btn-group { display: flex; gap: 12px; }
-        .btn { flex: 1; height: 48px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.1s; }
+        .btn { flex: 1; height: 45px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.1s; }
         .btn:active { transform: scale(0.96); }
         .btn-play { background: #fff; color: #000; }
         .btn-list { background: rgba(255,255,255,0.25); color: #fff; backdrop-filter: blur(4px); }
 
-        /* PILLS */
-        .pills-container { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px; margin-top: -10px; position: relative; z-index: 10; scrollbar-width: none; }
-        .pill { padding: 8px 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; white-space: nowrap; font-size: 13px; backdrop-filter: blur(5px); }
-        .pill.active { background: #fff; color: #000; font-weight: 700; border-color: #fff; }
-
-        /* SECCIONES */
+        /* LISTS & SECTIONS */
         .section { margin-top: 40px; }
         .sec-header { padding: 0 20px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .sec-title { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
-        
+        .sec-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .h-list { display: flex; overflow-x: auto; gap: 12px; padding: 0 20px; scrollbar-width: none; }
         
-        /* CARD NORMAL */
+        /* CARDS */
         .card { width: 120px; flex-shrink: 0; position: relative; cursor: pointer; }
         .card-img { width: 100%; height: 175px; border-radius: 8px; object-fit: cover; background: #222; }
 
-        /* CARD CONTINUAR VIENDO (WIDE) */
-        .wide-card { width: 200px; flex-shrink: 0; position: relative; cursor: pointer; }
-        .wide-img-box { position: relative; height: 110px; border-radius: 8px; overflow: hidden; }
+        /* WIDE CARD (CONTINUE WATCHING) */
+        .wide-card { width: 210px; flex-shrink: 0; position: relative; cursor: pointer; }
+        .wide-img-box { position: relative; height: 115px; border-radius: 8px; overflow: hidden; }
         .wide-img { width: 100%; height: 100%; object-fit: cover; }
         .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .play-icon { width: 35px; height: 35px; background: rgba(0,0,0,0.6); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        
         .progress-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.3); }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; }
-        
         .wide-info { margin-top: 6px; display: flex; justify-content: space-between; font-size: 11px; color: #bbb; }
 
-        /* REPRODUCTOR */
+        /* --- BOTÓN ELIMINAR (NUEVO) --- */
+        .delete-btn { 
+            position: absolute; top: 5px; right: 5px; 
+            width: 26px; height: 26px; 
+            background: rgba(0,0,0,0.6); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            color: #fff; z-index: 10; 
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+        }
+        .delete-btn:active { background: var(--primary); transform: scale(0.9); }
+        .delete-btn i { font-size: 12px; }
+
+        /* --- MODAL CONFIRMACIÓN (NUEVO) --- */
+        .confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
+        .confirm-box { background: #1a1a24; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 40px #000; transform: scale(0.9); animation: popIn 0.2s forwards; }
+        .confirm-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .confirm-msg { font-size: 14px; color: #aaa; margin-bottom: 25px; }
+        .confirm-btns { display: flex; gap: 10px; }
+        .c-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .c-btn-cancel { background: #2a2a35; color: #fff; }
+        .c-btn-delete { background: var(--primary); color: #fff; }
+
+        @keyframes popIn { to { transform: scale(1); } }
+
+        /* PILLS & PLAYER */
+        .pills-container { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px; margin-top: -10px; position: relative; z-index: 10; scrollbar-width: none; }
+        .pill { padding: 8px 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; white-space: nowrap; font-size: 13px; backdrop-filter: blur(5px); }
+        .pill.active { background: #fff; color: #000; font-weight: 700; }
+        
         .player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; font-size: 24px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; color: #fff; z-index: 5002; cursor: pointer; backdrop-filter: blur(4px); }
+        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; font-size: 24px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; color: #fff; z-index: 5002; cursor: pointer; }
         #dynamic-player { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; }
         video { width: 100%; max-height: 100vh; }
         iframe { width: 100%; height: 100%; border: none; }
 
         /* NAV */
         .nav { position: fixed; bottom: 0; width: 100%; background: #0f0f1a; border-top: 1px solid #2a2a3a; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; }
-        .nav-btn { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-btn { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-btn.active { color: #fff; }
         .nav-btn i { font-size: 22px; }
 
         .hidden { display: none !important; }
-        .loading { padding: 20px; color: #666; font-size: 13px; text-align: center; }
+        .loading { padding: 20px; text-align: center; color: #666; }
     </style>
 </head>
 <body>
+
+    <div id="confirm-modal" class="confirm-modal">
+        <div class="confirm-box">
+            <div class="confirm-title">¿Eliminar de la lista?</div>
+            <div class="confirm-msg">Este título se borrará de tu sección Continuar Viendo.</div>
+            <div class="confirm-btns">
+                <button class="c-btn c-btn-cancel" onclick="closeConfirm()">Cancelar</button>
+                <button class="c-btn c-btn-delete" onclick="executeDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="player-overlay" class="player-fs">
         <i class="fa-solid fa-xmark close-player" onclick="closePlayer()"></i>
@@ -91,14 +124,12 @@
     <div id="app">
         <header class="header">
             <div class="logo">Flechazo TV</div>
-            <div style="font-size:12px; font-weight:bold; background:#333; padding:5px 10px; border-radius:15px;">
-                <i class="fa-solid fa-crown" style="color:#FFD700; margin-right:4px;"></i> VIP
-            </div>
+            <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
         </header>
 
         <div id="hero-container">
-            <div style="height:75vh; background:#111; display:flex; align-items:center; justify-content:center;">
-                <i class="fa-solid fa-spinner fa-spin" style="color:#333; font-size:30px;"></i>
+            <div style="height:75vh; display:flex; align-items:center; justify-content:center; background:#111;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size:30px; color:#333;"></i>
             </div>
         </div>
 
@@ -106,28 +137,24 @@
             <div class="pill active" onclick="filterBy('Todos', this)">Todos</div>
             <div class="pill" onclick="filterBy('Acción', this)">Acción</div>
             <div class="pill" onclick="filterBy('Drama', this)">Drama</div>
-            <div class="pill" onclick="filterBy('Anime', this)">Anime</div>
             <div class="pill" onclick="filterBy('Romance', this)">Romance</div>
         </div>
 
         <div id="section-continue" class="section hidden">
-            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-clock-rotate-left" style="font-size:16px; color:var(--primary);"></i> Continuar Viendo</span></div>
+            <div class="sec-header">
+                <span class="sec-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary)"></i> Continuar Viendo</span>
+            </div>
             <div class="h-list" id="continue-list"></div>
         </div>
 
         <div id="section-mylist" class="section hidden">
-            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-check" style="font-size:16px; color:#46d369;"></i> Mi Lista</span></div>
+            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-check" style="color:#46d369"></i> Mi Lista</span></div>
             <div class="h-list" id="mylist-list"></div>
         </div>
 
         <div class="section">
             <div class="sec-header"><span class="sec-title">Tendencias</span></div>
-            <div class="h-list" id="trends-list"><div class="loading">Cargando contenido...</div></div>
-        </div>
-
-        <div class="section">
-            <div class="sec-header"><span class="sec-title">Para ti</span></div>
-            <div class="h-list" id="rec-list"><div class="loading">Cargando...</div></div>
+            <div class="h-list" id="trends-list"><div class="loading">Cargando...</div></div>
         </div>
 
         <br><br><br>
@@ -135,77 +162,65 @@
 
     <nav class="nav">
         <div class="nav-btn active"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-btn"><i class="fa-solid fa-magnifying-glass"></i>Buscar</div>
+        <div class="nav-btn"><i class="fa-solid fa-compass"></i>Explorar</div>
         <div class="nav-btn"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-btn" onclick="clearData()"><i class="fa-solid fa-trash"></i>Limpiar</div>
+        <div class="nav-btn" onclick="clearAllData()"><i class="fa-solid fa-gear"></i>Reset</div>
     </nav>
 
     <script>
         const API_URL = 'https://flechazotv.vercel.app/api/movies';
         let allMovies = [];
+        let itemToDelete = null; // Variable para saber qué vamos a borrar
         let currentVideoElement = null;
 
-        // --- 1. INICIALIZACIÓN ---
+        // --- 1. INICIO ---
         async function initApp() {
             try {
-                // Fetch datos de la API
                 const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
-                
                 if(data.length > 0) {
                     allMovies = data;
-                    renderHero(data[0]); // Peli destacada
+                    renderHero(data[0]);
                     renderList('trends-list', data);
-                    renderList('rec-list', [...data].reverse());
-                    
-                    // Renderizar listas personalizadas
                     renderContinueWatching();
                     renderMyList();
                 }
-
             } catch (e) {
-                console.error(e);
-                document.getElementById('trends-list').innerHTML = `<p class="loading">Error de conexión. Verifica la API.</p>`;
+                document.getElementById('trends-list').innerHTML = `<p class="loading">Error de conexión.</p>`;
             }
         }
 
-        // --- 2. RENDERIZADO VISUAL ---
+        // --- 2. RENDERIZADO BÁSICO ---
         function renderHero(movie) {
             const isListed = isInMyList(movie.id);
-            const btnText = isListed ? 'En mi lista' : 'Mi Lista';
-            const btnIcon = isListed ? 'fa-check' : 'fa-plus';
-
             document.getElementById('hero-container').innerHTML = `
                 <div class="hero-wrap">
                     <img src="${movie.img}" class="hero-bg">
                     <div class="hero-gradient"></div>
                     <div class="hero-content">
-                        <div style="color:#46d369; font-weight:bold; margin-bottom:5px;">98% Coincidencia</div>
+                        <div style="color:#46d369; font-weight:bold; margin-bottom:5px;">Nuevo episodio</div>
                         <h1 class="hero-title">${movie.title}</h1>
-                        <p class="hero-desc">${movie.desc || 'Una historia increíble te espera.'}</p>
+                        <p class="hero-desc">${movie.desc || 'Sin descripción disponible.'}</p>
                         <div class="btn-group">
                             <button class="btn btn-play" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
                                 <i class="fa-solid fa-play"></i> Reproducir
                             </button>
                             <button class="btn btn-list" onclick="toggleMyList(${movie.id}, this)">
-                                <i class="fa-solid ${btnIcon}"></i> ${btnText}
+                                <i class="fa-solid ${isListed ? 'fa-check' : 'fa-plus'}"></i> ${isListed ? 'En lista' : 'Mi Lista'}
                             </button>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function renderList(id, list) {
             document.getElementById(id).innerHTML = list.map(m => `
                 <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
                     <img src="${m.img}" class="card-img" loading="lazy">
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
-        // --- 3. LOGICA CONTINUAR VIENDO (LocalStorage) ---
+        // --- 3. LÓGICA CONTINUAR VIENDO (CON BORRADO) ---
         function renderContinueWatching() {
             const history = JSON.parse(localStorage.getItem('f_history')) || {};
             const ids = Object.keys(history).sort((a,b) => history[b].date - history[a].date);
@@ -223,42 +238,52 @@
                 if (!movie) return '';
 
                 const data = history[id];
-                let pct = 0;
-                
-                // Calculamos porcentaje
-                if (data.duration > 0) pct = (data.time / data.duration) * 100;
-                else if (data.isEmbed) pct = 100; // Si es embed, mostramos lleno o a medias según prefieras
-
-                const left = data.duration ? Math.floor((data.duration - data.time) / 60) + ' min' : 'Continuar';
+                let pct = data.duration > 0 ? (data.time / data.duration) * 100 : (data.isEmbed ? 100 : 0);
+                const timeLeft = data.duration ? Math.floor((data.duration - data.time)/60) + ' min' : 'Ver';
 
                 return `
                 <div class="wide-card" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
+                    <div class="delete-btn" onclick="askDelete(event, ${id})">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
+                    
                     <div class="wide-img-box">
                         <img src="${movie.img}" class="wide-img">
-                        <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px; color:#fff; margin-left:2px;"></i></div></div>
+                        <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px;color:#fff;margin-left:2px"></i></div></div>
                         <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
                     </div>
                     <div class="wide-info">
                         <span>${movie.title}</span>
-                        <span>${left}</span>
+                        <span>${timeLeft}</span>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function saveProgress(id, time, duration, isEmbed = false) {
-            const history = JSON.parse(localStorage.getItem('f_history')) || {};
-            history[id] = {
-                time: time,
-                duration: duration,
-                isEmbed: isEmbed,
-                date: Date.now()
-            };
-            localStorage.setItem('f_history', JSON.stringify(history));
-            renderContinueWatching(); // Actualizar UI en tiempo real
+        // --- 4. FUNCIONES DE BORRADO ---
+        function askDelete(event, id) {
+            event.stopPropagation(); // IMPORTANTE: Evita que el click pase al padre y abra el video
+            itemToDelete = id;
+            document.getElementById('confirm-modal').style.display = 'flex';
         }
 
-        // --- 4. LOGICA MI LISTA (LocalStorage) ---
+        function executeDelete() {
+            if (itemToDelete) {
+                const history = JSON.parse(localStorage.getItem('f_history')) || {};
+                delete history[itemToDelete]; // Borrar del objeto
+                localStorage.setItem('f_history', JSON.stringify(history));
+                
+                renderContinueWatching(); // Refrescar UI
+                closeConfirm();
+            }
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirm-modal').style.display = 'none';
+            itemToDelete = null;
+        }
+
+        // --- 5. MI LISTA ---
         function renderMyList() {
             const listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
             const container = document.getElementById('mylist-list');
@@ -268,115 +293,86 @@
                 section.classList.add('hidden');
                 return;
             }
-
             section.classList.remove('hidden');
-            // Filtramos las pelis que están en la lista
-            const myListMovies = allMovies.filter(m => listIds.includes(m.id));
-            
-            container.innerHTML = myListMovies.map(m => `
-                <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
-                    <img src="${m.img}" class="card-img">
-                </div>
+            const myList = allMovies.filter(m => listIds.includes(m.id));
+            container.innerHTML = myList.map(m => `
+                <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})"><img src="${m.img}" class="card-img"></div>
             `).join('');
         }
 
-        function toggleMyList(id, btnElement) {
-            let listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
-            if (listIds.includes(id)) {
-                listIds = listIds.filter(x => x !== id);
-                if(btnElement) btnElement.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
+        function toggleMyList(id, btn) {
+            let list = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            if(list.includes(id)) {
+                list = list.filter(x => x !== id);
+                if(btn) btn.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
             } else {
-                listIds.push(id);
-                if(btnElement) btnElement.innerHTML = '<i class="fa-solid fa-check"></i> En mi lista';
+                list.push(id);
+                if(btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> En lista';
             }
-            localStorage.setItem('f_mylist', JSON.stringify(listIds));
+            localStorage.setItem('f_mylist', JSON.stringify(list));
             renderMyList();
         }
 
         function isInMyList(id) {
-            const listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
-            return listIds.includes(id);
+            return (JSON.parse(localStorage.getItem('f_mylist')) || []).includes(id);
         }
 
-        // --- 5. REPRODUCTOR INTELIGENTE ---
+        // --- 6. PLAYER ---
         function openPlayer(url, id) {
             const overlay = document.getElementById('player-overlay');
             const container = document.getElementById('dynamic-player');
             const history = JSON.parse(localStorage.getItem('f_history')) || {};
-            const savedData = history[id];
-
-            container.innerHTML = ''; 
-
-            // A. YOUTUBE / VIMEO / EMBED
-            if (url.includes('youtube') || url.includes('youtu.be') || url.includes('vimeo') || !url.match(/\.(mp4|webm|ogg)$/i)) {
-                
-                // Intentamos extraer ID de Youtube
-                let embedUrl = url;
-                if (url.includes('youtube') || url.includes('youtu.be')) {
-                    let vId = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
-                    embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1&rel=0&modestbranding=1`;
-                }
-                
-                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay"></iframe>`;
-                
-                // Guardamos que se abrió (no podemos saber el segundo exacto en iframe simple)
-                saveProgress(id, 100, 100, true);
-            } 
-            // B. MP4 NATIVO (Permite guardar segundo exacto)
-            else {
+            
+            container.innerHTML = '';
+            
+            if (url.includes('youtube') || url.includes('youtu.be')) {
+                let vId = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
+                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${vId}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
+                saveHistory(id, 100, 100, true);
+            } else {
                 const video = document.createElement('video');
                 video.src = url;
                 video.controls = true;
                 video.autoplay = true;
                 video.playsInline = true;
-
-                // Restaurar tiempo
-                if(savedData && savedData.time && !savedData.isEmbed) {
-                    video.currentTime = savedData.time;
-                }
-
-                // Guardar cada 2 segundos
+                if(history[id] && !history[id].isEmbed) video.currentTime = history[id].time;
+                
                 video.addEventListener('timeupdate', () => {
-                    if(video.currentTime > 5 && !video.paused) {
-                        saveProgress(id, video.currentTime, video.duration, false);
-                    }
+                    if(video.currentTime > 5 && !video.paused) saveHistory(id, video.currentTime, video.duration, false);
                 });
-
                 container.appendChild(video);
                 currentVideoElement = video;
             }
-
             overlay.style.display = 'flex';
         }
 
+        function saveHistory(id, time, duration, isEmbed) {
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            history[id] = { time, duration, isEmbed, date: Date.now() };
+            localStorage.setItem('f_history', JSON.stringify(history));
+            renderContinueWatching();
+        }
+
         function closePlayer() {
-            if(currentVideoElement) {
-                currentVideoElement.pause();
-                currentVideoElement = null;
-            }
+            if(currentVideoElement) { currentVideoElement.pause(); currentVideoElement = null; }
             document.getElementById('dynamic-player').innerHTML = '';
             document.getElementById('player-overlay').style.display = 'none';
         }
 
-        // --- 6. UTILIDADES ---
+        // --- UTILIDADES ---
         function filterBy(cat, el) {
             document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
-            if(cat === 'Todos') renderList('trends-list', allMovies);
-            else {
-                const filtered = allMovies.filter(m => m.cat == cat);
-                renderList('trends-list', filtered);
-            }
+            renderList('trends-list', cat === 'Todos' ? allMovies : allMovies.filter(m => m.cat == cat));
         }
 
-        function clearData() {
-            if(confirm('¿Borrar historial y favoritos?')) {
+        function clearAllData() {
+            if(confirm("¿Restablecer toda la aplicación?")) {
                 localStorage.clear();
                 location.reload();
             }
         }
 
-        // Iniciar
         initApp();
     </script>
 </body>
