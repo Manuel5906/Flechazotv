@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE --- */
+        /* --- 1. CORE --- */
         :root { 
             --bg: #0f0f1a; --card: #1c1c2a; --primary: #E50914; --text: #fff;
             --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
@@ -18,179 +18,301 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* HEADER & HERO */
-        .header { position: fixed; top: 0; width: 100%; padding: calc(15px + var(--safe-top)) 20px 15px; background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, transparent 100%); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
-        .logo { color: var(--primary); font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        /* --- 2. PANTALLA DE CARGA (SPLASH) --- */
+        #splash-screen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .splash-logo { font-size: 40px; font-weight: 900; color: var(--primary); text-transform: uppercase; animation: pulse 1.5s infinite; }
+        .loader-ring {
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary); border-radius: 50%; margin-top: 20px;
+            animation: spin 1s linear infinite;
+        }
 
-        .hero-wrap { height: 75vh; position: relative; display: flex; align-items: flex-end; }
-        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.4) 60%, rgba(15,15,26,0.9) 100%); }
-        .hero-content { padding: 20px; z-index: 2; width: 100%; }
-        .hero-title { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 10px; text-shadow: 0 2px 15px #000; }
-        .hero-desc { color: #ddd; font-size: 14px; margin-bottom: 20px; line-height: 1.4; max-width: 90%; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        /* --- 3. UI GENERAL --- */
+        .screen { display: none; animation: fadeIn 0.3s; padding-top: calc(10px + var(--safe-top)); }
+        .screen.active { display: block; }
         
-        .btn-group { display: flex; gap: 12px; }
-        .btn { flex: 1; height: 45px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.96); }
+        .header { position: sticky; top: 0; padding: 10px 20px; z-index: 100; background: var(--bg); display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--primary); font-weight: 900; font-size: 24px; text-transform: uppercase; }
+
+        /* HERO */
+        .hero-wrap { height: 70vh; position: relative; display: flex; align-items: flex-end; margin-top: -60px; }
+        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, rgba(15,15,26,0.3) 60%, rgba(15,15,26,0.9) 100%); }
+        .hero-content { padding: 20px; z-index: 2; width: 100%; }
+        .hero-title { font-size: 38px; font-weight: 900; line-height: 1; margin-bottom: 10px; text-shadow: 0 2px 10px #000; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; height: 45px; border-radius: 8px; border: none; font-weight: bold; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
         .btn-play { background: #fff; color: #000; }
         .btn-list { background: rgba(255,255,255,0.25); color: #fff; backdrop-filter: blur(4px); }
 
-        /* LISTS & SECTIONS */
-        .section { margin-top: 40px; }
-        .sec-header { padding: 0 20px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .sec-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        /* LISTAS HORIZONTALES */
+        .section { margin-top: 35px; }
+        .sec-header { padding: 0 20px 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .sec-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .h-list { display: flex; overflow-x: auto; gap: 12px; padding: 0 20px; scrollbar-width: none; }
         
-        /* CARDS */
-        .card { width: 120px; flex-shrink: 0; position: relative; cursor: pointer; }
-        .card-img { width: 100%; height: 175px; border-radius: 8px; object-fit: cover; background: #222; }
+        .card { width: 115px; flex-shrink: 0; position: relative; cursor: pointer; }
+        .card-img { width: 100%; height: 170px; border-radius: 8px; object-fit: cover; background: #222; }
 
-        /* WIDE CARD (CONTINUE WATCHING) */
+        /* WIDE CARD (CONTINUAR VIENDO) */
         .wide-card { width: 210px; flex-shrink: 0; position: relative; cursor: pointer; }
         .wide-img-box { position: relative; height: 115px; border-radius: 8px; overflow: hidden; }
         .wide-img { width: 100%; height: 100%; object-fit: cover; }
         .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-        .play-icon { width: 35px; height: 35px; background: rgba(0,0,0,0.6); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .progress-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.3); }
+        .progress-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.3); }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; }
         .wide-info { margin-top: 6px; display: flex; justify-content: space-between; font-size: 11px; color: #bbb; }
-
-        /* --- BOTÓN ELIMINAR (NUEVO) --- */
-        .delete-btn { 
-            position: absolute; top: 5px; right: 5px; 
-            width: 26px; height: 26px; 
-            background: rgba(0,0,0,0.6); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            color: #fff; z-index: 10; 
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: 0.2s;
-        }
-        .delete-btn:active { background: var(--primary); transform: scale(0.9); }
-        .delete-btn i { font-size: 12px; }
-
-        /* --- MODAL CONFIRMACIÓN (NUEVO) --- */
-        .confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
-        .confirm-box { background: #1a1a24; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 40px #000; transform: scale(0.9); animation: popIn 0.2s forwards; }
-        .confirm-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .confirm-msg { font-size: 14px; color: #aaa; margin-bottom: 25px; }
-        .confirm-btns { display: flex; gap: 10px; }
-        .c-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; }
-        .c-btn-cancel { background: #2a2a35; color: #fff; }
-        .c-btn-delete { background: var(--primary); color: #fff; }
-
-        @keyframes popIn { to { transform: scale(1); } }
-
-        /* PILLS & PLAYER */
-        .pills-container { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px; margin-top: -10px; position: relative; z-index: 10; scrollbar-width: none; }
-        .pill { padding: 8px 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; white-space: nowrap; font-size: 13px; backdrop-filter: blur(5px); }
-        .pill.active { background: #fff; color: #000; font-weight: 700; }
         
-        .player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; font-size: 24px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; color: #fff; z-index: 5002; cursor: pointer; }
-        #dynamic-player { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; }
-        video { width: 100%; max-height: 100vh; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* BOTÓN BORRAR */
+        .delete-btn { position: absolute; top: 5px; right: 5px; width: 24px; height: 24px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; z-index: 10; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); }
 
-        /* NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #0f0f1a; border-top: 1px solid #2a2a3a; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; }
-        .nav-btn { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-btn.active { color: #fff; }
+        /* --- 4. BUSCADOR (EXPLORAR) --- */
+        .search-bar { margin: 10px 20px; position: relative; }
+        .search-input { width: 100%; background: #222; border: 1px solid #333; padding: 12px 12px 12px 45px; border-radius: 8px; color: #fff; font-size: 16px; }
+        .search-icon { position: absolute; left: 15px; top: 14px; color: #777; }
+        .grid-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
+        .grid-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; background: #222; }
+
+        /* --- 5. SHORTS --- */
+        .shorts-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-snap-type: y mandatory; background: #000; margin-top: -20px; }
+        .short-item { height: 100%; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
+        .short-video { width: 100%; height: 100%; object-fit: cover; }
+        .short-overlay { position: absolute; bottom: 20px; left: 15px; z-index: 10; text-shadow: 0 1px 3px #000; }
+
+        /* --- 6. PERFIL --- */
+        .profile-header { text-align: center; padding: 40px 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 15px; }
+        .stats-row { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .stat-box { background: #222; padding: 15px; border-radius: 10px; width: 100px; text-align: center; }
+
+        /* --- 7. NAV --- */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; backdrop-filter: blur(10px); }
+        .nav-btn { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
+        .nav-btn.active { color: #fff; transform: scale(1.1); }
         .nav-btn i { font-size: 22px; }
 
+        /* UTILS */
+        .player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .close-player { position: absolute; top: 30px; left: 20px; font-size: 24px; color: #fff; z-index: 5001; text-shadow: 0 2px 4px #000; cursor: pointer; }
+        .confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .confirm-box { background: #1a1a24; padding: 25px; border-radius: 16px; width: 80%; max-width: 300px; text-align: center; border: 1px solid #333; }
         .hidden { display: none !important; }
-        .loading { padding: 20px; text-align: center; color: #666; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
+    <div id="splash-screen">
+        <div class="splash-logo">Flechazo TV</div>
+        <div class="loader-ring"></div>
+    </div>
+
     <div id="confirm-modal" class="confirm-modal">
         <div class="confirm-box">
-            <div class="confirm-title">¿Eliminar de la lista?</div>
-            <div class="confirm-msg">Este título se borrará de tu sección Continuar Viendo.</div>
-            <div class="confirm-btns">
-                <button class="c-btn c-btn-cancel" onclick="closeConfirm()">Cancelar</button>
-                <button class="c-btn c-btn-delete" onclick="executeDelete()">Eliminar</button>
+            <h3 style="margin-bottom:10px;">¿Eliminar?</h3>
+            <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Se borrará de Continuar Viendo.</p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeConfirm()" style="flex:1; padding:10px; border-radius:6px; border:none; background:#333; color:#fff;">Cancelar</button>
+                <button onclick="executeDelete()" style="flex:1; padding:10px; border-radius:6px; border:none; background:var(--primary); color:#fff;">Eliminar</button>
             </div>
         </div>
     </div>
 
     <div id="player-overlay" class="player-fs">
-        <i class="fa-solid fa-xmark close-player" onclick="closePlayer()"></i>
-        <div id="dynamic-player"></div>
+        <i class="fa-solid fa-chevron-left close-player" onclick="closePlayer()"></i>
+        <div id="dynamic-player" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
     </div>
 
     <div id="app">
-        <header class="header">
-            <div class="logo">Flechazo TV</div>
-            <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
-        </header>
+        
+        <div id="screen-home" class="screen active">
+            <header class="header">
+                <div class="logo">Flechazo TV</div>
+                <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
+            </header>
 
-        <div id="hero-container">
-            <div style="height:75vh; display:flex; align-items:center; justify-content:center; background:#111;">
-                <i class="fa-solid fa-spinner fa-spin" style="font-size:30px; color:#333;"></i>
+            <div id="hero-container">
+                <div style="height:70vh; background:#111; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-spinner fa-spin" style="color:#333; font-size:30px;"></i>
+                </div>
+            </div>
+
+            <div id="section-continue" class="section hidden">
+                <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary)"></i> Continuar Viendo</span></div>
+                <div class="h-list" id="continue-list"></div>
+            </div>
+
+            <div id="section-mylist" class="section hidden">
+                <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-check" style="color:#46d369"></i> Mi Lista</span></div>
+                <div class="h-list" id="mylist-list"></div>
+            </div>
+
+            <div class="section">
+                <div class="sec-header"><span class="sec-title">Tendencias</span></div>
+                <div class="h-list" id="trends-list"></div>
             </div>
         </div>
 
-        <div class="pills-container">
-            <div class="pill active" onclick="filterBy('Todos', this)">Todos</div>
-            <div class="pill" onclick="filterBy('Acción', this)">Acción</div>
-            <div class="pill" onclick="filterBy('Drama', this)">Drama</div>
-            <div class="pill" onclick="filterBy('Romance', this)">Romance</div>
-        </div>
-
-        <div id="section-continue" class="section hidden">
-            <div class="sec-header">
-                <span class="sec-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary)"></i> Continuar Viendo</span>
+        <div id="screen-explore" class="screen">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar películas, series, anime..." onkeyup="handleSearch()">
             </div>
-            <div class="h-list" id="continue-list"></div>
+            <div class="section">
+                <div class="sec-header"><span class="sec-title" id="search-title">Más populares</span></div>
+                <div class="grid-results" id="search-grid">
+                    </div>
+            </div>
         </div>
 
-        <div id="section-mylist" class="section hidden">
-            <div class="sec-header"><span class="sec-title"><i class="fa-solid fa-check" style="color:#46d369"></i> Mi Lista</span></div>
-            <div class="h-list" id="mylist-list"></div>
+        <div id="screen-shorts" class="screen" style="padding:0;">
+            <div class="shorts-container" id="shorts-wrapper">
+                </div>
         </div>
 
-        <div class="section">
-            <div class="sec-header"><span class="sec-title">Tendencias</span></div>
-            <div class="h-list" id="trends-list"><div class="loading">Cargando...</div></div>
+        <div id="screen-profile" class="screen">
+            <div class="profile-header">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar">
+                <h2>Gamer Pro</h2>
+                <p style="color:#aaa;">Miembro Premium</p>
+                
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <h3 id="stat-watched">0</h3>
+                        <span style="font-size:12px; color:#888;">Vistos</span>
+                    </div>
+                    <div class="stat-box">
+                        <h3 id="stat-list">0</h3>
+                        <span style="font-size:12px; color:#888;">En Lista</span>
+                    </div>
+                </div>
+
+                <div style="margin-top:40px;">
+                    <button onclick="clearAllData()" style="width:100%; padding:15px; background:#222; border:1px solid #333; color:#fff; border-radius:10px; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fa-solid fa-trash" style="margin-right:10px;"></i> Borrar Historial</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px;"></i>
+                    </button>
+                    <button onclick="alert('Versión 2.5 Ultimate')" style="width:100%; padding:15px; background:#222; border:1px solid #333; color:#fff; border-radius:10px; margin-top:10px; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fa-solid fa-circle-info" style="margin-right:10px;"></i> Acerca de</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px;"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <br><br><br>
     </div>
 
     <nav class="nav">
-        <div class="nav-btn active"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-btn"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-btn"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-btn" onclick="clearAllData()"><i class="fa-solid fa-gear"></i>Reset</div>
+        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
+        <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
     </nav>
 
     <script>
         const API_URL = 'https://flechazotv.vercel.app/api/movies';
         let allMovies = [];
-        let itemToDelete = null; // Variable para saber qué vamos a borrar
-        let currentVideoElement = null;
+        let itemToDelete = null;
 
-        // --- 1. INICIO ---
-        async function initApp() {
+        // --- 1. INICIO & CARGA ---
+        window.onload = async () => {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
+                
                 if(data.length > 0) {
                     allMovies = data;
+                    
+                    // Home Setup
                     renderHero(data[0]);
                     renderList('trends-list', data);
+                    
+                    // Explore Setup
+                    renderGrid(data);
+
+                    // Shorts Setup (Simulados con data existente)
+                    renderShorts(data);
+
+                    // User Data
+                    updateUserData();
                     renderContinueWatching();
                     renderMyList();
                 }
             } catch (e) {
-                document.getElementById('trends-list').innerHTML = `<p class="loading">Error de conexión.</p>`;
+                console.error("API Error");
+            } finally {
+                // Ocultar Splash Screen
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.opacity = '0';
+                    setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+                }, 1500); // 1.5s de carga falsa para efecto PRO
+            }
+        };
+
+        // --- 2. NAVEGACIÓN ---
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-'+tab).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if(tab === 'profile') updateUserData();
+        }
+
+        // --- 3. BUSCADOR ---
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const title = document.getElementById('search-title');
+            
+            if(query.length > 0) {
+                title.innerText = "Resultados";
+                const filtered = allMovies.filter(m => m.title.toLowerCase().includes(query) || m.cat.toLowerCase().includes(query));
+                renderGrid(filtered);
+            } else {
+                title.innerText = "Más populares";
+                renderGrid(allMovies);
             }
         }
 
-        // --- 2. RENDERIZADO BÁSICO ---
+        function renderGrid(list) {
+            const grid = document.getElementById('search-grid');
+            if(list.length === 0) {
+                grid.innerHTML = '<p style="color:#666; grid-column:span 3; text-align:center;">No se encontraron resultados.</p>';
+                return;
+            }
+            grid.innerHTML = list.map(m => `
+                <div class="grid-card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
+                    <img src="${m.img}" loading="lazy">
+                </div>
+            `).join('');
+        }
+
+        // --- 4. SHORTS ---
+        function renderShorts(list) {
+            // Duplicamos la lista para tener más contenido
+            const shortsList = [...list, ...list]; 
+            const container = document.getElementById('shorts-wrapper');
+            container.innerHTML = shortsList.map(m => `
+                <div class="short-item">
+                    <video src="${m.videoUrl}" class="short-video" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
+                    <div class="short-overlay">
+                        <h3 style="margin:0;">${m.title}</h3>
+                        <p style="margin:0; font-size:13px;">${m.cat}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 5. RENDERIZADO HOME ---
         function renderHero(movie) {
             const isListed = isInMyList(movie.id);
             document.getElementById('hero-container').innerHTML = `
@@ -198,16 +320,12 @@
                     <img src="${movie.img}" class="hero-bg">
                     <div class="hero-gradient"></div>
                     <div class="hero-content">
-                        <div style="color:#46d369; font-weight:bold; margin-bottom:5px;">Nuevo episodio</div>
+                        <div style="background:rgba(255,255,255,0.2); backdrop-filter:blur(5px); display:inline-block; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; margin-bottom:10px;">TOP 1 HOY</div>
                         <h1 class="hero-title">${movie.title}</h1>
-                        <p class="hero-desc">${movie.desc || 'Sin descripción disponible.'}</p>
+                        <p class="hero-desc">${movie.desc || 'Disfruta del mejor contenido.'}</p>
                         <div class="btn-group">
-                            <button class="btn btn-play" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
-                                <i class="fa-solid fa-play"></i> Reproducir
-                            </button>
-                            <button class="btn btn-list" onclick="toggleMyList(${movie.id}, this)">
-                                <i class="fa-solid ${isListed ? 'fa-check' : 'fa-plus'}"></i> ${isListed ? 'En lista' : 'Mi Lista'}
-                            </button>
+                            <button class="btn btn-play" onclick="openPlayer('${movie.videoUrl}', ${movie.id})"><i class="fa-solid fa-play"></i> Ver</button>
+                            <button class="btn btn-list" onclick="toggleMyList(${movie.id}, this)"><i class="fa-solid ${isListed ? 'fa-check' : 'fa-plus'}"></i> ${isListed ? 'Lista' : 'Mi Lista'}</button>
                         </div>
                     </div>
                 </div>`;
@@ -216,108 +334,12 @@
         function renderList(id, list) {
             document.getElementById(id).innerHTML = list.map(m => `
                 <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
-                    <img src="${m.img}" class="card-img" loading="lazy">
-                </div>`).join('');
-        }
-
-        // --- 3. LÓGICA CONTINUAR VIENDO (CON BORRADO) ---
-        function renderContinueWatching() {
-            const history = JSON.parse(localStorage.getItem('f_history')) || {};
-            const ids = Object.keys(history).sort((a,b) => history[b].date - history[a].date);
-            const container = document.getElementById('continue-list');
-            const section = document.getElementById('section-continue');
-
-            if (ids.length === 0) {
-                section.classList.add('hidden');
-                return;
-            }
-
-            section.classList.remove('hidden');
-            container.innerHTML = ids.map(id => {
-                const movie = allMovies.find(m => m.id == id);
-                if (!movie) return '';
-
-                const data = history[id];
-                let pct = data.duration > 0 ? (data.time / data.duration) * 100 : (data.isEmbed ? 100 : 0);
-                const timeLeft = data.duration ? Math.floor((data.duration - data.time)/60) + ' min' : 'Ver';
-
-                return `
-                <div class="wide-card" onclick="openPlayer('${movie.videoUrl}', ${movie.id})">
-                    <div class="delete-btn" onclick="askDelete(event, ${id})">
-                        <i class="fa-solid fa-xmark"></i>
-                    </div>
-                    
-                    <div class="wide-img-box">
-                        <img src="${movie.img}" class="wide-img">
-                        <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play" style="font-size:12px;color:#fff;margin-left:2px"></i></div></div>
-                        <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
-                    </div>
-                    <div class="wide-info">
-                        <span>${movie.title}</span>
-                        <span>${timeLeft}</span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // --- 4. FUNCIONES DE BORRADO ---
-        function askDelete(event, id) {
-            event.stopPropagation(); // IMPORTANTE: Evita que el click pase al padre y abra el video
-            itemToDelete = id;
-            document.getElementById('confirm-modal').style.display = 'flex';
-        }
-
-        function executeDelete() {
-            if (itemToDelete) {
-                const history = JSON.parse(localStorage.getItem('f_history')) || {};
-                delete history[itemToDelete]; // Borrar del objeto
-                localStorage.setItem('f_history', JSON.stringify(history));
-                
-                renderContinueWatching(); // Refrescar UI
-                closeConfirm();
-            }
-        }
-
-        function closeConfirm() {
-            document.getElementById('confirm-modal').style.display = 'none';
-            itemToDelete = null;
-        }
-
-        // --- 5. MI LISTA ---
-        function renderMyList() {
-            const listIds = JSON.parse(localStorage.getItem('f_mylist')) || [];
-            const container = document.getElementById('mylist-list');
-            const section = document.getElementById('section-mylist');
-
-            if (listIds.length === 0) {
-                section.classList.add('hidden');
-                return;
-            }
-            section.classList.remove('hidden');
-            const myList = allMovies.filter(m => listIds.includes(m.id));
-            container.innerHTML = myList.map(m => `
-                <div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})"><img src="${m.img}" class="card-img"></div>
+                    <img src="${m.img}" class="card-img">
+                </div>
             `).join('');
         }
 
-        function toggleMyList(id, btn) {
-            let list = JSON.parse(localStorage.getItem('f_mylist')) || [];
-            if(list.includes(id)) {
-                list = list.filter(x => x !== id);
-                if(btn) btn.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
-            } else {
-                list.push(id);
-                if(btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> En lista';
-            }
-            localStorage.setItem('f_mylist', JSON.stringify(list));
-            renderMyList();
-        }
-
-        function isInMyList(id) {
-            return (JSON.parse(localStorage.getItem('f_mylist')) || []).includes(id);
-        }
-
-        // --- 6. PLAYER ---
+        // --- 6. PLAYER & LOGIC ---
         function openPlayer(url, id) {
             const overlay = document.getElementById('player-overlay');
             const container = document.getElementById('dynamic-player');
@@ -327,53 +349,95 @@
             
             if (url.includes('youtube') || url.includes('youtu.be')) {
                 let vId = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
-                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${vId}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
+                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${vId}?autoplay=1&rel=0&modestbranding=1" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
                 saveHistory(id, 100, 100, true);
             } else {
                 const video = document.createElement('video');
-                video.src = url;
-                video.controls = true;
-                video.autoplay = true;
-                video.playsInline = true;
+                video.src = url; video.controls = true; video.autoplay = true; video.playsInline = true;
                 if(history[id] && !history[id].isEmbed) video.currentTime = history[id].time;
-                
-                video.addEventListener('timeupdate', () => {
-                    if(video.currentTime > 5 && !video.paused) saveHistory(id, video.currentTime, video.duration, false);
-                });
+                video.addEventListener('timeupdate', () => { if(video.currentTime > 5) saveHistory(id, video.currentTime, video.duration, false); });
                 container.appendChild(video);
-                currentVideoElement = video;
             }
             overlay.style.display = 'flex';
+        }
+
+        function closePlayer() {
+            document.getElementById('dynamic-player').innerHTML = '';
+            document.getElementById('player-overlay').style.display = 'none';
+            renderContinueWatching();
+            updateUserData();
         }
 
         function saveHistory(id, time, duration, isEmbed) {
             const history = JSON.parse(localStorage.getItem('f_history')) || {};
             history[id] = { time, duration, isEmbed, date: Date.now() };
             localStorage.setItem('f_history', JSON.stringify(history));
+        }
+
+        // --- 7. USER DATA & LISTS ---
+        function renderContinueWatching() {
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            const ids = Object.keys(history).sort((a,b) => history[b].date - history[a].date);
+            const container = document.getElementById('continue-list');
+            const section = document.getElementById('section-continue');
+
+            if (ids.length === 0) { section.classList.add('hidden'); return; }
+            section.classList.remove('hidden');
+
+            container.innerHTML = ids.map(id => {
+                const m = allMovies.find(x => x.id == id);
+                if (!m) return '';
+                const d = history[id];
+                const pct = d.duration ? (d.time / d.duration) * 100 : 100;
+                return `
+                <div class="wide-card" onclick="openPlayer('${m.videoUrl}', ${m.id})">
+                    <div class="delete-btn" onclick="event.stopPropagation(); itemToDelete=${id}; document.getElementById('confirm-modal').style.display='flex'"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="wide-img-box"><img src="${m.img}" class="wide-img"><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+                    <div class="wide-info"><span>${m.title}</span><span>Continuar</span></div>
+                </div>`;
+            }).join('');
+        }
+
+        function executeDelete() {
+            const h = JSON.parse(localStorage.getItem('f_history')) || {};
+            delete h[itemToDelete];
+            localStorage.setItem('f_history', JSON.stringify(h));
+            closeConfirm();
             renderContinueWatching();
+            updateUserData();
         }
 
-        function closePlayer() {
-            if(currentVideoElement) { currentVideoElement.pause(); currentVideoElement = null; }
-            document.getElementById('dynamic-player').innerHTML = '';
-            document.getElementById('player-overlay').style.display = 'none';
+        function closeConfirm() { document.getElementById('confirm-modal').style.display = 'none'; }
+
+        function renderMyList() {
+            const list = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            const section = document.getElementById('section-mylist');
+            const container = document.getElementById('mylist-list');
+            if(list.length === 0) { section.classList.add('hidden'); return; }
+            section.classList.remove('hidden');
+            const movies = allMovies.filter(m => list.includes(m.id));
+            container.innerHTML = movies.map(m => `<div class="card" onclick="openPlayer('${m.videoUrl}', ${m.id})"><img src="${m.img}" class="card-img"></div>`).join('');
         }
 
-        // --- UTILIDADES ---
-        function filterBy(cat, el) {
-            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            renderList('trends-list', cat === 'Todos' ? allMovies : allMovies.filter(m => m.cat == cat));
+        function toggleMyList(id, btn) {
+            let list = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            if(list.includes(id)) { list = list.filter(x => x !== id); if(btn) btn.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista'; }
+            else { list.push(id); if(btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> Lista'; }
+            localStorage.setItem('f_mylist', JSON.stringify(list));
+            renderMyList();
+            updateUserData();
         }
 
-        function clearAllData() {
-            if(confirm("¿Restablecer toda la aplicación?")) {
-                localStorage.clear();
-                location.reload();
-            }
+        function isInMyList(id) { return (JSON.parse(localStorage.getItem('f_mylist')) || []).includes(id); }
+
+        function updateUserData() {
+            const history = JSON.parse(localStorage.getItem('f_history')) || {};
+            const list = JSON.parse(localStorage.getItem('f_mylist')) || [];
+            document.getElementById('stat-watched').innerText = Object.keys(history).length;
+            document.getElementById('stat-list').innerText = list.length;
         }
 
-        initApp();
+        function clearAllData() { if(confirm("¿Reiniciar app?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
