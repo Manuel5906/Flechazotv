@@ -1,6 +1,5 @@
 import express from 'express'
 import path from 'path'
-import { Analytics } from "@vercel/analytics/next"
 import { fileURLToPath } from 'url'
 
 // IMPORTAMOS TUS RUTAS (Esto busca el archivo del paso 2)
