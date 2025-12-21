@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- RESET & VARIABLES --- */
+        /* --- 1. RESET Y VARIABLES --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         :root { 
             --bg-dark: #0f0f1a; 
@@ -26,27 +26,27 @@
             user-select: none; overflow-x: hidden; 
         }
 
-        /* --- UTILIDADES --- */
+        /* --- 2. COMPONENTES GLOBALES --- */
         .hidden { display: none !important; }
         .logo { font-size: 22px; margin: 0; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: -0.5px; }
         
-        /* --- NOTIFICACIONES (TOAST) --- */
+        /* Toast Notification */
         .toast { 
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
             background: rgba(30, 30, 40, 0.95); color: white; padding: 12px 25px; 
-            border-radius: 50px; z-index: 2000; display: none; font-size: 13px; 
+            border-radius: 50px; z-index: 3000; display: none; font-size: 13px; 
             border-left: 3px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            animation: slideInTop 0.4s;
+            animation: slideInTop 0.4s; backdrop-filter: blur(5px);
         }
         @keyframes slideInTop { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
-        /* --- HEADER COMÚN --- */
+        /* Header */
         .header { 
             padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; 
             z-index: 50; backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; 
         }
 
-        /* --- HOME --- */
+        /* --- 3. PANTALLA: HOME --- */
         .hero-banner {
             width: 100%; height: 50vh; position: relative; overflow: hidden;
             background-image: url('https://image.tmdb.org/t/p/original/jXJxMcVoEuXzym3vFnjqDW4ifo6.jpg');
@@ -59,10 +59,15 @@
         
         .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; gap: 12px; }
-        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; position: relative; }
+        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; position: relative; transition: transform 0.1s; }
+        .poster-card:active { transform: scale(0.95); }
         .poster-card img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- EXPLORAR --- */
+        /* --- 4. PANTALLA: EXPLORAR (Buscador) --- */
+        .search-box {
+            background:#252535; width:100%; padding:12px; border-radius:12px; 
+            display:flex; align-items:center; border: 1px solid rgba(255,255,255,0.1);
+        }
         .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
         .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; position: relative; }
         .explore-item img { width: 100%; height: 100%; object-fit: cover; }
@@ -70,14 +75,14 @@
         .category-pill.active { background: var(--primary); color: white; }
         .categories-scroll { overflow-x: auto; white-space: nowrap; padding: 10px 20px; }
 
-        /* --- SHORTS (TIKTOK STYLE) --- */
+        /* --- 5. PANTALLA: SHORTS (TikTok Style) --- */
         .shorts-container {
             width: 100vw; height: 100vh; 
             scroll-snap-type: y mandatory; 
             overflow-y: scroll; 
             background: black;
             position: fixed; top: 0; left: 0; z-index: 200;
-            padding-bottom: 70px; /* Espacio para el nav */
+            padding-bottom: 70px;
         }
         .short-item {
             width: 100%; height: 100%;
@@ -88,36 +93,34 @@
         }
         .short-video { width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         
-        /* Capas Shorts */
         .short-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
             pointer-events: none; z-index: 2;
         }
+        /* Icono Play Fantasma (No bloquea clicks) */
         .play-icon-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 80px; color: rgba(255,255,255,0.6); display: none; 
-            pointer-events: none; /* CRÍTICO: Permite click a través */
-            z-index: 5; animation: pulse 0.5s;
+            pointer-events: none; z-index: 5; animation: pulse 0.5s;
         }
         .short-info {
-            position: absolute; bottom: 90px; left: 15px; width: 70%;
+            position: absolute; bottom: 90px; left: 15px; width: 75%;
             pointer-events: none; z-index: 10; text-shadow: 1px 1px 3px black;
         }
         .short-actions {
             position: absolute; bottom: 100px; right: 10px;
-            display: flex; flex-direction: column; gap: 20px; align-items: center;
-            z-index: 20;
+            display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20;
         }
         .action-btn { text-align: center; cursor: pointer; pointer-events: auto; }
         .action-icon { 
-            width: 45px; height: 45px; background: rgba(255,255,255,0.15); 
+            width: 45px; height: 45px; background: rgba(255,255,255,0.2); 
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 22px; color: white; transition: 0.2s; backdrop-filter: blur(5px);
         }
         .liked { color: #ff4b4b !important; animation: pop 0.3s; }
 
-        /* --- PERFIL --- */
+        /* --- 6. PANTALLA: PERFIL --- */
         .profile-header { background: linear-gradient(to bottom, #2a2a40, var(--bg-dark)); padding: 40px 20px 20px; text-align: center; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
         .stats-row { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
@@ -144,7 +147,7 @@
         .h-meta { font-size: 11px; color: #888; }
         .btn-delete { padding: 10px; color: #ff4b4b; background: transparent; border: none; font-size: 16px; }
 
-        /* --- MODALS --- */
+        /* --- 7. MODALES --- */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 500; display: none; 
@@ -159,27 +162,41 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
         
-        /* Modal Editar */
         .edit-input { width: 100%; background: #222; border: 1px solid #444; padding: 12px; color: white; border-radius: 8px; margin-bottom: 15px; }
         .avatar-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
         .avatar-option { width: 50px; height: 50px; border-radius: 50%; border: 2px solid transparent; opacity: 0.6; }
         .avatar-option.selected { border-color: var(--primary); opacity: 1; }
 
-        /* Modal Detalle */
         .detail-hero { width: 100%; height: 200px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; position: relative; }
         .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .play-float { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,0.8); }
+        .play-float { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,0.9); filter: drop-shadow(0 0 10px black); }
 
-        /* --- NAV --- */
+        /* --- 8. REPRODUCTOR DE VIDEO FULLSCREEN (Overlay) --- */
+        .player-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 2500; /* Encima de todo */
+            display: flex; justify-content: center; align-items: center;
+        }
+        #main-video-player { width: 100%; height: auto; max-height: 100vh; }
+        .close-player-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0, 0, 0, 0.5); color: white;
+            border: none; width: 40px; height: 40px; border-radius: 50%;
+            font-size: 20px; cursor: pointer; z-index: 2501;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- 9. NAV --- */
         .bottom-nav { 
             position: fixed; bottom: 0; width: 100%; background: #0f0f1a; 
             display: flex; justify-content: space-around; padding: 10px 0 25px 0; 
             z-index: 300; border-top: 1px solid rgba(255,255,255,0.1); 
         }
         .nav-item { text-align: center; color: #666; font-size: 10px; transition: 0.2s; flex: 1; }
-        .nav-item.active { color: var(--primary); }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
 
+        /* Animaciones */
         @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
         @keyframes pulse { 0%{opacity:0; transform: translate(-50%, -50%) scale(0.5);} 100%{opacity:1; transform: translate(-50%, -50%) scale(1);} }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -190,6 +207,13 @@
 
     <div id="toast" class="toast">Notificación</div>
 
+    <div id="video-player-overlay" class="player-overlay hidden">
+        <button class="close-player-btn" onclick="closePlayer()"><i class="fa-solid fa-xmark"></i></button>
+        <video id="main-video-player" controls playsinline>
+            <source src="" type="video/mp4">
+        </video>
+    </div>
+
     <div id="tab-home" class="screen">
         <div class="header">
             <h2 class="logo">Flechazo TV</h2>
@@ -198,8 +222,9 @@
         <div class="hero-banner">
             <div class="hero-content">
                 <div class="hero-title">Amor Prohibido</div>
+                <div style="font-size:12px; margin-bottom:10px; color:#ddd;">N° 1 en Tendencias • Drama</div>
                 <button onclick="playMovie(1)" style="background:white; color:black; border:none; padding:10px 20px; border-radius:5px; font-weight:bold;"><i class="fa-solid fa-play"></i> Reproducir</button>
-                <button onclick="toggleMyList(1)" style="background:rgba(255,255,255,0.3); color:white; border:none; padding:10px 20px; border-radius:5px; margin-left:10px;"><i class="fa-solid fa-plus"></i> Lista</button>
+                <button onclick="toggleMyList(1)" style="background:rgba(255,255,255,0.3); color:white; border:none; padding:10px 20px; border-radius:5px; margin-left:10px; backdrop-filter:blur(5px);"><i class="fa-solid fa-plus"></i> Lista</button>
             </div>
         </div>
         <div class="section-title">🔥 Tendencias</div>
@@ -211,18 +236,18 @@
     </div>
 
     <div id="tab-explore" class="screen hidden">
-        <div class="header">
-            <div style="background:#252535; width:100%; padding:10px; border-radius:10px; display:flex; align-items:center;">
+        <div class="header" style="display:block;">
+            <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass" style="color:#666; margin-right:10px;"></i>
-                <input type="text" placeholder="Buscar dramas, actores..." style="background:transparent; border:none; color:white; width:100%;">
+                <input type="text" id="search-input" placeholder="Buscar películas, anime, clips..." style="background:transparent; border:none; color:white; width:100%; font-size:15px;">
             </div>
         </div>
         <div class="categories-scroll">
-            <span class="category-pill active">Todo</span>
-            <span class="category-pill">Acción</span>
-            <span class="category-pill">Romance</span>
-            <span class="category-pill">Free Fire</span>
-            <span class="category-pill">K-Drama</span>
+            <span class="category-pill active" onclick="filterCat('Todo', this)">Todo</span>
+            <span class="category-pill" onclick="filterCat('Acción', this)">Acción</span>
+            <span class="category-pill" onclick="filterCat('Romance', this)">Romance</span>
+            <span class="category-pill" onclick="filterCat('Free Fire', this)">Free Fire</span>
+            <span class="category-pill" onclick="filterCat('Suspenso', this)">Suspenso</span>
         </div>
         <div class="explore-grid" id="explore-grid"></div>
         <br><br><br>
@@ -230,8 +255,7 @@
 
     <div id="tab-shorts" class="screen hidden" style="background: black;">
         <div class="shorts-container" id="shorts-feed">
-            <div style="color:white; text-align:center; padding-top:50%;">Cargando Shorts...</div>
-        </div>
+            </div>
     </div>
 
     <div id="tab-profile" class="screen hidden">
@@ -314,122 +338,148 @@
     </nav>
 
     <script>
-        /* --- BASE DE DATOS LOCAL (SIMULANDO BACKEND) --- */
+        /* --- 1. BASE DE DATOS MOCK (Simulando API) --- */
+        // Aquí están los datos que vendrían de tu backend.
+        // He puesto enlaces de video reales para que funcione el reproductor.
+        
         const moviesDB = [
-            { id: 1, title: "Amor Prohibido", desc: "El amor entre dos mundos opuestos.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Romance" },
-            { id: 2, title: "Free Fire: La Película", desc: "Booyah! La batalla real comienza.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción" },
-            { id: 3, title: "Venganza", desc: "Nadie escapa de su pasado.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", cat: "Acción" },
-            { id: 4, title: "El Hacker", desc: "Código rojo en la red.", img: "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", cat: "Suspenso" },
-            { id: 5, title: "Romance Real", desc: "Un príncipe busca el amor verdadero.", img: "https://image.tmdb.org/t/p/w300/q719jXXEzOoYaps6babgKnONONX.jpg", cat: "Romance" },
-            { id: 6, title: "Heroico", desc: "El camino al gran maestro.", img: "https://image.tmdb.org/t/p/w300/iuFNMS8U5cb6xfzi513hSCzxdn5.jpg", cat: "Acción" }
+            { id: 1, title: "Amor Prohibido", desc: "El amor entre dos mundos opuestos.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Romance", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { id: 2, title: "Free Fire: Booyah", desc: "La batalla real comienza ahora.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+            { id: 3, title: "Venganza Mortal", desc: "Nadie escapa de su pasado.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", cat: "Acción", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+            { id: 4, title: "El Hacker", desc: "Código rojo en la red.", img: "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", cat: "Suspenso", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+            { id: 5, title: "Romance Real", desc: "Un príncipe busca el amor.", img: "https://image.tmdb.org/t/p/w300/q719jXXEzOoYaps6babgKnONONX.jpg", cat: "Romance", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
+            { id: 6, title: "Heroico", desc: "El camino al gran maestro.", img: "https://image.tmdb.org/t/p/w300/iuFNMS8U5cb6xfzi513hSCzxdn5.jpg", cat: "Free Fire", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" }
         ];
 
-        /* --- API MOCK (SIMULADA) PARA SHORTS --- */
         const shortsMockData = [
-            { id: 101, user: "ElTioSpoiler", desc: "¡Jugada maestra en Free Fire! 😱🔥", likes: "10.2k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" },
-            { id: 102, user: "FlechazoClips", desc: "El final de este drama... 💔😭", likes: "5k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-            { id: 103, user: "ProGamer", desc: "Bug encontrado en la actualización 👀", likes: "340", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
+            { id: 101, user: "ElTioSpoiler", desc: "¡Jugada maestra! 😱🔥", likes: "10k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" },
+            { id: 102, user: "FlechazoClips", desc: "Final inesperado... 💔", likes: "5k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+            { id: 103, user: "ProGamer", desc: "Bug encontrado 👀", likes: "340", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
         ];
 
-        /* --- ESTADO --- */
         let myList = [];
         let myHistory = [];
         let tempAvatar = "";
 
-        /* --- INICIALIZACIÓN --- */
+        /* --- 2. INICIALIZACIÓN --- */
         function init() {
-            // Render Home
+            renderHome();
+            renderExplore(moviesDB); // Cargar todo al inicio
+            loadShorts();
+            showHistory('history'); // Cargar perfil
+            
+            // Evento Buscador en Tiempo Real
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const filtered = moviesDB.filter(m => 
+                    m.title.toLowerCase().includes(val) || 
+                    m.cat.toLowerCase().includes(val)
+                );
+                renderExplore(filtered);
+            });
+        }
+
+        function renderHome() {
             const homeList = document.getElementById('home-list');
             const actionList = document.getElementById('action-list');
-            const grid = document.getElementById('explore-grid');
-
+            
             moviesDB.forEach(m => {
                 const card = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
                 homeList.innerHTML += card;
-                grid.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-                if(m.cat === 'Acción') actionList.innerHTML += card;
+                if(m.cat === 'Acción' || m.cat === 'Free Fire') actionList.innerHTML += card;
             });
-
-            // Cargar Shorts (Simulando Fetch)
-            loadShortsFromAPI();
-            
-            // Cargar Historial vacío
-            showHistory('history');
         }
 
-        /* --- LÓGICA DE SHORTS --- */
-        async function loadShortsFromAPI() {
+        function renderExplore(data) {
+            const grid = document.getElementById('explore-grid');
+            grid.innerHTML = '';
+            if(data.length === 0) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#666; padding:20px;">No se encontraron resultados 🔍</div>';
+            
+            data.forEach(m => {
+                grid.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
+            });
+        }
+
+        function filterCat(cat, el) {
+            document.querySelectorAll('.category-pill').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            
+            if(cat === 'Todo') renderExplore(moviesDB);
+            else {
+                const filtered = moviesDB.filter(m => m.cat === cat);
+                renderExplore(filtered);
+            }
+        }
+
+        /* --- 3. LÓGICA DE SHORTS --- */
+        function loadShorts() {
             const container = document.getElementById('shorts-feed');
-            
-            // SIMULAMOS UNA LLAMADA AL SERVIDOR (Aquí iría tu fetch real)
-            // const response = await fetch('http://localhost:3000/api/shorts');
-            
-            setTimeout(() => { // Simulamos retardo de red
-                container.innerHTML = '';
-                shortsMockData.forEach(short => {
-                    const html = `
-                    <div class="short-item" onclick="toggleVideoPlay(this)">
-                        <video class="short-video" src="${short.videoUrl}" loop playsinline></video>
-                        <div class="play-icon-overlay"><i class="fa-solid fa-play"></i></div>
-                        <div class="short-overlay"></div>
-                        <div class="short-actions">
-                            <div class="action-btn" onclick="toggleLike(this, event)">
-                                <div class="action-icon"><i class="fa-solid fa-heart"></i></div>
-                                <span class="action-label">${short.likes}</span>
-                            </div>
-                            <div class="action-btn" onclick="shareShort(event)">
-                                <div class="action-icon"><i class="fa-solid fa-share"></i></div>
-                                <span class="action-label">Share</span>
-                            </div>
+            // Simulamos carga de API
+            container.innerHTML = '';
+            shortsMockData.forEach(short => {
+                const html = `
+                <div class="short-item" onclick="toggleShortPlay(this)">
+                    <video class="short-video" src="${short.videoUrl}" loop playsinline></video>
+                    <div class="play-icon-overlay"><i class="fa-solid fa-play"></i></div>
+                    <div class="short-overlay"></div>
+                    <div class="short-actions">
+                        <div class="action-btn" onclick="toggleLike(this, event)">
+                            <div class="action-icon"><i class="fa-solid fa-heart"></i></div>
+                            <span class="action-label">${short.likes}</span>
                         </div>
-                        <div class="short-info">
-                            <div style="font-weight:bold; margin-bottom:5px;"><i class="fa-solid fa-gamepad" style="color:#FFD700"></i> @${short.user}</div>
-                            <div style="font-size:13px; color:#ddd;">${short.desc}</div>
+                        <div class="action-btn" onclick="shareShort(event)">
+                            <div class="action-icon"><i class="fa-solid fa-share"></i></div>
+                            <span class="action-label">Share</span>
                         </div>
-                    </div>`;
-                    container.innerHTML += html;
-                });
-                setupAutoPlay();
-            }, 500);
+                    </div>
+                    <div class="short-info">
+                        <div style="font-weight:bold; margin-bottom:5px;"><i class="fa-solid fa-gamepad" style="color:#FFD700"></i> @${short.user}</div>
+                        <div style="font-size:13px; color:#ddd;">${short.desc}</div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+            setupShortsObserver();
         }
 
-        /* --- INTERACCIÓN DE SHORTS --- */
-        window.toggleVideoPlay = (container) => {
+        window.toggleShortPlay = (container) => {
             const video = container.querySelector('video');
             const icon = container.querySelector('.play-icon-overlay');
-            if (video.paused) { video.play(); icon.style.display = 'none'; } 
-            else { video.pause(); icon.style.display = 'block'; }
+            if(video.paused) { video.play(); icon.style.display='none'; }
+            else { video.pause(); icon.style.display='block'; }
         }
 
         window.toggleLike = (btn, event) => {
             event.stopPropagation();
             btn.querySelector('.action-icon').classList.toggle('liked');
         }
-
         window.shareShort = (event) => {
             event.stopPropagation();
-            showToast("Enlace copiado al portapapeles");
+            showToast("Enlace copiado");
         }
 
-        function setupAutoPlay() {
+        function setupShortsObserver() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const video = entry.target.querySelector('video');
                     const icon = entry.target.querySelector('.play-icon-overlay');
-                    if (entry.isIntersecting) {
-                        video.currentTime = 0; video.play().catch(e => console.log("Autoplay bloqueado")); icon.style.display = 'none';
+                    if(entry.isIntersecting) { 
+                        video.currentTime = 0; video.play().catch(e=>{}); icon.style.display='none';
                     } else { video.pause(); }
                 });
             }, { threshold: 0.7 });
             document.querySelectorAll('.short-item').forEach(item => observer.observe(item));
         }
 
-        /* --- LÓGICA DE DETALLE Y REPRODUCCIÓN --- */
+        /* --- 4. LÓGICA DE REPRODUCTOR & DETALLE --- */
         window.openDetail = (id) => {
             const m = moviesDB.find(x => x.id === id);
             const content = `
                 <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
-                <div class="detail-hero"><img src="${m.img}"><div class="play-float"><i class="fa-solid fa-circle-play"></i></div></div>
+                <div class="detail-hero" onclick="playMovie(${m.id})">
+                    <img src="${m.img}">
+                    <div class="play-float"><i class="fa-solid fa-circle-play"></i></div>
+                </div>
                 <h2 style="margin:0 0 5px 0;">${m.title}</h2>
                 <div style="font-size:12px; color:#aaa; margin-bottom:10px;">${m.cat} • 2024 • HD</div>
                 <p style="font-size:14px; color:#ddd; line-height:1.5;">${m.desc}</p>
@@ -441,25 +491,43 @@
             openModal('detail-modal');
         }
 
+        // FUNCIÓN CLAVE: Abre el video Fullscreen
         window.playMovie = (id) => {
             const movie = moviesDB.find(m => m.id === id);
-            // Agregar al historial si no existe
+            const overlay = document.getElementById('video-player-overlay');
+            const videoTag = document.getElementById('main-video-player');
+
+            // Configurar video
+            videoTag.src = movie.videoUrl;
+            overlay.classList.remove('hidden');
+            videoTag.play().catch(e=>{});
+
+            // Guardar en historial
             if(!myHistory.find(h => h.id === id)) myHistory.unshift(movie);
-            showToast(`Reproduciendo: ${movie.title}`);
+            
             closeModal('detail-modal');
-            showHistory('history'); // Actualizar UI
+            showToast(`Reproduciendo: ${movie.title}`);
+            showHistory('history');
+        }
+
+        window.closePlayer = () => {
+            const overlay = document.getElementById('video-player-overlay');
+            const videoTag = document.getElementById('main-video-player');
+            videoTag.pause();
+            videoTag.src = "";
+            overlay.classList.add('hidden');
         }
 
         window.toggleMyList = (id) => {
             const movie = moviesDB.find(m => m.id === id);
-            const index = myList.findIndex(m => m.id === id);
-            if(index === -1) { myList.push(movie); showToast("Agregado a Mi Lista"); }
-            else { myList.splice(index, 1); showToast("Eliminado de la lista"); }
+            const idx = myList.findIndex(m => m.id === id);
+            if(idx === -1) { myList.push(movie); showToast("Agregado a Mi Lista"); }
+            else { myList.splice(idx, 1); showToast("Eliminado de la lista"); }
             closeModal('detail-modal');
-            showHistory('list'); // Actualizar UI
+            showHistory('list');
         }
 
-        /* --- LÓGICA DE PERFIL --- */
+        /* --- 5. LÓGICA DE PERFIL --- */
         window.showHistory = (type) => {
             const container = document.getElementById('history-container');
             const title = document.getElementById('history-title');
@@ -470,7 +538,7 @@
             document.getElementById('count-history').innerText = myHistory.length;
 
             if(data.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#666; padding:30px;">Nada por aquí... <i class="fa-solid fa-ghost"></i></div>`;
+                container.innerHTML = `<div style="text-align:center; color:#666; padding:30px;">Sin actividad reciente <i class="fa-solid fa-ghost"></i></div>`;
                 return;
             }
 
@@ -512,25 +580,28 @@
             showToast("Perfil actualizado");
         }
 
-        /* --- UTILIDADES DE UI --- */
+        /* --- 6. UTILIDADES --- */
         window.switchTab = (id, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('tab-'+id).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
+            
+            // Pausar shorts si sales de la pestaña
             if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
         }
 
         window.openModal = (id) => document.getElementById(id).classList.add('open');
         window.closeModal = (id) => document.getElementById(id).classList.remove('open');
         window.closeModalIfOutside = (e, id) => { if(e.target.id === id) closeModal(id); }
-        window.showToast = (msg) => {
+        window.showToast = (msg, type='info') => {
             const t = document.getElementById('toast');
             t.innerText = msg; t.style.display = 'block';
+            t.style.borderLeftColor = type==='error'?'red':'var(--primary)';
             setTimeout(() => t.style.display = 'none', 3000);
         }
 
-        // Arrancamos la app
+        // START APP
         init();
     </script>
 </body>
