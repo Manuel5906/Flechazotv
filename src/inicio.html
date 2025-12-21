@@ -5,283 +5,291 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Flechazo TV - Ultimate</title>
+    <title>Flechazo TV - Premium</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. TEMAS --- */
+        /* --- 1. VARIABLES & RESET --- */
         :root { 
-            --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
-            --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
+            --bg: #0f0f1a; --card: #1e1e2d; --primary: #e50914; /* Rojo tipo Netflix */
+            --text-gray: #b3b3b3;
+            --gradient: linear-gradient(180deg, rgba(15,15,26,0) 0%, rgba(15,15,26,1) 100%);
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(135deg, #ff3300, #ff9900); }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(135deg, #00ff88, #00ccff); }
-        .theme-ocean { --bg: #050a1a; --card: #0d152d; --primary: #0088ff; --gradient: linear-gradient(135deg, #0088ff, #00ffff); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #fff; padding-bottom: calc(80px + var(--safe-bottom)); overflow-x: hidden; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: #fff; padding-bottom: calc(90px + var(--safe-bottom)); transition: 0.4s; overflow-x: hidden; }
-
-        /* --- 2. NOTIFICACIONES --- */
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); width: 16px; height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
-        .notif-panel { position: fixed; top: 75px; right: 20px; width: 280px; max-height: 350px; background: var(--card); border-radius: 20px; border: 1px solid #333; z-index: 2000; display: none; overflow-y: auto; box-shadow: 0 10px 30px #000; }
-        .notif-item { padding: 15px; border-bottom: 1px solid #333; font-size: 13px; }
-
-        /* --- 3. REPRODUCTOR --- */
-        .player-fs { position: fixed; inset: 0; background: #000; z-index: 6000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .close-player { position: absolute; top: calc(25px + var(--safe-top)); left: 20px; font-size: 28px; z-index: 6002; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        /* --- 2. HEADER FLOTANTE --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; padding: calc(10px + var(--safe-top)) 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); transition: 0.3s; }
+        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(229,9,20,0.5); }
         
-        /* Estilos del contenedor dinámico */
-        #dynamic-player { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        #dynamic-player iframe { border: none; width: 100%; height: 100%; }
-        #dynamic-player video { width: 100%; height: auto; max-height: 100%; }
+        /* --- 3. HERO BANNER (PORTADA) --- */
+        .hero-banner { height: 70vh; position: relative; display: flex; align-items: flex-end; }
+        .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(15,15,26,0.2), var(--bg)); }
+        .hero-content { padding: 0 20px 40px; width: 100%; z-index: 2; position: relative; }
+        .hero-tags { font-size: 12px; color: #fff; display: flex; gap: 10px; margin-bottom: 10px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .hero-title { font-size: 40px; line-height: 1; margin-bottom: 10px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .hero-desc { font-size: 14px; color: #ddd; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 2px rgba(0,0,0,0.8); max-width: 90%; }
+        
+        .hero-btns { display: flex; gap: 15px; }
+        .btn-play { flex: 1; background: #fff; color: #000; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-list { flex: 1; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        /* --- 4. MODAL INFO --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: none; align-items: flex-end; backdrop-filter: blur(8px); }
-        .modal-sheet { width: 100%; max-width: 500px; background: var(--card); border-radius: 30px 30px 0 0; animation: slideUp 0.4s ease; margin: 0 auto; overflow: hidden; }
-        .modal-hero { width: 100%; height: 230px; position: relative; }
-        .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+        /* --- 4. CATEGORÍAS (PILLS) --- */
+        .category-scroll { display: flex; gap: 10px; padding: 10px 20px; overflow-x: auto; scrollbar-width: none; margin-top: -20px; position: relative; z-index: 10; }
+        .cat-pill { padding: 6px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+        .cat-pill.active { background: #fff; color: #000; font-weight: bold; border-color: #fff; }
 
-        /* --- 5. UI PRINCIPAL --- */
-        .header { padding: calc(15px + var(--safe-top)) 25px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 1000; }
-        .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); margin-right: 15px; cursor: pointer; transition: 0.2s; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; scrollbar-width: none; }
-        .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
+        /* --- 5. LISTAS HORIZONTALES --- */
+        .section { margin-top: 25px; }
+        .section-header { padding: 0 20px 10px; font-size: 17px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .see-all { font-size: 12px; color: var(--primary); font-weight: 600; }
+        
+        .h-list { display: flex; overflow-x: auto; padding: 0 20px; gap: 12px; scrollbar-width: none; }
+        .card { width: 110px; flex-shrink: 0; position: relative; }
+        .card-img { width: 100%; height: 160px; border-radius: 6px; object-fit: cover; background: #222; }
+        
+        /* Estilo Continuar Viendo */
+        .progress-cont { height: 3px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); width: 45%; }
+        .card-info { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .card-icon { color: #fff; font-size: 14px; }
 
-        /* --- 6. SHORTS --- */
-        .shorts-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; background: #000; position: fixed; inset: 0; z-index: 500; padding-bottom: calc(70px + var(--safe-bottom)); }
-        .short-v { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; }
-        .short-v video { width: 100%; height: 100%; object-fit: cover; }
-        .short-ui { position: absolute; bottom: 100px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 10; text-shadow: 0 2px 4px #000; }
+        /* Estilo Top 10 */
+        .top10-card { display: flex; align-items: flex-end; width: 140px; position: relative; margin-right: 10px; }
+        .big-number { font-size: 90px; font-weight: 900; color: #000; -webkit-text-stroke: 2px #555; position: absolute; left: -15px; bottom: -10px; z-index: -1; font-family: impact, sans-serif; letter-spacing: -5px; }
+        .top10-img { width: 100px; height: 150px; border-radius: 6px; margin-left: auto; object-fit: cover; }
 
-        /* --- 7. NAV --- */
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); z-index: 2000; border-top: 1px solid #333; }
-        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
+        /* --- 6. NAV BAR --- */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.95); backdrop-filter: blur(10px); border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 10px; gap: 4px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #fff; }
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* --- 7. PLAYER & MODAL (Mismo código optimizado) --- */
+        .player-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; color: #fff; font-size: 30px; z-index: 5001; cursor: pointer; text-shadow: 0 2px 5px #000; }
+        #dynamic-player { width: 100%; height: 100%; }
+        #dynamic-player iframe { width: 100%; height: 100%; border: none; }
+        #dynamic-player video { width: 100%; height: auto; max-height: 100vh; }
+        
+        /* Modal Info */
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 4000; display: none; align-items: flex-end; backdrop-filter: blur(5px); }
+        .modal-card { width: 100%; background: #1a1a1a; border-radius: 20px 20px 0 0; overflow: hidden; animation: slideUp 0.3s; max-width: 500px; margin: 0 auto; }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="player-overlay" class="player-fs">
+    <div id="player-overlay" class="player-overlay">
         <i class="fa-solid fa-chevron-left close-player" onclick="stopVideo()"></i>
-        <div id="dynamic-player">
-            </div>
-    </div>
-
-    <div id="info-modal" class="modal-overlay" onclick="if(event.target.id==='info-modal') closeInfo()">
-        <div class="modal-sheet" id="info-content"></div>
+        <div id="dynamic-player"></div>
     </div>
 
     <div id="app">
-        <header id="main-header" class="header">
-            <h2 class="logo">Flechazo TV</h2>
-            <div style="position:relative;" onclick="toggleNotifs()">
-                <i class="fa-solid fa-bell" style="font-size:24px;"></i>
-                <span id="notif-dot" class="notif-badge hidden">!</span>
-                <div id="notif-panel" class="notif-panel"></div>
-            </div>
+        
+        <header class="header">
+            <div class="logo">Flechazo TV</div>
+            <i class="fa-solid fa-chromecast" style="font-size: 22px;"></i>
         </header>
 
-        <div id="screen-home" class="screen">
-            <div class="section-title">🔥 Tendencias Semanales</div>
-            <div class="horizontal-scroll" id="trends-list"></div>
-            <div class="section-title">⚔️ Acción y Free Fire</div>
-            <div class="horizontal-scroll" id="action-list"></div>
-        </div>
-
-        <div id="screen-explore" class="screen hidden">
-            <div style="padding: calc(15px + var(--safe-top)) 20px;">
-                <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px; border:1px solid #333;">
-                    <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
-                    <input type="text" id="search-inp" placeholder="Buscar drama, acción..." style="background:transparent; border:none; color:white; width:100%;">
+        <div id="screen-home">
+            <div id="hero" class="hero-banner">
                 </div>
+
+            <div class="category-scroll">
+                <div class="cat-pill active">Todos</div>
+                <div class="cat-pill">Dramas</div>
+                <div class="cat-pill">CEO</div>
+                <div class="cat-pill">Histórico</div>
+                <div class="cat-pill">Venganza</div>
+                <div class="cat-pill">Comedia</div>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
-        </div>
 
-        <div id="screen-shorts" class="screen hidden">
-            <div id="shorts-wrapper" class="shorts-container"></div>
-        </div>
-
-        <div id="screen-profile" class="screen hidden">
-            <div style="padding: 40px 20px; text-align: center;">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:110px; border-radius:50%; border:3px solid var(--primary);">
-                <h2 id="p-name">Gamer Pro</h2>
-                <div style="background:var(--card); border-radius:20px; padding:10px; margin-top:20px; text-align: left;">
-                    <div style="padding:15px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">
-                        <span>Tema de App</span>
-                        <select onchange="setTheme(this.value)" style="background:none; border:none; color:var(--primary); font-weight:bold;">
-                            <option value="default">Noche</option>
-                            <option value="fire">Fuego</option>
-                            <option value="emerald">Esmeralda</option>
-                            <option value="ocean">Océano</option>
-                        </select>
+            <div class="section">
+                <div class="section-header">
+                    Continuar Viendo
+                </div>
+                <div class="h-list" id="continue-list">
                     </div>
-                </div>
-                <button onclick="location.reload()" style="width:100%; padding:15px; border-radius:15px; margin-top:20px; background:rgba(255,0,0,0.1); color:red; border:none; font-weight:bold;">CERRAR SESIÓN</button>
             </div>
-        </div>
+
+            <div class="section">
+                <div class="section-header">
+                    Top 10 en Perú hoy
+                </div>
+                <div class="h-list" id="top10-list">
+                    </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span>Tendencias Semanales</span>
+                    <span class="see-all">Ver todo</span>
+                </div>
+                <div class="h-list" id="trends-list">
+                    </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span>Zona Gamer & Acción</span>
+                </div>
+                <div class="h-list" id="action-list"></div>
+            </div>
+
+            <br><br> </div>
 
         <nav class="nav">
-            <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-            <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-            <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-solid fa-bolt"></i>Shorts</div>
-            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user-gear"></i>Perfil</div>
+            <div class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</div>
+            <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Buscar</div>
+            <div class="nav-item"><i class="fa-solid fa-clapperboard"></i>Shorts</div>
+            <div class="nav-item"><i class="fa-regular fa-user"></i>Mi Perfil</div>
         </nav>
+
     </div>
 
     <script>
+        // --- BASE DE DATOS SIMULADA (La API de vercel se usa aquí) ---
         let moviesData = [];
-        const API_URL = 'https://flechazotv.vercel.app/api';
+        // Puedes cambiar esto por tu URL de API real
+        const API_URL = 'https://flechazotv.vercel.app/api/movies'; 
 
-        // --- 1. CARGA DE APIS ---
-        async function initApp() {
+        // Datos de respaldo por si falla la API (Para que veas el diseño ya)
+        const backupData = [
+            { id: 1, title: "Amor de Contrato", img: "https://i.pinimg.com/564x/a8/50/26/a850262450375a24209938f323719036.jpg", cat: "Romance", video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", desc: "Un CEO millonario y una chica humilde firman un contrato de matrimonio." },
+            { id: 2, title: "Venganza de Fuego", img: "https://i.pinimg.com/564x/f3/f9/d6/f3f9d651543883a88701918a974b9409.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { id: 3, title: "El Heredero", img: "https://i.pinimg.com/564x/96/8c/dc/968cdc637311140026e643032549d448.jpg", cat: "Drama" },
+            { id: 4, title: "Free Fire League", img: "https://i.pinimg.com/736x/21/fd/8b/21fd8b4618ee31548cc0443317c96350.jpg", cat: "Free Fire" },
+            { id: 5, title: "Secretos de Palacio", img: "https://i.pinimg.com/564x/e7/5d/3c/e75d3c8c760220677891823101897e06.jpg", cat: "Histórico" }
+        ];
+
+        async function init() {
             try {
-                const [m, s, n] = await Promise.all([
-                    fetch(`${API_URL}/movies`).then(r => r.json()),
-                    fetch(`${API_URL}/shorts`).then(r => r.json()),
-                    fetch(`${API_URL}/notifications`).then(r => r.json())
-                ]);
-                moviesData = m;
-                renderMovies(m);
-                renderShorts(s);
-                renderNotifs(n);
-            } catch(e) { console.error("API Error: Verifica que el servidor puerto 3000 esté activo."); }
-        }
-
-        function renderMovies(data) {
-            const h = document.getElementById('trends-list');
-            const a = document.getElementById('action-list');
-            const e = document.getElementById('explore-grid');
-            h.innerHTML = ''; a.innerHTML = ''; e.innerHTML = '';
-            data.forEach(m => {
-                const img = `<img class="poster" src="${m.img}" onclick="openInfo(${m.id})">`;
-                h.innerHTML += img;
-                e.innerHTML += img;
-                if(m.cat === 'Acción' || m.cat === 'Free Fire') a.innerHTML += img;
-            });
-        }
-
-        // --- 2. MODAL Y REPRODUCTOR INTELIGENTE ---
-        window.openInfo = id => {
-            const m = moviesData.find(x => x.id === id);
-            document.getElementById('info-content').innerHTML = `
-                <div class="modal-hero"><img src="${m.img}"></div>
-                <div style="padding:25px;">
-                    <h2 style="margin:0;">${m.title}</h2>
-                    <p style="color:var(--primary); font-weight:bold;">${m.cat} • 2025</p>
-                    <p style="color:#aaa; font-size:14px; margin-bottom:20px;">${m.desc || 'Disfruta de lo mejor de Flechazo TV.'}</p>
-                    <button onclick="playVideo('${m.videoUrl || m.video}')" style="width:100%; padding:15px; background:#fff; color:#000; border:none; border-radius:12px; font-weight:bold;">VER AHORA</button>
-                </div>`;
-            document.getElementById('info-modal').style.display = 'flex';
-        };
-
-        // --- FUNCIÓN ADAPTATIVA DE VIDEO ---
-        function getEmbedHTML(url) {
-            // Caso 1: YouTube (Soporta links cortos y largos)
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                let videoId = '';
-                if (url.includes('youtu.be')) {
-                    videoId = url.split('/').pop();
+                // Intentamos cargar API, si falla usamos backup
+                const res = await fetch(API_URL);
+                if(res.ok) {
+                    moviesData = await res.json();
                 } else {
-                    const urlParams = new URLSearchParams(new URL(url).search);
-                    videoId = urlParams.get('v');
+                    moviesData = backupData;
                 }
-                // Si falla la extracción, retornamos la URL tal cual en iframe
-                if(!videoId) return `<iframe src="${url}" allowfullscreen></iframe>`;
-                
-                return `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            } catch(e) {
+                moviesData = backupData;
             }
+
+            // 1. Configurar Hero Banner (Usamos la primera película como destacada)
+            setupHero(moviesData[0] || backupData[0]);
+
+            // 2. Llenar Listas
+            renderList('trends-list', moviesData);
+            renderList('action-list', moviesData.filter(m => m.cat === 'Acción' || m.cat === 'Free Fire'));
+            renderContinueWatching(moviesData.slice(0,3)); // Simulamos 3 pelis viendo
+            renderTop10(moviesData.slice(0,5)); // Top 5
+        }
+
+        // --- RENDERIZADO DE UI ---
+
+        function setupHero(movie) {
+            const hero = document.getElementById('hero');
+            // Usamos una imagen de alta calidad si es posible
+            const imgUrl = movie.img; 
             
-            // Caso 2: Vimeo
+            hero.innerHTML = `
+                <img src="${imgUrl}" class="hero-img">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <div class="hero-tags">
+                        <span style="color:#46d369">98% Coincidencia</span>
+                        <span>${movie.cat}</span>
+                        <span>2025</span>
+                    </div>
+                    <h1 class="hero-title">${movie.title}</h1>
+                    <p class="hero-desc">${movie.desc || "La serie más esperada del año llega a Flechazo TV. Drama, pasión y secretos revelados."}</p>
+                    <div class="hero-btns">
+                        <button class="btn-play" onclick="playVideo('${movie.video || movie.videoUrl || ''}')">
+                            <i class="fa-solid fa-play"></i> Reproducir
+                        </button>
+                        <button class="btn-list">
+                            <i class="fa-solid fa-plus"></i> Mi Lista
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderList(elementId, data) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = data.map(m => `
+                <div class="card" onclick="playVideo('${m.video || m.videoUrl || ''}')">
+                    <img src="${m.img}" class="card-img">
+                </div>
+            `).join('');
+        }
+
+        function renderContinueWatching(data) {
+            const container = document.getElementById('continue-list');
+            container.innerHTML = data.map(m => `
+                <div class="card" onclick="playVideo('${m.video || ''}')">
+                    <img src="${m.img}" class="card-img" style="height:100px;"> <div class="progress-cont">
+                        <div class="progress-bar" style="width: ${Math.floor(Math.random() * 80) + 10}%"></div>
+                    </div>
+                    <div class="card-info">
+                        <i class="fa-solid fa-circle-info" style="color:#aaa;"></i>
+                        <i class="fa-solid fa-ellipsis-vertical" style="color:#aaa;"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTop10(data) {
+            const container = document.getElementById('top10-list');
+            container.innerHTML = data.map((m, index) => `
+                <div class="top10-card" onclick="playVideo('${m.video || ''}')">
+                    <span class="big-number">${index + 1}</span>
+                    <img src="${m.img}" class="top10-img">
+                </div>
+            `).join('');
+        }
+
+        // --- LÓGICA DEL REPRODUCTOR (ADAPTATIVA) ---
+        // Esta es la misma lógica avanzada que te di antes
+
+        function getEmbedHTML(url) {
+            if (!url) return '<h2 style="color:white;text-align:center;">Video no disponible</h2>';
+
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                let videoId = url.includes('youtu.be') ? url.split('/').pop() : new URLSearchParams(new URL(url).search).get('v');
+                return `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            }
             if (url.includes('vimeo.com')) {
                 const videoId = url.split('/').pop();
-                return `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                return `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
             }
-
-            // Caso 3: Archivo de Video Directo (.mp4, .mkv, .webm)
             if (url.match(/\.(mp4|webm|ogg|mkv)$/i)) {
-                return `<video id="main-video" controls playsinline webkit-playsinline autoplay style="width:100%;">
-                            <source src="${url}" type="video/mp4">
-                            Tu navegador no soporta este video.
-                        </video>`;
+                return `<video controls playsinline autoplay style="width:100%; height:auto;"><source src="${url}" type="video/mp4"></video>`;
             }
-
-            // Caso 4: Iframe Genérico / Embed (Por defecto para todo lo demás)
-            return `<iframe src="${url}" frameborder="0" allowfullscreen allow="autoplay"></iframe>`;
+            return `<iframe src="${url}" allowfullscreen allow="autoplay"></iframe>`;
         }
 
         window.playVideo = url => {
             const container = document.getElementById('dynamic-player');
             container.innerHTML = getEmbedHTML(url);
             document.getElementById('player-overlay').style.display = 'flex';
-            closeInfo();
         };
 
-        window.stopVideo = () => { 
-            // Es crucial vaciar el innerHTML para matar los Iframes y detener el audio de fondo
-            document.getElementById('dynamic-player').innerHTML = ''; 
-            document.getElementById('player-overlay').style.display = 'none'; 
+        window.stopVideo = () => {
+            document.getElementById('dynamic-player').innerHTML = '';
+            document.getElementById('player-overlay').style.display = 'none';
         };
 
-        window.closeInfo = () => document.getElementById('info-modal').style.display = 'none';
+        // Iniciar
+        init();
 
-        // --- 3. SHORTS TIKTOK ---
-        function renderShorts(data) {
-            const wrap = document.getElementById('shorts-wrapper');
-            wrap.innerHTML = data.map(s => `
-                <div class="short-v">
-                    <video src="${s.videoUrl}" loop playsinline webkit-playsinline></video>
-                    <div class="short-ui"><b>@${s.user}</b></div>
-                </div>`).join('');
-            const obs = new IntersectionObserver(ents => ents.forEach(e => {
-                const v = e.target.querySelector('video');
-                if (e.isIntersecting) v.play().catch(()=>{}); else v.pause();
-            }), { threshold: 0.8 });
-            document.querySelectorAll('.short-v').forEach(sv => obs.observe(sv));
-        }
-
-        // --- 4. BUSCADOR Y NOTIF ---
-        document.getElementById('search-inp').addEventListener('input', async e => {
-            // Simulación de búsqueda local si la API falla o para prueba
-            const val = e.target.value.toLowerCase();
-            const filtered = moviesData.filter(m => m.title.toLowerCase().includes(val));
-            renderMovies(filtered);
-        });
-
-        function renderNotifs(data) {
-            if(data && data.length > 0) {
-                document.getElementById('notif-dot').classList.remove('hidden');
-                document.getElementById('notif-panel').innerHTML = data.map(n => `<div class="notif-item"><b>${n.title}</b><br>${n.msg}</div>`).join('');
-            }
-        }
-        window.toggleNotifs = () => {
-            const p = document.getElementById('notif-panel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
-            document.getElementById('notif-dot').classList.add('hidden');
-        };
-
-        // --- 5. NAVEGACIÓN ---
-        window.switchTab = (tab, el) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('screen-'+tab).classList.remove('hidden');
-            document.getElementById('main-header').style.display = (tab === 'home') ? 'flex' : 'none';
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            if(tab !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
-        }
-
-        window.setTheme = t => { document.body.className = 'theme-' + t; localStorage.setItem('f_theme', t); }
-
-        initApp();
-        if(localStorage.getItem('f_theme')) setTheme(localStorage.getItem('f_theme'));
     </script>
 </body>
 </html>
