@@ -5,99 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" id="status-bar-color" content="#0f0f1a">
-    <title>Flechazo TV - Ultimate Edition</title>
+    <title>Flechazo TV - Home Premium</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. VARIABLES DINÁMICAS (TEMAS) --- */
+        /* --- 1. TEMAS Y VARIABLES --- */
         :root { 
-            --bg: #0f0f1a; 
-            --card: #1e1e2d; 
-            --primary: #ff4b4b; 
-            --accent: #a24bfa;
-            --text: #fff; 
-            --text-sec: #aaa;
+            --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
+            --accent: #a24bfa; --text: #fff; --text-sec: #aaa;
             --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
         }
-
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --accent: #ff9900; --gradient: linear-gradient(45deg, #ff3300, #ff9900); }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --accent: #00ccff; --gradient: linear-gradient(45deg, #00ff88, #00ccff); }
-        .theme-purple { --bg: #10051a; --card: #1e0d2d; --primary: #bf00ff; --accent: #ff0077; --gradient: linear-gradient(45deg, #bf00ff, #ff0077); }
+        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(45deg, #ff3300, #ff9900); }
+        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(45deg, #00ff88, #00ccff); }
+        .theme-purple { --bg: #10051a; --card: #1e0d2d; --primary: #bf00ff; --gradient: linear-gradient(45deg, #bf00ff, #ff0077); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg); color: var(--text); padding-bottom: 80px; 
-            user-select: none; overflow-x: hidden; transition: background 0.4s ease;
-        }
-        .hidden { display: none !important; }
-
-        /* --- 2. NOTIFICACIONES (ESTILOS NUEVOS) --- */
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; border-radius: 50%; width: 15px; height: 15px; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); z-index: 10; }
-        .notif-panel { position: fixed; top: 70px; right: 20px; width: 300px; max-height: 400px; background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; }
-        .notif-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .notif-item b { display: block; color: var(--primary); font-size: 14px; }
-        .notif-item small { color: #888; font-size: 11px; }
-
-        /* --- 3. UI COMPONENTS --- */
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; transition: background 0.4s; overflow-x: hidden; }
+        
+        /* --- 2. COMPONENTES UI --- */
         .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
-        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; margin-right: 10px; position: relative; }
-        .poster-card img { width: 100%; height: 100%; object-fit: cover; }
+        .logo { font-size: 22px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
+        .notif-panel { position: fixed; top: 70px; right: 20px; width: 300px; max-height: 400px; background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-y: auto; }
+        .notif-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .search-box { background:#252535; padding:12px; border-radius:12px; display:flex; align-items:center; margin: 10px 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
+        .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; animation: fadeIn 0.4s; }
+        .explore-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; margin-right: 12px; }
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
         .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
 
-        /* Modal y Reproductor */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
+        /* --- 3. MODAL DETALLE PREMIUM --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-overlay.open { display: flex; }
-        .modal-sheet { background: var(--card); width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; animation: slideUp 0.3s ease; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); }
-        .detail-hero { width: 100%; height: 230px; position: relative; }
+        .modal-sheet { background: var(--card); width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; animation: slideUp 0.3s ease; overflow: hidden; }
+        .detail-hero { width: 100%; height: 240px; position: relative; }
         .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-play-hero { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; box-shadow: 0 0 20px rgba(255,75,75,0.5); cursor: pointer; }
+
+        /* --- 4. REPRODUCTOR --- */
         .player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; display: flex; justify-content: center; align-items: center; }
-        #main-video-player { width: 100%; height: auto; }
         .close-player { position: absolute; top: 25px; right: 25px; color: white; font-size: 30px; z-index: 5001; }
 
-        /* Perfil */
-        .profile-container { padding: 20px; }
-        .avatar-box { position: relative; width: 110px; height: 110px; margin: 0 auto; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; }
-        .level-badge { position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-        .xp-container { width: 80%; margin: 15px auto; height: 6px; background: #333; border-radius: 10px; overflow: hidden; }
-        .xp-bar { height: 100%; width: 65%; background: var(--gradient); }
-        .settings-group { background: var(--card); border-radius: 20px; padding: 10px; margin-bottom: 20px; }
-        .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .theme-selector { display: flex; gap: 10px; padding: 10px; }
-        .theme-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+        /* --- 5. PERFIL --- */
+        .avatar-box { position: relative; width: 100px; height: 100px; margin: 20px auto; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
+        .theme-dot { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
 
-        /* Nav */
+        /* --- 6. NAV --- */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
         .nav-item { text-align: center; color: #666; font-size: 10px; flex: 1; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
 
+        .hidden { display: none !important; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="toast" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--card); color:white; padding:10px 20px; border-radius:50px; z-index:9000; display:none; font-size:12px; border:1px solid var(--primary);"></div>
-
     <div id="notif-panel" class="notif-panel">
-        <div style="padding: 15px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">Notificaciones</div>
-        <div id="notif-content">
-            <p style="padding: 20px; text-align: center; color: #666;">No hay novedades</p>
-        </div>
+        <div style="padding: 15px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">Centro de Avisos</div>
+        <div id="notif-content"><p style="padding: 20px; text-align: center; color: #666;">No hay mensajes nuevos</p></div>
     </div>
 
     <div id="video-player-overlay" class="player-overlay hidden">
         <i class="fa-solid fa-xmark close-player" onclick="closePlayer()"></i>
-        <video id="main-video-player" controls playsinline src=""></video>
+        <video id="main-video-player" controls playsinline style="width: 100%;"></video>
     </div>
 
     <div id="app-content">
-        
         <div id="tab-home" class="screen">
             <div class="header">
-                <h2 style="background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">Flechazo TV</h2>
+                <h2 class="logo">Flechazo TV</h2>
                 <div style="position: relative;" onclick="toggleNotifs()">
                     <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
                     <div id="bell-dot" class="notif-badge hidden">!</div>
@@ -109,44 +94,37 @@
             <div class="horizontal-scroll" id="action-list"></div>
         </div>
 
+        <div id="tab-explore" class="screen hidden">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color:#666; margin-right:10px;"></i>
+                <input type="text" id="search-input" placeholder="Buscar en Flechazo TV..." style="background:transparent; border:none; color:white; width:100%;">
+            </div>
+            <div class="explore-grid" id="explore-grid"></div>
+        </div>
+
         <div id="tab-shorts" class="screen hidden" style="background: black;">
             <div id="shorts-feed" style="height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory;"></div>
         </div>
 
         <div id="tab-profile" class="screen hidden">
-            <div class="profile-header" style="text-align: center; padding-top: 40px;">
+            <div style="text-align: center; padding: 40px 20px;">
                 <div class="avatar-box">
                     <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-img">
-                    <div class="level-badge">LVL 15</div>
                 </div>
-                <h2 id="profile-name" style="margin: 15px 0 5px;">Usuario</h2>
-                <div class="xp-container"><div class="xp-bar"></div></div>
-            </div>
-
-            <div class="profile-container">
-                <div class="section-title" style="padding-left:0;">Personalización</div>
-                <div class="settings-group">
-                    <div class="settings-item">
-                        <span>Tema de la App</span>
-                        <div class="theme-selector">
-                            <div class="theme-dot" style="background:#0f0f1a" onclick="changeTheme('default')"></div>
-                            <div class="theme-dot" style="background:#ff3300" onclick="changeTheme('fire')"></div>
-                            <div class="theme-dot" style="background:#00ff88" onclick="changeTheme('emerald')"></div>
-                            <div class="theme-dot" style="background:#bf00ff" onclick="changeTheme('purple')"></div>
-                        </div>
-                    </div>
+                <h2 id="profile-name">Cargando...</h2>
+                <div style="display:flex; justify-content:center; gap:15px; margin: 20px 0;">
+                    <div class="theme-dot" style="background:#0f0f1a" onclick="changeTheme('default')"></div>
+                    <div class="theme-dot" style="background:#ff3300" onclick="changeTheme('fire')"></div>
+                    <div class="theme-dot" style="background:#00ff88" onclick="changeTheme('emerald')"></div>
+                    <div class="theme-dot" style="background:#bf00ff" onclick="changeTheme('purple')"></div>
                 </div>
-
-                <div class="section-title" style="padding-left:0;">Ajustes</div>
-                <div class="settings-group">
-                    <div class="settings-item"><span>Notificaciones</span><input type="checkbox" checked></div>
-                    <div class="settings-item" onclick="logout()" style="color: var(--primary);"><span>Cerrar Sesión</span><i class="fa-solid fa-right-from-bracket"></i></div>
-                </div>
+                <button onclick="location.reload()" style="padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid #444; color:white; border-radius:20px;">Cerrar Sesión</button>
             </div>
         </div>
 
         <nav class="bottom-nav">
             <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+            <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
             <div class="nav-item" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
             <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
         </nav>
@@ -157,67 +135,63 @@
     </div>
 
     <script>
-        // --- SISTEMA DE NOTIFICACIONES ---
-        async function fetchNotifications() {
+        let movies = [];
+        let searchTimeout;
+
+        // --- 1. APIS Y DATOS ---
+        async function loadData() {
             try {
-                const res = await fetch('http://localhost:3000/api/notifications');
-                const data = await res.json();
-                const container = document.getElementById('notif-content');
-                if(data.length > 0) {
-                    document.getElementById('bell-dot').classList.remove('hidden');
-                    container.innerHTML = data.map(n => `
-                        <div class="notif-item">
-                            <b>${n.title}</b>
-                            <p style="margin:5px 0; font-size:13px;">${n.msg}</p>
-                            <small>${n.date}</small>
-                        </div>
-                    `).join('');
-                }
-            } catch(e) { console.log("API offline"); }
+                const [moviesRes, shortsRes, notifsRes] = await Promise.all([
+                    fetch('http://localhost:3000/api/movies'),
+                    fetch('http://localhost:3000/api/shorts'),
+                    fetch('http://localhost:3000/api/notifications')
+                ]);
+                movies = await moviesRes.json();
+                renderMovies(movies);
+                renderShorts(await shortsRes.json());
+                renderNotifs(await notifsRes.json());
+            } catch (e) {
+                console.warn("API Offline, usando datos locales");
+                movies = [{ id: 1, title: "Amor Prohibido", desc: "Drama romántico.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }];
+                renderMovies(movies);
+            }
         }
 
-        window.toggleNotifs = () => {
-            const p = document.getElementById('notif-panel');
-            const dot = document.getElementById('bell-dot');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
-            dot.classList.add('hidden');
-        }
-
-        // --- TEMAS ---
-        window.changeTheme = (theme) => {
-            document.body.classList.remove('theme-fire', 'theme-emerald', 'theme-purple');
-            if(theme !== 'default') document.body.classList.add('theme-' + theme);
-            localStorage.setItem('user-theme', theme);
-        };
-        if(localStorage.getItem('user-theme')) changeTheme(localStorage.getItem('user-theme'));
-
-        // --- CONTENIDO ---
-        let movies = [
-            { id: 1, title: "Amor Prohibido", desc: "Un romance épico.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Tendencias", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { id: 2, title: "Free Fire: Booyah", desc: "Solo uno sobrevive.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" }
-        ];
-
-        function initContent() {
+        // --- 2. RENDERIZADO ---
+        function renderMovies(data) {
             const hList = document.getElementById('home-list');
             const aList = document.getElementById('action-list');
-            movies.forEach(m => {
-                const card = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-                hList.innerHTML += card;
-                if(m.cat === 'Acción') aList.innerHTML += card;
+            const eGrid = document.getElementById('explore-grid');
+            hList.innerHTML = ''; aList.innerHTML = ''; eGrid.innerHTML = '';
+
+            data.forEach(m => {
+                const html = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+                hList.innerHTML += html;
+                eGrid.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
+                if(m.cat === 'Acción') aList.innerHTML += html;
             });
-            renderShorts();
         }
 
+        function renderNotifs(data) {
+            if(data.length > 0) {
+                document.getElementById('bell-dot').classList.remove('hidden');
+                document.getElementById('notif-content').innerHTML = data.map(n => `
+                    <div class="notif-item"><b>${n.title}</b><p style="font-size:12px;margin:5px 0;">${n.msg}</p></div>
+                `).join('');
+            }
+        }
+
+        // --- 3. FUNCIONALIDADES ---
         window.openDetail = (id) => {
             const m = movies.find(x => x.id === id);
             document.getElementById('modal-injector').innerHTML = `
                 <div class="detail-hero" onclick="playMovie('${m.video}')">
                     <img src="${m.img}">
-                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:40px; color:white; background:var(--primary); width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-play"></i></div>
+                    <div class="btn-play-hero"><i class="fa-solid fa-play"></i></div>
                 </div>
                 <div style="padding:25px;">
-                    <h2>${m.title}</h2><p style="color:#ddd; font-size:14px;">${m.desc}</p>
-                    <button onclick="playMovie('${m.video}')" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:bold;">REPRODUCIR</button>
+                    <h2>${m.title}</h2><p style="color:#aaa;">${m.desc}</p>
+                    <button onclick="playMovie('${m.video}')" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:bold;">VER AHORA</button>
                 </div>`;
             document.getElementById('detail-modal').classList.add('open');
         };
@@ -230,18 +204,38 @@
             closeModal();
         };
 
-        window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
-        window.closePlayer = () => { document.getElementById('main-video-player').pause(); document.getElementById('video-player-overlay').classList.add('hidden'); };
+        window.closePlayer = () => {
+            const v = document.getElementById('main-video-player');
+            v.pause(); v.src = "";
+            document.getElementById('video-player-overlay').classList.add('hidden');
+        };
 
-        function renderShorts() {
-            const feed = document.getElementById('shorts-feed');
-            const data = [{ user: "Gamer", desc: "Clip Pro", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" }];
-            data.forEach(s => {
-                feed.innerHTML += `<div style="height:100vh; scroll-snap-align:start; position:relative; background:black; display:flex; align-items:center;"><video src="${s.video}" loop style="width:100%; height:100%; object-fit:cover;"></video></div>`;
-            });
-            const observer = new IntersectionObserver(ents => { ents.forEach(e => { const v = e.target.querySelector('video'); if(e.isIntersecting) v.play(); else v.pause(); }); }, { threshold: 0.8 });
-            document.querySelectorAll('#shorts-feed > div').forEach(d => observer.observe(d));
-        }
+        window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
+
+        window.toggleNotifs = () => {
+            const p = document.getElementById('notif-panel');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('bell-dot').classList.add('hidden');
+        };
+
+        window.changeTheme = (theme) => {
+            document.body.className = theme === 'default' ? '' : 'theme-' + theme;
+            localStorage.setItem('user-theme', theme);
+        };
+
+        // BÚSQUEDA
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const txt = e.target.value.toLowerCase();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`http://localhost:3000/api/search?q=${txt}`);
+                    renderMovies(await res.json());
+                } catch {
+                    renderMovies(movies.filter(m => m.title.toLowerCase().includes(txt)));
+                }
+            }, 500);
+        });
 
         window.switchTab = (id, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
@@ -251,9 +245,9 @@
             if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
         };
 
-        initContent();
-        fetchNotifications();
-        setInterval(fetchNotifications, 30000);
+        // INIT
+        if(localStorage.getItem('user-theme')) changeTheme(localStorage.getItem('user-theme'));
+        loadData();
     </script>
 </body>
 </html>
