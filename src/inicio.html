@@ -3,341 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Flechazo TV - Perfil Elite Funcional</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f0f1a">
+
+    <title>Flechazo TV - Pro Edition</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
             --gold: #FFD700; --text: #fff; --text-sec: #aaa;
             --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
         }
+
+        /* Temas */
+        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
+        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
-
-        /* --- UI DE PERFIL --- */
-        .profile-header {
-            background: linear-gradient(to bottom, rgba(162, 75, 250, 0.2), var(--bg));
-            padding: 50px 20px 20px; text-align: center;
+        
+        body { 
+            margin: 0; font-family: -apple-system, system-ui, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            padding-bottom: calc(90px + var(--safe-bottom));
+            transition: 0.4s; overflow-x: hidden;
         }
 
-        .avatar-main {
-            width: 120px; height: 120px; border-radius: 50%;
-            border: 4px solid var(--primary); padding: 5px;
-            background: var(--bg); position: relative; display: inline-block;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* --- HEADER --- */
+        .header { 
+            padding: calc(15px + var(--safe-top)) 25px 15px; 
+            background: rgba(15,15,26,0.9); position: sticky; top: 0; 
+            z-index: 1000; display: flex; justify-content: space-between; 
+            align-items: center; backdrop-filter: blur(15px);
         }
-        .avatar-main:active { transform: scale(0.9); }
+        .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- CONTENIDO --- */
+        .container { max-width: 1200px; margin: 0 auto; } /* Centrado para PC */
+        .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; gap: 15px; scrollbar-width: none; }
+        .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
+        .poster:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* --- EXPLORAR (SEARCH) --- */
+        .search-container { padding: 15px 25px; }
+        .search-bar { 
+            background: var(--card); padding: 15px; border-radius: 15px; 
+            display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .search-bar input { background: transparent; border: none; color: white; width: 100%; font-size: 16px; }
+
+        /* --- PERFIL ELITE --- */
+        .profile-header { padding: 40px 25px; text-align: center; background: linear-gradient(to bottom, rgba(162, 75, 250, 0.1), transparent); }
+        .avatar-main { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); padding: 5px; position: relative; margin: 0 auto; }
         .avatar-main img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .edit-icon { position: absolute; bottom: 5px; right: 5px; background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--bg); }
         
-        .edit-badge {
-            position: absolute; bottom: 5px; right: 5px;
-            background: var(--primary); color: white; width: 32px; height: 32px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            border: 3px solid var(--bg); font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .xp-bar { width: 250px; height: 8px; background: #333; margin: 15px auto; border-radius: 10px; overflow: hidden; }
+        .xp-fill { height: 100%; width: 65%; background: var(--gradient); transition: 1s; }
+
+        .vip-card { 
+            margin: 20px 25px; padding: 20px; border-radius: 20px; 
+            background: linear-gradient(135deg, #1e1e2d, #000); 
+            border: 1px solid rgba(255,215,0,0.3); display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* Barra de XP */
-        .xp-container {
-            width: 200px; height: 8px; background: #333;
-            margin: 15px auto; border-radius: 10px; overflow: hidden;
-            position: relative;
-        }
-        .xp-fill {
-            height: 100%; width: 65%; background: var(--gradient);
-            transition: width 1s ease-in-out;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 25px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-box i { color: var(--primary); margin-bottom: 8px; font-size: 20px; }
 
-        /* Tarjeta VIP */
-        .vip-card {
-            background: linear-gradient(135deg, #2c3e50, #000);
-            margin: 20px; border-radius: 20px; padding: 20px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
+        /* --- AMIGOS REALES --- */
+        .friend-list { display: flex; gap: 15px; overflow-x: auto; padding: 10px 25px; scrollbar-width: none; }
+        .friend-card { min-width: 70px; text-align: center; position: relative; }
+        .friend-card img { width: 60px; height: 60px; border-radius: 18px; border: 2px solid #00ff88; padding: 2px; }
+        .status-online { position: absolute; top: 5px; right: 8px; width: 12px; height: 12px; background: #00ff88; border-radius: 50%; border: 2px solid var(--bg); }
 
-        /* Stats */
-        .gamer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; }
-        .stat-box {
-            background: var(--card); padding: 15px 5px; border-radius: 18px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+        /* --- BOTONES Y MENÚ --- */
+        .menu-list { padding: 20px 25px; }
+        .menu-item { 
+            background: var(--card); padding: 18px; border-radius: 18px; margin-bottom: 12px; 
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
         }
-        .stat-box i { color: var(--primary); font-size: 18px; margin-bottom: 5px; }
-        .stat-box b { display: block; font-size: 16px; }
-        .stat-box span { font-size: 9px; color: var(--text-sec); letter-spacing: 1px; }
+        .menu-item i { width: 20px; text-align: center; color: var(--primary); margin-right: 15px; }
 
-        /* Amigos */
-        .friends-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; }
-        .friends-scroll::-webkit-scrollbar { display: none; }
-        .friend-dot { min-width: 65px; text-align: center; font-size: 10px; transition: 0.2s; }
-        .friend-dot:active { transform: scale(0.9); }
-        .friend-avatar { width: 55px; height: 55px; border-radius: 18px; margin-bottom: 6px; border: 2px solid #00ff88; padding: 2px; object-fit: cover; }
+        /* --- NAV INFERIOR --- */
+        .nav { 
+            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.95); 
+            display: flex; justify-content: space-around; padding: 10px 0 calc(15px + var(--safe-bottom)); 
+            z-index: 2000; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(15px);
+        }
+        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .nav-btn.active { color: var(--primary); transform: translateY(-3px); }
+        .nav-btn i { font-size: 22px; display: block; margin-bottom: 5px; }
 
-        /* Ajustes */
-        .menu-list { padding: 0 20px; }
-        .menu-item {
-            background: var(--card); display: flex; align-items: center;
-            padding: 16px; border-radius: 18px; margin-bottom: 12px;
-            cursor: pointer; border: 1px solid transparent; transition: 0.2s;
+        /* --- MODAL AVATARES --- */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 3000; display: none; align-items: flex-end; 
         }
-        .menu-item:active { background: #252535; border-color: var(--primary); }
-        .menu-item i:first-child { 
-            width: 38px; height: 38px; background: rgba(255,255,255,0.05);
-            border-radius: 12px; display: flex; align-items: center;
-            justify-content: center; margin-right: 15px; color: var(--primary);
+        .modal.active { display: flex; }
+        .modal-sheet { 
+            width: 100%; background: var(--card); border-radius: 30px 30px 0 0; 
+            padding: 30px 25px 50px; animation: slideUp 0.4s ease; 
         }
-        .menu-text { flex: 1; }
-        .menu-text b { display: block; font-size: 14px; }
-        .menu-text span { font-size: 11px; color: var(--text-sec); }
+        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .avatar-opt { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; cursor: pointer; }
+        .avatar-opt.active { border-color: var(--primary); }
 
-        /* --- MODALES --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 1999; display: none; opacity: 0; transition: 0.3s;
-        }
-        .modal-overlay.active { display: block; opacity: 1; }
-
-        .modal-sheet {
-            position: fixed; bottom: -100%; left: 0; width: 100%;
-            background: var(--card); border-radius: 30px 30px 0 0;
-            padding: 30px 20px 50px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 2000; box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
-        }
-        .modal-sheet.open { bottom: 0; }
-        
-        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
-        .avatar-option { 
-            width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; 
-            border: 3px solid transparent; object-fit: cover; transition: 0.2s;
-        }
-        .avatar-option.active { border-color: var(--primary); transform: scale(1.1); }
-
-        /* --- NAV --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(21, 21, 32, 0.95);
-            display: flex; justify-content: space-around; padding: 15px 0 35px;
-            border-top: 1px solid #333; z-index: 1000; backdrop-filter: blur(10px);
-        }
-        .nav-item { color: #666; text-align: center; font-size: 10px; flex: 1; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 5px; }
-
-        /* Toast */
-        .toast {
-            position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 10px 25px;
-            border-radius: 50px; z-index: 3000; display: none; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255, 75, 75, 0.4);
-        }
+        .hidden { display: none !important; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="toast" class="toast">¡Avatar actualizado!</div>
-    <div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+    <div id="player" style="display:none; position:fixed; inset:0; background:#000; z-index:9999; display:none; align-items:center;">
+        <i class="fa-solid fa-arrow-left" onclick="stopVideo()" style="position:absolute; top:40px; left:25px; font-size:24px; z-index:10001;"></i>
+        <video id="main-video" controls style="width:100%;"></video>
+    </div>
 
-    <div id="tab-profile">
-        <div class="profile-header">
-            <div class="avatar-main" onclick="openModal('modal-avatars')">
-                <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
-                <div class="edit-badge"><i class="fa-solid fa-camera"></i></div>
+    <div id="app">
+        <header class="header">
+            <h2 class="logo">Flechazo TV</h2>
+            <div style="position:relative;">
+                <i class="fa-regular fa-bell" style="font-size:24px;"></i>
+                <span style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%;"></span>
             </div>
-            <h2 id="display-name" style="margin:15px 0 5px;">Gamer_Pro_2025</h2>
-            <div class="xp-container"><div id="xp-bar" class="xp-fill"></div></div>
-            <span id="display-level" style="color:var(--text-sec); font-size:12px;">Nivel 15 • 650/1000 XP</span>
+        </header>
+
+        <div id="screen-home" class="screen container">
+            <div class="section-title">🔥 Tendencias</div>
+            <div class="horizontal-scroll" id="trends-list"></div>
+            
+            <div class="section-title">✨ Recomendados</div>
+            <div class="horizontal-scroll" id="rec-list"></div>
         </div>
 
-        <div class="vip-card" onclick="alert('Funcionalidad Premium próximamente')">
-            <div>
-                <b style="color:var(--gold); font-size:17px;"><i class="fa-solid fa-crown"></i> MIEMBRO PREMIUM</b>
-                <p style="margin:5px 0 0; font-size:11px; color:#ccc;">Vence en: 15 de Enero, 2026</p>
-            </div>
-            <i class="fa-solid fa-chevron-right" style="opacity:0.5;"></i>
-        </div>
-
-        <div class="gamer-stats">
-            <div class="stat-box">
-                <i class="fa-solid fa-stopwatch"></i>
-                <b id="stat-hours">128h</b>
-                <span>Visto</span>
-            </div>
-            <div class="stat-box">
-                <i class="fa-solid fa-fire"></i>
-                <b id="stat-streak">12</b>
-                <span>Racha</span>
-            </div>
-            <div class="stat-box">
-                <i class="fa-solid fa-trophy"></i>
-                <b id="stat-medals">45</b>
-                <span>Logros</span>
-            </div>
-        </div>
-
-        <div class="section-title" style="padding:25px 20px 10px; font-weight: bold; font-size: 14px;">👥 AMIGOS ONLINE</div>
-        <div class="friends-scroll">
-            <div class="friend-dot" onclick="pokeFriend('Sky_Killer')">
-                <img src="https://i.pravatar.cc/100?u=1" class="friend-avatar">
-                <span>Sky_Killer</span>
-            </div>
-            <div class="friend-dot" onclick="pokeFriend('Dramatica')">
-                <img src="https://i.pravatar.cc/100?u=2" class="friend-avatar">
-                <span>Dramatica</span>
-            </div>
-            <div class="friend-dot" onclick="pokeFriend('FF_Master')">
-                <img src="https://i.pravatar.cc/100?u=4" class="friend-avatar">
-                <span>FF_Master</span>
-            </div>
-            <div class="friend-dot" onclick="alert('Este amigo no está disponible')">
-                <img src="https://i.pravatar.cc/100?u=3" class="friend-avatar" style="border-color:#555; opacity: 0.6;">
-                <span style="color:#555;">Offline</span>
-            </div>
-        </div>
-
-        <div class="section-title" style="padding:15px 20px 10px; font-weight: bold; font-size: 14px;">⚙️ AJUSTES</div>
-        <div class="menu-list">
-            <div class="menu-item" onclick="openModal('modal-security')">
-                <i class="fa-solid fa-shield-halved"></i>
-                <div class="menu-text">
-                    <b>Seguridad</b>
-                    <span>PIN de acceso y contraseña</span>
+        <div id="screen-explore" class="screen hidden container">
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
+                    <input type="text" id="search-inp" placeholder="¿Qué quieres ver hoy?">
                 </div>
             </div>
-            <div class="menu-item" onclick="clearAppData()">
-                <i class="fa-solid fa-database"></i>
-                <div class="menu-text">
-                    <b>Almacenamiento</b>
-                    <span id="cache-info">Caché: 142.5 MB</span>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; padding:0 25px;" id="explore-grid"></div>
+        </div>
+
+        <div id="screen-profile" class="screen hidden container">
+            <div class="profile-header">
+                <div class="avatar-main" onclick="toggleModal('modal-avatars', true)">
+                    <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
+                    <div class="edit-icon"><i class="fa-solid fa-camera" style="font-size:14px;"></i></div>
                 </div>
+                <h2 id="user-name" style="margin:15px 0 5px;">Gamer Elite</h2>
+                <div class="xp-bar"><div class="xp-fill"></div></div>
+                <p style="color:var(--text-sec); font-size:12px;">Nivel 15 • Gamer Pro</p>
             </div>
-            <div class="menu-item" style="background: rgba(255,75,75,0.05);" onclick="handleLogout()">
-                <i class="fa-solid fa-power-off" style="color:#ff4b4b;"></i>
-                <div class="menu-text">
-                    <b style="color:#ff4b4b;">Cerrar Sesión</b>
-                    <span>Salir de este dispositivo</span>
+
+            <div class="vip-card">
+                <div>
+                    <b style="color:var(--gold); font-size:17px;"><i class="fa-solid fa-crown"></i> MIEMBRO VIP</b>
+                    <p style="margin:5px 0 0; font-size:11px; color:#aaa;">Expira: 20 Dic, 2025</p>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="opacity:0.3;"></i>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box"><i class="fa-solid fa-clock"></i><b>128h</b><span>Visto</span></div>
+                <div class="stat-box"><i class="fa-solid fa-fire"></i><b>12</b><span>Racha</span></div>
+                <div class="stat-box"><i class="fa-solid fa-trophy"></i><b>45</b><span>Logros</span></div>
+            </div>
+
+            <div class="section-title"><i class="fa-solid fa-users" style="margin-right:10px;"></i>Amigos Online</div>
+            <div class="friend-list">
+                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=1"><span>Sky_K</span><div class="status-online"></div></div>
+                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=2"><span>Drama</span><div class="status-online"></div></div>
+                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=4"><span>FF_Pro</span><div class="status-online"></div></div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item"><div><i class="fa-solid fa-shield-halved"></i><b>Seguridad</b></div><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="menu-item"><div><i class="fa-solid fa-palette"></i><b>Temas</b></div>
+                    <div style="display:flex; gap:8px;">
+                        <div onclick="setTheme('default')" style="width:20px; height:20px; background:#0f0f1a; border-radius:50%; border:1px solid #fff;"></div>
+                        <div onclick="setTheme('fire')" style="width:20px; height:20px; background:#ff3300; border-radius:50%; border:1px solid #fff;"></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="location.reload()" style="background:rgba(255,75,75,0.05); border:1px solid rgba(255,75,75,0.2);">
+                    <div><i class="fa-solid fa-power-off" style="color:var(--primary);"></i><b style="color:var(--primary);">Cerrar Sesión</b></div>
                 </div>
             </div>
         </div>
+
+        <nav class="nav">
+            <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+            <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+            <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-solid fa-bolt"></i>Shorts</div>
+            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+        </nav>
     </div>
 
-    <div id="modal-avatars" class="modal-sheet">
-        <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
-        <h3 style="margin:0; text-align:center;">Elige tu Avatar</h3>
-        <div class="avatar-grid" id="grid-options">
+    <div id="modal-avatars" class="modal" onclick="if(event.target.id==='modal-avatars') toggleModal('modal-avatars', false)">
+        <div class="modal-sheet">
+            <h3 style="margin-top:0; text-align:center;">Elige tu Personaje</h3>
+            <div class="avatar-grid">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-opt active" onclick="changeAvatar(this)">
+                <img src="https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg" class="avatar-opt" onclick="changeAvatar(this)">
+                <img src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png" class="avatar-opt" onclick="changeAvatar(this)">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-m7_2oW0h529z5SAnI_U6m5B7u_iO6zL_A&usqp=CAU" class="avatar-opt" onclick="changeAvatar(this)">
             </div>
-        <button onclick="closeAllModals()" style="width:100%; padding:16px; margin-top:25px; background:var(--primary); border:none; border-radius:18px; color:white; font-weight:bold; cursor:pointer;">LISTO</button>
-    </div>
-
-    <div id="modal-security" class="modal-sheet">
-        <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
-        <h3 style="text-align:center;">Seguridad</h3>
-        <div style="padding:10px 0;">
-            <p style="font-size:13px; color:var(--text-sec);">Cambiar contraseña de la cuenta:</p>
-            <input type="password" placeholder="Contraseña actual" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#000; color:#fff; margin-bottom:10px;">
-            <input type="password" placeholder="Nueva contraseña" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#000; color:#fff;">
-            <button onclick="alert('Contraseña actualizada')" style="width:100%; padding:16px; margin-top:15px; background:var(--gradient); border:none; border-radius:12px; color:white; font-weight:bold;">ACTUALIZAR</button>
+            <button onclick="toggleModal('modal-avatars', false)" style="width:100%; padding:15px; margin-top:25px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:bold;">CONFIRMAR</button>
         </div>
     </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-item"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-item"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-item"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-item active"><i class="fa-solid fa-user"></i>Perfil</div>
-    </nav>
 
     <script>
-        // --- BASE DE DATOS LOCAL ---
-        const AVATARES = [
-            "https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg",
-            "https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg",
-            "https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-m7_2oW0h529z5SAnI_U6m5B7u_iO6zL_A&usqp=CAU",
-            "https://i.pravatar.cc/150?u=9",
-            "https://i.pravatar.cc/150?u=12",
-            "https://i.pravatar.cc/150?u=45",
-            "https://i.pravatar.cc/150?u=30"
-        ];
+        let moviesData = [];
 
-        // --- LÓGICA DE INICIO ---
-        window.onload = () => {
-            initProfile();
-            generateAvatarOptions();
-        };
+        // 1. CARGA DE APIS
+        async function loadContent() {
+            try {
+                // Simulación de fetch a tu API local
+                // const res = await fetch('/api/movies');
+                // moviesData = await res.json();
 
-        function initProfile() {
-            // Cargar imagen guardada
-            const savedAvatar = localStorage.getItem('userAvatar');
-            if(savedAvatar) document.getElementById('user-img').src = savedAvatar;
-
-            // Simular ganancia de XP al entrar
-            setTimeout(() => {
-                const xpBar = document.getElementById('xp-bar');
-                xpBar.style.width = "85%";
-                document.getElementById('display-level').innerText = "Nivel 15 • 850/1000 XP";
-            }, 500);
+                moviesData = [
+                    { id: 1, title: "Amor Prohibido", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+                    { id: 2, title: "Booyah Master", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+                    { id: 3, title: "Venganza Coreana", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
+                ];
+                
+                renderUI();
+            } catch (e) { console.error("Error cargando API"); }
         }
 
-        // --- MODALES ---
-        function openModal(id) {
-            document.getElementById('modal-overlay').classList.add('active');
-            document.getElementById(id).classList.add('open');
-        }
-
-        function closeAllModals() {
-            document.getElementById('modal-overlay').classList.remove('active');
-            document.querySelectorAll('.modal-sheet').forEach(m => m.classList.remove('open'));
-        }
-
-        // --- FUNCIONES AVATAR ---
-        function generateAvatarOptions() {
-            const grid = document.getElementById('grid-options');
-            const current = localStorage.getItem('userAvatar') || AVATARES[0];
+        // 2. RENDERIZADO
+        function renderUI() {
+            const trends = document.getElementById('trends-list');
+            const grid = document.getElementById('explore-grid');
             
-            AVATARES.forEach(src => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = `avatar-option ${src === current ? 'active' : ''}`;
-                img.onclick = () => selectAvatar(img, src);
-                grid.appendChild(img);
-            });
+            const html = moviesData.map(m => `<img class="poster" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
+            trends.innerHTML = html;
+            grid.innerHTML = html;
+            document.getElementById('rec-list').innerHTML = [...html].reverse().join('');
         }
 
-        function selectAvatar(element, src) {
-            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('user-img').src = src;
-            localStorage.setItem('userAvatar', src);
-            showToast("Avatar actualizado con éxito");
+        // 3. NAVEGACIÓN
+        window.switchTab = (tab, el) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('screen-'+tab).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
         }
 
-        // --- ACCIONES GAMER ---
-        function pokeFriend(name) {
-            showToast("Saludaste a " + name + " 👋");
+        // 4. PLAYER
+        window.playVideo = (url) => {
+            const p = document.getElementById('player');
+            const v = document.getElementById('main-video');
+            v.src = url;
+            p.style.display = 'flex';
+            v.play();
+        }
+        window.stopVideo = () => {
+            const p = document.getElementById('player');
+            const v = document.getElementById('main-video');
+            v.pause();
+            p.style.display = 'none';
         }
 
-        function clearAppData() {
-            if(confirm("¿Deseas limpiar el caché de la aplicación para ganar espacio?")) {
-                document.getElementById('cache-info').innerText = "Caché: 0.0 MB";
-                showToast("Caché limpiada");
-            }
+        // 5. PERFIL
+        window.toggleModal = (id, show) => {
+            document.getElementById(id).classList.toggle('active', show);
+        }
+        window.changeAvatar = (el) => {
+            document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('user-img').src = el.src;
+            localStorage.setItem('userAvatar', el.src);
+        }
+        window.setTheme = (t) => {
+            document.body.className = t === 'default' ? '' : 'theme-' + t;
         }
 
-        function handleLogout() {
-            if(confirm("¿Cerrar sesión en este dispositivo?")) {
-                localStorage.removeItem('userAvatar');
-                location.reload();
-            }
+        // INIT
+        window.onload = () => {
+            loadContent();
+            if(localStorage.getItem('userAvatar')) document.getElementById('user-img').src = localStorage.getItem('userAvatar');
         }
 
-        // --- UI HELPERS ---
-        function showToast(text) {
-            const t = document.getElementById('toast');
-            t.innerText = text;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
-        }
+        // Búsqueda real
+        document.getElementById('search-inp').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = moviesData.filter(m => m.title.toLowerCase().includes(val));
+            const grid = document.getElementById('explore-grid');
+            grid.innerHTML = filtered.map(m => `<img class="poster" style="width:100%;" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
+        });
     </script>
 </body>
 </html>
