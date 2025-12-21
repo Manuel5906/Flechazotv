@@ -20,7 +20,6 @@
             --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
         }
 
-        /* Temas adicionales */
         .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --accent: #ff9900; --gradient: linear-gradient(45deg, #ff3300, #ff9900); }
         .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --accent: #00ccff; --gradient: linear-gradient(45deg, #00ff88, #00ccff); }
         .theme-purple { --bg: #10051a; --card: #1e0d2d; --primary: #bf00ff; --accent: #ff0077; --gradient: linear-gradient(45deg, #bf00ff, #ff0077); }
@@ -33,59 +32,43 @@
         }
         .hidden { display: none !important; }
 
-        /* --- 2. AUTH SCREEN --- */
-        #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 10%, var(--card) 0%, var(--bg) 80%);
-            z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
-            padding: 35px 25px; border-radius: 30px; width: 100%; max-width: 380px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .auth-input {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px; color: white; border-radius: 15px; margin-bottom: 15px;
-        }
-        .auth-btn {
-            width: 100%; padding: 16px; border: none; border-radius: 15px;
-            background: var(--gradient); color: white; font-weight: bold; cursor: pointer;
-        }
+        /* --- 2. NOTIFICACIONES (ESTILOS NUEVOS) --- */
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; border-radius: 50%; width: 15px; height: 15px; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); z-index: 10; }
+        .notif-panel { position: fixed; top: 70px; right: 20px; width: 300px; max-height: 400px; background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; }
+        .notif-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .notif-item b { display: block; color: var(--primary); font-size: 14px; }
+        .notif-item small { color: #888; font-size: 11px; }
 
-        /* --- 3. MODAL DETALLE --- */
+        /* --- 3. UI COMPONENTS --- */
+        .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; margin-right: 10px; position: relative; }
+        .poster-card img { width: 100%; height: 100%; object-fit: cover; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
+        .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
+
+        /* Modal y Reproductor */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-overlay.open { display: flex; }
         .modal-sheet { background: var(--card); width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; animation: slideUp 0.3s ease; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); }
         .detail-hero { width: 100%; height: 230px; position: relative; }
         .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- 4. REPRODUCTOR --- */
         .player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; display: flex; justify-content: center; align-items: center; }
         #main-video-player { width: 100%; height: auto; }
         .close-player { position: absolute; top: 25px; right: 25px; color: white; font-size: 30px; z-index: 5001; }
 
-        /* --- 5. PERFIL AVANZADO (NUEVO) --- */
+        /* Perfil */
         .profile-container { padding: 20px; }
         .avatar-box { position: relative; width: 110px; height: 110px; margin: 0 auto; }
         .avatar-img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; }
         .level-badge { position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-        
         .xp-container { width: 80%; margin: 15px auto; height: 6px; background: #333; border-radius: 10px; overflow: hidden; }
         .xp-bar { height: 100%; width: 65%; background: var(--gradient); }
-
-        .badges-row { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .badge-icon { font-size: 18px; color: var(--gold); background: rgba(255,215,0,0.1); padding: 8px; border-radius: 50%; }
-
         .settings-group { background: var(--card); border-radius: 20px; padding: 10px; margin-bottom: 20px; }
         .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .settings-item:last-child { border: none; }
-
-        /* Selector de Temas */
         .theme-selector { display: flex; gap: 10px; padding: 10px; }
         .theme-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
 
-        /* --- 6. NAV --- */
+        /* Nav */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
         .nav-item { text-align: center; color: #666; font-size: 10px; flex: 1; }
         .nav-item.active { color: var(--primary); }
@@ -98,16 +81,10 @@
 
     <div id="toast" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--card); color:white; padding:10px 20px; border-radius:50px; z-index:9000; display:none; font-size:12px; border:1px solid var(--primary);"></div>
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h2 style="background:linear-gradient(45deg, #ff4b4b, #a24bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size: 30px; margin: 0 0 10px 0;">Flechazo TV</h2>
-            <p id="auth-title" style="color: #ccc; margin-bottom: 25px; font-size: 14px;">Inicia sesión para continuar</p>
-            <input type="email" id="auth-email" class="auth-input" placeholder="Correo electrónico">
-            <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña">
-            <button class="auth-btn" id="auth-main-btn" onclick="handleAuth()">Iniciar Sesión</button>
-            <div style="margin-top: 20px; font-size: 13px; color: #888;">
-                <p id="auth-msg">¿No tienes cuenta? <span style="color:var(--primary); font-weight:bold;" onclick="toggleAuthMode()">Regístrate</span></p>
-            </div>
+    <div id="notif-panel" class="notif-panel">
+        <div style="padding: 15px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">Notificaciones</div>
+        <div id="notif-content">
+            <p style="padding: 20px; text-align: center; color: #666;">No hay novedades</p>
         </div>
     </div>
 
@@ -116,12 +93,15 @@
         <video id="main-video-player" controls playsinline src=""></video>
     </div>
 
-    <div id="app-content" class="hidden">
+    <div id="app-content">
         
         <div id="tab-home" class="screen">
             <div class="header">
                 <h2 style="background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">Flechazo TV</h2>
-                <i class="fa-regular fa-bell"></i>
+                <div style="position: relative;" onclick="toggleNotifs()">
+                    <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
+                    <div id="bell-dot" class="notif-badge hidden">!</div>
+                </div>
             </div>
             <div class="section-title">🔥 Tendencias</div>
             <div class="horizontal-scroll" id="home-list"></div>
@@ -134,19 +114,13 @@
         </div>
 
         <div id="tab-profile" class="screen hidden">
-            <div class="profile-header">
+            <div class="profile-header" style="text-align: center; padding-top: 40px;">
                 <div class="avatar-box">
                     <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-img">
                     <div class="level-badge">LVL 15</div>
                 </div>
                 <h2 id="profile-name" style="margin: 15px 0 5px;">Usuario</h2>
                 <div class="xp-container"><div class="xp-bar"></div></div>
-                
-                <div class="badges-row">
-                    <i class="fa-solid fa-crown badge-icon" title="Premium"></i>
-                    <i class="fa-solid fa-bolt badge-icon" style="color:#00ff88" title="Activo"></i>
-                    <i class="fa-solid fa-shield-halved badge-icon" style="color:#a24bfa" title="Verificado"></i>
-                </div>
             </div>
 
             <div class="profile-container">
@@ -165,18 +139,8 @@
 
                 <div class="section-title" style="padding-left:0;">Ajustes</div>
                 <div class="settings-group">
-                    <div class="settings-item">
-                        <span>Notificaciones</span>
-                        <input type="checkbox" checked style="accent-color: var(--primary);">
-                    </div>
-                    <div class="settings-item">
-                        <span>Ahorro de Datos</span>
-                        <input type="checkbox" style="accent-color: var(--primary);">
-                    </div>
-                    <div class="settings-item" onclick="logout()" style="color: var(--primary);">
-                        <span>Cerrar Sesión</span>
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </div>
+                    <div class="settings-item"><span>Notificaciones</span><input type="checkbox" checked></div>
+                    <div class="settings-item" onclick="logout()" style="color: var(--primary);"><span>Cerrar Sesión</span><i class="fa-solid fa-right-from-bracket"></i></div>
                 </div>
             </div>
         </div>
@@ -192,69 +156,42 @@
         <div class="modal-sheet" id="modal-injector"></div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ",
-          authDomain: "flechazo-tv.firebaseapp.com",
-          projectId: "flechazo-tv",
-          storageBucket: "flechazo-tv.firebasestorage.app",
-          messagingSenderId: "382962164040",
-          appId: "1:382962164040:web:6f24cad4108f824437137d",
-          measurementId: "G-2GZJT4Y983"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        // --- AUTH ---
-        let isLoginMode = true;
-        window.toggleAuthMode = () => {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Inicia sesión para continuar" : "Únete a Flechazo TV";
-            document.getElementById('auth-main-btn').innerText = isLoginMode ? "Iniciar Sesión" : "Crear Cuenta";
-        };
-
-        window.handleAuth = async () => {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            if(!email || !pass) return showToast("Faltan datos");
+    <script>
+        // --- SISTEMA DE NOTIFICACIONES ---
+        async function fetchNotifications() {
             try {
-                if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
-                else await createUserWithEmailAndPassword(auth, email, pass);
-            } catch (e) { showToast("Error de acceso"); }
-        };
+                const res = await fetch('http://localhost:3000/api/notifications');
+                const data = await res.json();
+                const container = document.getElementById('notif-content');
+                if(data.length > 0) {
+                    document.getElementById('bell-dot').classList.remove('hidden');
+                    container.innerHTML = data.map(n => `
+                        <div class="notif-item">
+                            <b>${n.title}</b>
+                            <p style="margin:5px 0; font-size:13px;">${n.msg}</p>
+                            <small>${n.date}</small>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) { console.log("API offline"); }
+        }
 
-        window.logout = () => signOut(auth);
+        window.toggleNotifs = () => {
+            const p = document.getElementById('notif-panel');
+            const dot = document.getElementById('bell-dot');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            dot.classList.add('hidden');
+        }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('hidden');
-                document.getElementById('profile-name').innerText = user.email.split('@')[0];
-                initContent();
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('hidden');
-            }
-        });
-
-        // --- THEMES ---
+        // --- TEMAS ---
         window.changeTheme = (theme) => {
-            const body = document.body;
-            body.classList.remove('theme-fire', 'theme-emerald', 'theme-purple');
-            if(theme !== 'default') body.classList.add('theme-' + theme);
+            document.body.classList.remove('theme-fire', 'theme-emerald', 'theme-purple');
+            if(theme !== 'default') document.body.classList.add('theme-' + theme);
             localStorage.setItem('user-theme', theme);
-            showToast("Tema actualizado");
         };
+        if(localStorage.getItem('user-theme')) changeTheme(localStorage.getItem('user-theme'));
 
-        // Cargar tema guardado
-        const savedTheme = localStorage.getItem('user-theme');
-        if(savedTheme) changeTheme(savedTheme);
-
-        // --- CONTENT ---
+        // --- CONTENIDO ---
         let movies = [
             { id: 1, title: "Amor Prohibido", desc: "Un romance épico.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Tendencias", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
             { id: 2, title: "Free Fire: Booyah", desc: "Solo uno sobrevive.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" }
@@ -263,7 +200,6 @@
         function initContent() {
             const hList = document.getElementById('home-list');
             const aList = document.getElementById('action-list');
-            hList.innerHTML = ''; aList.innerHTML = '';
             movies.forEach(m => {
                 const card = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
                 hList.innerHTML += card;
@@ -280,14 +216,11 @@
                     <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:40px; color:white; background:var(--primary); width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-play"></i></div>
                 </div>
                 <div style="padding:25px;">
-                    <h2>${m.title}</h2>
-                    <p style="color:#ddd; font-size:14px;">${m.desc}</p>
+                    <h2>${m.title}</h2><p style="color:#ddd; font-size:14px;">${m.desc}</p>
                     <button onclick="playMovie('${m.video}')" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:bold;">REPRODUCIR</button>
                 </div>`;
             document.getElementById('detail-modal').classList.add('open');
         };
-
-        window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
 
         window.playMovie = (url) => {
             const v = document.getElementById('main-video-player');
@@ -297,35 +230,16 @@
             closeModal();
         };
 
-        window.closePlayer = () => {
-            const v = document.getElementById('main-video-player');
-            v.pause();
-            document.getElementById('video-player-overlay').classList.add('hidden');
-        };
+        window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
+        window.closePlayer = () => { document.getElementById('main-video-player').pause(); document.getElementById('video-player-overlay').classList.add('hidden'); };
 
         function renderShorts() {
             const feed = document.getElementById('shorts-feed');
-            const data = [
-                { user: "Gamer", desc: "Clip Pro", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" },
-                { user: "Cine", desc: "Best Movie", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
-            ];
-            feed.innerHTML = '';
+            const data = [{ user: "Gamer", desc: "Clip Pro", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" }];
             data.forEach(s => {
-                feed.innerHTML += `
-                <div style="height:100vh; scroll-snap-align:start; position:relative; background:black; display:flex; align-items:center;">
-                    <video src="${s.video}" loop style="width:100%; height:100%; object-fit:cover;"></video>
-                    <div style="position:absolute; bottom:100px; left:15px; z-index:10;">
-                        <b>@${s.user}</b><br><small>${s.desc}</small>
-                    </div>
-                </div>`;
+                feed.innerHTML += `<div style="height:100vh; scroll-snap-align:start; position:relative; background:black; display:flex; align-items:center;"><video src="${s.video}" loop style="width:100%; height:100%; object-fit:cover;"></video></div>`;
             });
-            // AutoPlay
-            const observer = new IntersectionObserver(ents => {
-                ents.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if(e.isIntersecting) v.play(); else v.pause();
-                });
-            }, { threshold: 0.8 });
+            const observer = new IntersectionObserver(ents => { ents.forEach(e => { const v = e.target.querySelector('video'); if(e.isIntersecting) v.play(); else v.pause(); }); }, { threshold: 0.8 });
             document.querySelectorAll('#shorts-feed > div').forEach(d => observer.observe(d));
         }
 
@@ -337,11 +251,9 @@
             if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
         };
 
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
+        initContent();
+        fetchNotifications();
+        setInterval(fetchNotifications, 30000);
     </script>
 </body>
 </html>
