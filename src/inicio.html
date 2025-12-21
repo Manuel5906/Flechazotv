@@ -5,119 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" id="theme-meta" content="#0f0f1a">
-
-    <title>Flechazo TV - Master Total</title>
+    <title>Flechazo TV - Ultimate</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. SISTEMA DE TEMAS DINÁMICOS --- */
+        /* --- 1. TEMAS --- */
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
             --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
-            --gold: #FFD700; --text: #fff; --text-sec: #aaa;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
-
         .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(135deg, #ff3300, #ff9900); }
         .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(135deg, #00ff88, #00ccff); }
         .theme-ocean { --bg: #050a1a; --card: #0d152d; --primary: #0088ff; --gradient: linear-gradient(135deg, #0088ff, #00ffff); }
-        .theme-gold { --bg: #1a1505; --card: #2d250d; --primary: #ffcc00; --gradient: linear-gradient(135deg, #ffcc00, #ff6600); }
-        .theme-sakura { --bg: #1a0510; --card: #2d0d1e; --primary: #ff69b4; --gradient: linear-gradient(135deg, #ff69b4, #ffb6c1); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg); color: var(--text); 
-            padding-bottom: calc(100px + var(--safe-bottom));
-            transition: 0.4s; overflow-x: hidden;
-        }
+        body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: #fff; padding-bottom: calc(90px + var(--safe-bottom)); transition: 0.4s; overflow-x: hidden; }
 
-        .hidden { display: none !important; }
+        /* --- 2. NOTIFICACIONES --- */
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); width: 16px; height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
+        .notif-panel { position: fixed; top: 75px; right: 20px; width: 280px; max-height: 350px; background: var(--card); border-radius: 20px; border: 1px solid #333; z-index: 2000; display: none; overflow-y: auto; box-shadow: 0 10px 30px #000; }
+        .notif-item { padding: 15px; border-bottom: 1px solid #333; font-size: 13px; }
 
-        /* --- 2. AUTH SCREEN --- */
-        #auth-screen {
-            position: fixed; inset: 0; background: radial-gradient(circle at 50% 10%, var(--card) 0%, var(--bg) 80%);
-            z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
-            padding: 35px 25px; border-radius: 30px; width: 100%; max-width: 380px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .auth-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 15px; color: white; border-radius: 15px; margin-bottom: 15px; }
-        .auth-btn { width: 100%; padding: 16px; border: none; border-radius: 15px; background: var(--gradient); color: white; font-weight: bold; cursor: pointer; }
+        /* --- 3. REPRODUCTOR --- */
+        .player-fs { position: fixed; inset: 0; background: #000; z-index: 6000; display: none; align-items: center; justify-content: center; }
+        .close-player { position: absolute; top: calc(25px + var(--safe-top)); left: 20px; font-size: 28px; z-index: 6001; }
 
-        /* --- 3. UI COMPONENTS --- */
-        .header { padding: calc(15px + var(--safe-top)) 25px 15px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(15px); }
-        .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
-        .notif-panel { position: fixed; top: 75px; right: 20px; width: 280px; max-height: 350px; background: var(--card); border-radius: 20px; border: 1px solid #333; z-index: 2000; display: none; overflow-y: auto; }
-
-        /* --- 4. MODAL DETALLE --- */
+        /* --- 4. MODAL INFO --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: none; align-items: flex-end; backdrop-filter: blur(8px); }
-        .modal-sheet { width: 100%; background: var(--card); border-radius: 30px 30px 0 0; animation: slideUp 0.4s ease; padding-bottom: var(--safe-bottom); overflow: hidden; }
+        .modal-sheet { width: 100%; max-width: 500px; background: var(--card); border-radius: 30px 30px 0 0; animation: slideUp 0.4s ease; margin: 0 auto; overflow: hidden; }
         .modal-hero { width: 100%; height: 230px; position: relative; }
         .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--card), transparent); }
 
-        /* --- 5. REPRODUCTOR --- */
-        .player-fs { position: fixed; inset: 0; background: #000; z-index: 6000; display: none; align-items: center; }
-        .close-player { position: absolute; top: calc(25px + var(--safe-top)); left: 20px; font-size: 28px; color: white; z-index: 6001; }
+        /* --- 5. UI PRINCIPAL --- */
+        .header { padding: calc(15px + var(--safe-top)) 25px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 1000; }
+        .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); margin-right: 15px; cursor: pointer; transition: 0.2s; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; scrollbar-width: none; }
+        .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
 
-        /* --- 6. SHORTS TIKTOK --- */
+        /* --- 6. SHORTS --- */
         .shorts-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; background: #000; position: fixed; inset: 0; z-index: 500; padding-bottom: calc(70px + var(--safe-bottom)); }
         .short-v { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; }
         .short-v video { width: 100%; height: 100%; object-fit: cover; }
-        .short-ui { position: absolute; bottom: 100px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 10; }
+        .short-ui { position: absolute; bottom: 100px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 10; text-shadow: 0 2px 4px #000; }
 
-        /* --- 7. PERFIL ELITE --- */
-        .profile-hero { padding: calc(40px + var(--safe-top)) 25px 20px; text-align: center; }
-        .avatar-main { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--primary); padding: 5px; position: relative; margin: 0 auto; }
-        .avatar-main img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .xp-bar { width: 200px; height: 6px; background: #333; margin: 15px auto; border-radius: 10px; overflow: hidden; }
-        .xp-fill { height: 100%; width: 65%; background: var(--gradient); }
-
-        /* --- 8. NAV --- */
-        .nav { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); 
-            display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); 
-            z-index: 2000; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px);
-        }
+        /* --- 7. NAV --- */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); z-index: 2000; border-top: 1px solid #333; }
         .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
         .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="theme-default">
-
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h2 class="logo" style="font-size: 35px; margin-bottom: 10px;">Flechazo TV</h2>
-            <p id="auth-title">Inicia sesión para continuar</p>
-            <input type="email" id="auth-email" class="auth-input" placeholder="Correo electrónico">
-            <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña">
-            <button class="auth-btn" id="auth-main-btn" onclick="handleAuth()">Iniciar Sesión</button>
-            <p style="margin-top:20px; font-size:13px;">¿No tienes cuenta? <span onclick="toggleAuthMode()" style="color:var(--primary); font-weight:bold;">Regístrate</span></p>
-        </div>
-    </div>
+<body>
 
     <div id="player-overlay" class="player-fs">
-        <i class="fa-solid fa-arrow-left close-player" onclick="stopVideo()"></i>
-        <video id="main-video" controls playsinline></video>
+        <i class="fa-solid fa-chevron-left close-player" onclick="stopVideo()"></i>
+        <video id="main-video" controls playsinline webkit-playsinline style="width: 100%;"></video>
     </div>
 
     <div id="info-modal" class="modal-overlay" onclick="if(event.target.id==='info-modal') closeInfo()">
         <div class="modal-sheet" id="info-content"></div>
     </div>
 
-    <div id="app" class="hidden">
+    <div id="app">
         <header id="main-header" class="header">
             <h2 class="logo">Flechazo TV</h2>
             <div style="position:relative;" onclick="toggleNotifs()">
@@ -128,7 +84,7 @@
         </header>
 
         <div id="screen-home" class="screen">
-            <div class="section-title">🔥 Tendencias</div>
+            <div class="section-title">🔥 Tendencias Semanales</div>
             <div class="horizontal-scroll" id="trends-list"></div>
             <div class="section-title">⚔️ Acción y Free Fire</div>
             <div class="horizontal-scroll" id="action-list"></div>
@@ -137,8 +93,8 @@
         <div id="screen-explore" class="screen hidden">
             <div style="padding: calc(15px + var(--safe-top)) 20px;">
                 <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px; border:1px solid #333;">
-                    <i class="fa-solid fa-search" style="color:var(--primary);"></i>
-                    <input type="text" id="search-inp" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%;">
+                    <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
+                    <input type="text" id="search-inp" placeholder="Buscar drama, acción..." style="background:transparent; border:none; color:white; width:100%;">
                 </div>
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
@@ -149,13 +105,10 @@
         </div>
 
         <div id="screen-profile" class="screen hidden">
-            <div class="profile-hero">
-                <div class="avatar-main"><img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg"></div>
+            <div style="padding: 40px 20px; text-align: center;">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:110px; border-radius:50%; border:3px solid var(--primary);">
                 <h2 id="p-name">Gamer Pro</h2>
-                <div class="xp-bar"><div class="xp-fill"></div></div>
-            </div>
-            <div style="padding:20px;">
-                <div style="background:var(--card); border-radius:20px; overflow:hidden;">
+                <div style="background:var(--card); border-radius:20px; padding:10px; margin-top:20px; text-align: left;">
                     <div style="padding:15px; border-bottom:1px solid #333; display:flex; justify-content:space-between;">
                         <span>Tema de App</span>
                         <select onchange="setTheme(this.value)" style="background:none; border:none; color:var(--primary); font-weight:bold;">
@@ -163,15 +116,6 @@
                             <option value="fire">Fuego</option>
                             <option value="emerald">Esmeralda</option>
                             <option value="ocean">Océano</option>
-                            <option value="sakura">Sakura</option>
-                        </select>
-                    </div>
-                    <div style="padding:15px; display:flex; justify-content:space-between;">
-                        <span>Idioma</span>
-                        <select id="lang-sel" onchange="setLang(this.value)" style="background:none; border:none; color:var(--primary); font-weight:bold;">
-                            <option value="es">Español</option>
-                            <option value="en">English</option>
-                            <option value="ko">Coreano</option>
                         </select>
                     </div>
                 </div>
@@ -183,56 +127,27 @@
             <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
             <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
             <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-solid fa-bolt"></i>Shorts</div>
-            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user-gear"></i>Perfil</div>
         </nav>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <script>
+        let moviesData = [];
+        const API_URL = 'http://localhost:3000/api';
 
-        // FIREBASE CONFIG
-        const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        let movies = [];
-        let isLoginMode = true;
-
-        // AUTH LOGIC
-        window.toggleAuthMode = () => {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Inicia sesión" : "Regístrate";
-            document.getElementById('auth-main-btn').innerText = isLoginMode ? "Iniciar Sesión" : "Crear Cuenta";
-        };
-
-        window.handleAuth = async () => {
-            const e = document.getElementById('auth-email').value;
-            const p = document.getElementById('auth-pass').value;
-            try {
-                if(isLoginMode) await signInWithEmailAndPassword(auth, e, p);
-                else await createUserWithEmailAndPassword(auth, e, p);
-            } catch(err) { alert(err.message); }
-        };
-
-        onAuthStateChanged(auth, user => {
-            if(user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('p-name').innerText = user.email.split('@')[0];
-                initApp();
-            }
-        });
-
-        // APP LOGIC
+        // --- 1. CARGA DE APIS ---
         async function initApp() {
             try {
-                const res = await fetch('http://localhost:3000/api/movies');
-                movies = await res.json();
-                renderMovies(movies);
-                loadShorts();
-                fetchNotifs();
-            } catch(e) { console.log("API offline, usando fallback..."); }
+                const [m, s, n] = await Promise.all([
+                    fetch(`${API_URL}/movies`).then(r => r.json()),
+                    fetch(`${API_URL}/shorts`).then(r => r.json()),
+                    fetch(`${API_URL}/notifications`).then(r => r.json())
+                ]);
+                moviesData = m;
+                renderMovies(m);
+                renderShorts(s);
+                renderNotifs(n);
+            } catch(e) { console.error("API Error: Verifica que el servidor puerto 3000 esté activo."); }
         }
 
         function renderMovies(data) {
@@ -242,46 +157,62 @@
             h.innerHTML = ''; a.innerHTML = ''; e.innerHTML = '';
             data.forEach(m => {
                 const img = `<img class="poster" src="${m.img}" onclick="openInfo(${m.id})">`;
-                h.innerHTML += img; e.innerHTML += img;
+                h.innerHTML += img;
+                e.innerHTML += img;
                 if(m.cat === 'Acción' || m.cat === 'Free Fire') a.innerHTML += img;
             });
         }
 
+        // --- 2. MODAL Y PLAYER ---
         window.openInfo = id => {
-            const m = movies.find(x => x.id === id);
+            const m = moviesData.find(x => x.id === id);
             document.getElementById('info-content').innerHTML = `
                 <div class="modal-hero"><img src="${m.img}"></div>
                 <div style="padding:25px;">
                     <h2 style="margin:0;">${m.title}</h2>
                     <p style="color:var(--primary); font-weight:bold;">${m.cat} • 2025</p>
-                    <p style="color:var(--text-sec); font-size:14px;">${m.desc || 'Sin descripción.'}</p>
-                    <button onclick="playVideo('${m.video}')" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:12px; font-weight:bold;">VER AHORA</button>
+                    <p style="color:#aaa; font-size:14px; margin-bottom:20px;">${m.desc || 'Disfruta de lo mejor de Flechazo TV.'}</p>
+                    <button onclick="playVideo('${m.videoUrl || m.video}')" style="width:100%; padding:15px; background:#fff; color:#000; border:none; border-radius:12px; font-weight:bold;">VER AHORA</button>
                 </div>`;
             document.getElementById('info-modal').style.display = 'flex';
         };
 
         window.playVideo = url => {
             const v = document.getElementById('main-video');
-            v.src = url; document.getElementById('player-overlay').style.display = 'flex';
-            v.play(); closeInfo();
+            v.src = url;
+            document.getElementById('player-overlay').style.display = 'flex';
+            v.play();
+            closeInfo();
         };
 
         window.stopVideo = () => { document.getElementById('main-video').pause(); document.getElementById('player-overlay').style.display = 'none'; };
         window.closeInfo = () => document.getElementById('info-modal').style.display = 'none';
 
-        // SEARCH API
+        // --- 3. SHORTS TIKTOK ---
+        function renderShorts(data) {
+            const wrap = document.getElementById('shorts-wrapper');
+            wrap.innerHTML = data.map(s => `
+                <div class="short-v">
+                    <video src="${s.videoUrl}" loop playsinline webkit-playsinline></video>
+                    <div class="short-ui"><b>@${s.user}</b></div>
+                </div>`).join('');
+            const obs = new IntersectionObserver(ents => ents.forEach(e => {
+                const v = e.target.querySelector('video');
+                if (e.isIntersecting) v.play().catch(()=>{}); else v.pause();
+            }), { threshold: 0.8 });
+            document.querySelectorAll('.short-v').forEach(sv => obs.observe(sv));
+        }
+
+        // --- 4. BUSCADOR Y NOTIF ---
         document.getElementById('search-inp').addEventListener('input', async e => {
-            const res = await fetch(`http://localhost:3000/api/search?q=${e.target.value}`);
+            const res = await fetch(`${API_URL}/search?q=${e.target.value}`);
             renderMovies(await res.json());
         });
 
-        // NOTIFICATIONS
-        async function fetchNotifs() {
-            const res = await fetch('http://localhost:3000/api/notifications');
-            const data = await res.json();
+        function renderNotifs(data) {
             if(data.length > 0) {
                 document.getElementById('notif-dot').classList.remove('hidden');
-                document.getElementById('notif-panel').innerHTML = data.map(n => `<div style="padding:15px; border-bottom:1px solid #333;"><b>${n.title}</b><br><small>${n.msg}</small></div>`).join('');
+                document.getElementById('notif-panel').innerHTML = data.map(n => `<div class="notif-item"><b>${n.title}</b><br>${n.msg}</div>`).join('');
             }
         }
         window.toggleNotifs = () => {
@@ -290,35 +221,20 @@
             document.getElementById('notif-dot').classList.add('hidden');
         };
 
-        // SHORTS
-        async function loadShorts() {
-            const wrapper = document.getElementById('shorts-wrapper');
-            const res = await fetch('http://localhost:3000/api/shorts');
-            const data = await res.json();
-            wrapper.innerHTML = data.map(s => `
-                <div class="short-v">
-                    <video src="${s.videoUrl}" loop playsinline webkit-playsinline></video>
-                    <div class="short-ui"><b>@${s.user}</b></div>
-                </div>`).join('');
-            const obs = new IntersectionObserver(ents => ents.forEach(e => {
-                const v = e.target.querySelector('video');
-                if(e.isIntersecting) v.play().catch(()=>{}); else v.pause();
-            }), { threshold: 0.8 });
-            document.querySelectorAll('.short-v').forEach(sv => obs.observe(sv));
-        }
-
-        // NAVIGATION & THEMES
+        // --- 5. NAVEGACIÓN ---
         window.switchTab = (tab, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('screen-'+tab).classList.remove('hidden');
             document.getElementById('main-header').style.display = (tab === 'home') ? 'flex' : 'none';
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-        };
+            if(tab !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
+        }
 
-        window.setTheme = t => document.body.className = 'theme-' + t;
+        window.setTheme = t => { document.body.className = 'theme-' + t; localStorage.setItem('f_theme', t); }
 
         initApp();
+        if(localStorage.getItem('f_theme')) setTheme(localStorage.getItem('f_theme'));
     </script>
 </body>
 </html>
