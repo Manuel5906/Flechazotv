@@ -3,254 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Flechazo TV - Ultimate Pro</title>
+    <title>Flechazo TV - Perfil Elite</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. CONFIGURACIÓN Y TEMAS --- */
+        /* --- 1. VARIABLES Y TEMAS --- */
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
-            --accent: #a24bfa; --text: #fff; --text-sec: #aaa;
-            --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
+            --gold: #FFD700; --text: #fff; --text-sec: #aaa;
+            --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
         }
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; transition: 0.4s; overflow-x: hidden; }
+        body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; }
 
-        /* --- 2. SKELETON LOADING (Efecto de carga) --- */
-        .skeleton { background: #252535; position: relative; overflow: hidden; border-radius: 8px; }
-        .skeleton::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            animation: loading 1.5s infinite;
+        /* --- 2. PERFIL ELITE UI --- */
+        .profile-header {
+            background: linear-gradient(to bottom, rgba(162, 75, 250, 0.2), var(--bg));
+            padding: 40px 20px 20px; text-align: center;
         }
-        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* --- 3. UI COMPONENTS --- */
-        .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
-        .logo { font-size: 22px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .section-title { padding: 20px 20px 10px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; gap: 12px; scrollbar-width: none; }
-        
-        /* Películas */
-        .poster { min-width: 115px; height: 170px; border-radius: 10px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
-        .poster:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .avatar-main {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 4px solid var(--primary); padding: 5px;
+            background: var(--bg); position: relative; display: inline-block;
+        }
+        .avatar-main img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .edit-badge {
+            position: absolute; bottom: 5px; right: 5px;
+            background: var(--primary); color: white; width: 30px; height: 30px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--bg); font-size: 12px;
+        }
 
-        /* --- 4. REPRODUCTOR TIPO NETFLIX --- */
-        #player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; flex-direction: column; justify-content: center; }
-        #player-fs video { width: 100%; max-height: 80vh; }
-        .controls-fs { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 30px; font-size: 25px; color: #fff; }
+        /* Tarjeta VIP */
+        .vip-card {
+            background: linear-gradient(135deg, #2c3e50, #000);
+            margin: 20px; border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
 
-        /* --- 5. EXPLORAR --- */
-        .search-bar { background: var(--card); margin: 15px 20px; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1); }
-        .search-bar input { background: transparent; border: none; color: #fff; width: 100%; }
-        .filter-tags { display: flex; gap: 10px; padding: 0 20px 15px; overflow-x: auto; scrollbar-width: none; }
-        .tag { padding: 6px 15px; background: var(--card); border-radius: 20px; font-size: 12px; white-space: nowrap; border: 1px solid transparent; }
-        .tag.active { background: var(--primary); border-color: var(--primary); }
+        /* Estadísticas Gamer */
+        .gamer-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 15px; padding: 0 20px; margin-bottom: 25px;
+        }
+        .stat-box {
+            background: var(--card); padding: 15px; border-radius: 15px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-box i { color: var(--primary); font-size: 20px; margin-bottom: 8px; }
+        .stat-box b { display: block; font-size: 18px; }
+        .stat-box span { font-size: 10px; color: var(--text-sec); text-transform: uppercase; }
 
-        /* --- 6. SHORTS --- */
-        .short-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; background: #000; position: fixed; inset: 0; z-index: 200; padding-bottom: 70px; }
-        .short-v { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; }
-        .short-v video { width: 100%; height: 100%; object-fit: cover; }
-        .short-info { position: absolute; bottom: 100px; left: 15px; text-shadow: 0 2px 5px #000; }
+        /* Lista de Ajustes */
+        .menu-list { padding: 0 20px; }
+        .menu-item {
+            background: var(--card); display: flex; align-items: center;
+            padding: 18px; border-radius: 16px; margin-bottom: 12px;
+            transition: 0.3s; cursor: pointer;
+        }
+        .menu-item:active { transform: scale(0.98); background: #252535; }
+        .menu-item i:first-child { 
+            width: 40px; height: 40px; background: rgba(255,255,255,0.05);
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; margin-right: 15px; color: var(--primary);
+        }
+        .menu-text { flex: 1; }
+        .menu-text b { display: block; font-size: 15px; }
+        .menu-text span { font-size: 11px; color: var(--text-sec); }
 
-        /* --- 7. NAV --- */
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 12px 0 25px; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
-        .nav-btn { color: #666; font-size: 10px; text-align: center; flex: 1; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
+        /* Amigos Conectados */
+        .friends-scroll {
+            display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px;
+            scrollbar-width: none;
+        }
+        .friend-dot {
+            min-width: 60px; text-align: center; font-size: 10px;
+        }
+        .friend-avatar {
+            width: 50px; height: 50px; border-radius: 15px; margin-bottom: 5px;
+            border: 2px solid #00ff88; padding: 2px;
+        }
+
+        /* --- 3. MODALES --- */
+        .modal-sheet {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: var(--card); border-radius: 30px 30px 0 0;
+            padding: 30px 20px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2000; box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+        }
+        .modal-sheet.open { bottom: 0; }
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding-top: 20px;
+        }
+        .avatar-option { width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+        .avatar-option.active { border-color: var(--primary); }
+
+        /* --- 4. NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: #151520;
+            display: flex; justify-content: space-around; padding: 15px 0 30px;
+            border-top: 1px solid #333; z-index: 1000;
+        }
+        .nav-item { color: #666; text-align: center; font-size: 10px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 5px; }
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="notif-box" style="position:fixed; top:70px; right:20px; width:280px; background:var(--card); border-radius:15px; z-index:1000; display:none; border:1px solid var(--primary); box-shadow: 0 10px 30px #000;">
-        <div style="padding:15px; font-weight:bold; border-bottom:1px solid #333;">Avisos Recientes</div>
-        <div id="notif-list" style="max-height:300px; overflow-y:auto;"></div>
-    </div>
-
-    <div id="player-fs">
-        <i class="fa-solid fa-arrow-left" onclick="stopPlayer()" style="position:absolute; top:30px; left:25px; font-size:24px;"></i>
-        <video id="vid-main" controls playsinline></video>
-        <div class="controls-fs">
-            <i class="fa-solid fa-backward-step" onclick="skip(-10)"></i>
-            <i class="fa-solid fa-forward-step" onclick="skip(10)"></i>
+    <div id="tab-profile">
+        <div class="profile-header">
+            <div class="avatar-main" onclick="openAvatars()">
+                <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
+                <div class="edit-badge"><i class="fa-solid fa-camera"></i></div>
+            </div>
+            <h2 style="margin:15px 0 5px;">Gamer_Pro_2025</h2>
+            <span style="color:var(--text-sec); font-size:12px;">ID: 99283745 • Nivel 15</span>
         </div>
-    </div>
 
-    <div id="main-content">
-        <div class="header">
-            <h2 class="logo">Flechazo TV</h2>
-            <div style="position:relative;" onclick="toggleNotifs()">
-                <i class="fa-regular fa-bell" style="font-size:22px;"></i>
-                <span id="notif-dot" style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; display:none;"></span>
+        <div class="vip-card">
+            <div>
+                <b style="color:var(--gold); font-size:18px;"><i class="fa-solid fa-crown"></i> MIEMBRO PREMIUM</b>
+                <p style="margin:5px 0 0; font-size:11px; color:#ccc;">Vence en: 15 de Enero, 2026</p>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="opacity:0.5;"></i>
+        </div>
+
+        <div class="gamer-stats">
+            <div class="stat-box">
+                <i class="fa-solid fa-stopwatch"></i>
+                <b id="stat-hours">128h</b>
+                <span>Visto</span>
+            </div>
+            <div class="stat-box">
+                <i class="fa-solid fa-fire"></i>
+                <b id="stat-streak">12</b>
+                <span>Días Racha</span>
+            </div>
+            <div class="stat-box">
+                <i class="fa-solid fa-trophy"></i>
+                <b id="stat-medals">45</b>
+                <span>Logros</span>
             </div>
         </div>
 
-        <div id="screen-home">
-            <div class="section-title">🔥 Tendencias</div>
-            <div class="horizontal-scroll" id="list-trends">
-                <div class="skeleton poster"></div><div class="skeleton poster"></div><div class="skeleton poster"></div>
+        <div class="section-title" style="padding:0 20px 10px;">👥 Amigos Online</div>
+        <div class="friends-scroll">
+            <div class="friend-dot">
+                <img src="https://i.pravatar.cc/100?u=1" class="friend-avatar">
+                <span>Sky_Killer</span>
             </div>
-            <div class="section-title">✨ Recomendados</div>
-            <div class="horizontal-scroll" id="list-rec"></div>
+            <div class="friend-dot">
+                <img src="https://i.pravatar.cc/100?u=2" class="friend-avatar">
+                <span>Dramatica</span>
+            </div>
+            <div class="friend-dot">
+                <img src="https://i.pravatar.cc/100?u=3" class="friend-avatar" style="border-color:#555;">
+                <span style="color:#555;">Offline</span>
+            </div>
+            <div class="friend-dot">
+                <img src="https://i.pravatar.cc/100?u=4" class="friend-avatar">
+                <span>FF_Master</span>
+            </div>
         </div>
 
-        <div id="screen-explore" class="hidden">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inp-search" placeholder="Películas, dramas o clips...">
-            </div>
-            <div class="filter-tags">
-                <div class="tag active" onclick="filterCat('Todo', this)">Todo</div>
-                <div class="tag" onclick="filterCat('Acción', this)">Acción</div>
-                <div class="tag" onclick="filterCat('Romance', this)">Romance</div>
-                <div class="tag" onclick="filterCat('Free Fire', this)">Free Fire</div>
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
-        </div>
-
-        <div id="screen-shorts" class="hidden">
-            <div class="short-container" id="shorts-wrapper"></div>
-        </div>
-
-        <div id="screen-profile" class="hidden">
-            <div style="text-align:center; padding:40px 20px;">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--primary);">
-                <h3>Gamer Pro</h3>
-                <div style="margin:20px 0; display:flex; justify-content:center; gap:15px;">
-                    <div style="text-align:center;"><b id="count-list">0</b><br><small>Mi Lista</small></div>
-                    <div style="text-align:center;"><b>15</b><br><small>Nivel</small></div>
+        <div class="section-title" style="padding:25px 20px 10px;">⚙️ Ajustes de Cuenta</div>
+        <div class="menu-list">
+            <div class="menu-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <div class="menu-text">
+                    <b>Seguridad y Privacidad</b>
+                    <span>2FA, cambio de contraseña</span>
                 </div>
-                <div class="section-title">Temas</div>
-                <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
-                    <div onclick="setTheme('default')" style="width:30px; height:30px; background:#0f0f1a; border-radius:50%; border:2px solid #fff;"></div>
-                    <div onclick="setTheme('fire')" style="width:30px; height:30px; background:#ff3300; border-radius:50%; border:2px solid #fff;"></div>
-                    <div onclick="setTheme('emerald')" style="width:30px; height:30px; background:#00ff88; border-radius:50%; border:2px solid #fff;"></div>
+                <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.3;"></i>
+            </div>
+            <div class="menu-item" onclick="clearCache()">
+                <i class="fa-solid fa-database"></i>
+                <div class="menu-text">
+                    <b>Almacenamiento</b>
+                    <span id="cache-size">Limpiar 142 MB de caché</span>
                 </div>
-                <button onclick="location.reload()" style="width:100%; padding:15px; background:var(--card); border:none; color:#ff4b4b; border-radius:12px;">Cerrar Sesión</button>
+            </div>
+            <div class="menu-item" style="background: rgba(255,75,75,0.05);" onclick="logout()">
+                <i class="fa-solid fa-power-off" style="color:#ff4b4b;"></i>
+                <div class="menu-text">
+                    <b style="color:#ff4b4b;">Cerrar Sesión</b>
+                    <span>Salir de este dispositivo</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-info" onclick="if(event.target.id==='modal-info') this.classList.remove('open')">
-        <div class="modal-sheet" id="modal-data"></div>
+    <div id="modal-avatars" class="modal-sheet">
+        <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
+        <h3>Elegir Nuevo Avatar</h3>
+        <div class="avatar-grid">
+            <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-option active" onclick="selectAvatar(this)">
+            <img src="https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-m7_2oW0h529z5SAnI_U6m5B7u_iO6zL_A&usqp=CAU" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://i.pravatar.cc/150?u=a" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://i.pravatar.cc/150?u=b" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://i.pravatar.cc/150?u=c" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://i.pravatar.cc/150?u=d" class="avatar-option" onclick="selectAvatar(this)">
+        </div>
+        <button onclick="closeAvatars()" style="width:100%; padding:15px; margin-top:25px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:bold;">CONFIRMAR</button>
     </div>
 
-    <nav class="nav">
-        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+    <nav class="bottom-nav">
+        <div class="nav-item"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-item"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-item"><i class="fa-brands fa-tiktok"></i>Shorts</div>
+        <div class="nav-item active"><i class="fa-solid fa-user"></i>Perfil</div>
     </nav>
 
     <script>
-        let dbMovies = [];
-        let myList = JSON.parse(localStorage.getItem('flechazo_lista')) || [];
+        // --- FUNCIONES PERFIL ---
 
-        // 1. CARGA DE DATOS (Simulando API)
-        async function loadApp() {
-            try {
-                // Aquí llamarías a: fetch('http://localhost:3000/api/movies')
-                dbMovies = [
-                    { id: 1, title: "Amor Prohibido", cat: "Romance", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-                    { id: 2, title: "Booyah Master", cat: "Free Fire", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-                    { id: 3, title: "Venganza Mortal", cat: "Acción", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
-                ];
-                renderHome();
-                renderExplore(dbMovies);
-                loadShorts();
-                checkNotifs();
-                updateProfile();
-            } catch (e) { console.error("Error API"); }
+        function openAvatars() {
+            document.getElementById('modal-avatars').classList.add('open');
         }
 
-        // 2. REPRODUCTOR NETFLIX
-        window.startPlayer = (url) => {
-            const player = document.getElementById('player-fs');
-            const video = document.getElementById('vid-main');
-            video.src = url;
-            player.style.display = 'flex';
-            video.play();
-        }
-        window.stopPlayer = () => {
-            const player = document.getElementById('player-fs');
-            const video = document.getElementById('vid-main');
-            video.pause();
-            player.style.display = 'none';
-        }
-        window.skip = (sec) => document.getElementById('vid-main').currentTime += sec;
-
-        // 3. DETALLES MEJORADOS
-        window.openDetails = (id) => {
-            const m = dbMovies.find(x => x.id === id);
-            const inList = myList.some(x => x.id === id);
-            document.getElementById('modal-data').innerHTML = `
-                <div style="position:relative;">
-                    <img src="${m.img}" style="width:100%; height:250px; object-fit:cover;">
-                    <div onclick="startPlayer('${m.video}')" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:40px; color:#fff; background:var(--primary); width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px var(--primary);"><i class="fa-solid fa-play"></i></div>
-                </div>
-                <div style="padding:25px;">
-                    <h2 style="margin:0 0 10px;">${m.title}</h2>
-                    <p style="color:#aaa; font-size:14px;">98% Coincidencia • 2024 • ${m.cat}</p>
-                    <div style="display:flex; gap:10px; margin-top:20px;">
-                        <button onclick="startPlayer('${m.video}')" style="flex:1; padding:15px; background:#fff; color:#000; border:none; border-radius:8px; font-weight:bold;">VER AHORA</button>
-                        <button onclick="toggleList(${m.id})" style="flex:1; padding:15px; background:var(--card); color:#fff; border:none; border-radius:8px;">${inList ? '✓ EN LISTA' : '+ MI LISTA'}</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('modal-info').classList.add('open');
+        function closeAvatars() {
+            document.getElementById('modal-avatars').classList.remove('open');
         }
 
-        // 4. LÓGICA DE LISTA Y TEMAS
-        window.toggleList = (id) => {
-            const movie = dbMovies.find(x => x.id === id);
-            const index = myList.findIndex(x => x.id === id);
-            if(index > -1) myList.splice(index, 1);
-            else myList.push(movie);
-            localStorage.setItem('flechazo_lista', JSON.stringify(myList));
-            updateProfile();
-            openDetails(id);
-        }
-
-        window.setTheme = (t) => {
-            document.body.className = t === 'default' ? '' : 'theme-' + t;
-            localStorage.setItem('flechazo_theme', t);
-        }
-
-        // 5. NAVEGACIÓN Y CARGA INICIAL
-        function renderHome() {
-            const container = document.getElementById('list-trends');
-            container.innerHTML = dbMovies.map(m => `<img class="poster" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
-            document.getElementById('list-rec').innerHTML = [...dbMovies].reverse().map(m => `<img class="poster" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
-        }
-
-        function renderExplore(data) {
-            const grid = document.getElementById('explore-grid');
-            grid.innerHTML = data.map(m => `<img class="poster" style="min-width:auto; width:100%; height:140px;" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
-        }
-
-        window.switchTab = (tab, el) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('screen-'+tab).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        function selectAvatar(el) {
+            // Quitar clase activa de todos
+            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('active'));
+            // Poner activa al seleccionado
             el.classList.add('active');
-            if(tab !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
+            // Cambiar la imagen principal
+            document.getElementById('user-img').src = el.src;
+            localStorage.setItem('userAvatar', el.src);
         }
 
-        function updateProfile() {
-            document.getElementById('count-list').innerText = myList.length;
+        function clearCache() {
+            if(confirm("¿Quieres liberar espacio eliminando el caché de video?")) {
+                document.getElementById('cache-size').innerText = "Limpiar 0 MB de caché";
+                alert("¡Espacio liberado con éxito!");
+            }
         }
 
-        // CARGA
-        const savedTheme = localStorage.getItem('flechazo_theme');
-        if(savedTheme) setTheme(savedTheme);
-        loadApp();
+        function logout() {
+            if(confirm("¿Estás seguro de que quieres salir?")) {
+                location.reload();
+            }
+        }
+
+        // Cargar datos al iniciar
+        window.onload = () => {
+            const savedAvatar = localStorage.getItem('userAvatar');
+            if(savedAvatar) document.getElementById('user-img').src = savedAvatar;
+        }
     </script>
 </body>
 </html>
