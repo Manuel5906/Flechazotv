@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
-    <title>Flechazo TV - Pro Ultimate</title>
+    <title>Flechazo TV - API Connected</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
@@ -17,9 +17,8 @@
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Temas */
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(135deg, #ff3300, #ff9900); }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(135deg, #00ff88, #00ccff); }
+        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
+        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(100px + var(--safe-bottom)); transition: 0.4s; overflow-x: hidden; }
@@ -31,7 +30,7 @@
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; gap: 15px; scrollbar-width: none; }
         .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
 
-        /* --- MODAL DE INFORMACIÓN (EL QUE FALTABA) --- */
+        /* --- MODAL DE INFORMACIÓN (DINÁMICO) --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-sheet { 
             width: 100%; background: var(--card); border-radius: 30px 30px 0 0; 
@@ -41,8 +40,8 @@
         .modal-hero { width: 100%; height: 250px; position: relative; }
         .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
         .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--card), transparent); }
-        
         .modal-body { padding: 20px 25px; }
+
         .btn-play { background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
         .btn-list { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; }
 
@@ -64,50 +63,52 @@
 
     <div id="player-overlay">
         <i class="fa-solid fa-arrow-left close-player" onclick="stopVideo()"></i>
-        <video id="main-video" controls style="width:100%;"></video>
+        <video id="main-video" controls playsinline style="width:100%;"></video>
     </div>
 
     <div id="info-modal" class="modal-overlay" onclick="if(event.target.id==='info-modal') closeInfo()">
-        <div class="modal-sheet" id="info-content">
-            </div>
+        <div class="modal-sheet" id="info-content"></div>
     </div>
 
     <div id="app">
         <header id="main-header" class="header">
             <h2 class="logo">Flechazo TV</h2>
-            <i class="fa-solid fa-bell" style="font-size:24px;"></i>
+            <div style="position: relative;">
+                <i class="fa-solid fa-bell" style="font-size:24px;"></i>
+                <span id="notif-badge" style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; border:2px solid var(--bg); display:none;"></span>
+            </div>
         </header>
 
         <div id="screen-home" class="screen">
             <div class="section-title">🔥 Tendencias Semanales</div>
             <div class="horizontal-scroll" id="trends-list"></div>
-            <div class="section-title">✨ Recomendados</div>
-            <div class="horizontal-scroll" id="rec-list"></div>
+            <div class="section-title">⚔️ Acción y Free Fire</div>
+            <div class="horizontal-scroll" id="action-list"></div>
         </div>
 
         <div id="screen-explore" class="screen hidden">
-            <div style="padding: 20px;">
+            <div style="padding: calc(20px + var(--safe-top)) 25px 15px;">
                 <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px; border:1px solid #333;">
-                    <i class="fa-solid fa-search" style="color:var(--primary);"></i>
-                    <input type="text" id="search-inp" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%;">
+                    <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
+                    <input type="text" id="search-inp" placeholder="Buscar películas o actores..." style="background:transparent; border:none; color:white; width:100%;">
                 </div>
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
         </div>
 
         <div id="screen-profile" class="screen hidden">
-            <div style="text-align: center; padding: 40px;">
+            <div style="text-align: center; padding: calc(40px + var(--safe-top)) 20px 20px;">
                 <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:100px; border-radius:50%; border:3px solid var(--primary);">
                 <h3>Gamer Flechazo</h3>
-                <div style="background:var(--card); border-radius:20px; padding:10px; margin-top:20px;">
+                <div style="background:var(--card); border-radius:20px; padding:10px; margin-top:20px; text-align: left;">
                     <div class="setting-item" style="padding:15px; display:flex; justify-content:space-between;" onclick="setTheme('fire')">
-                        <span>Tema Fuego</span><i class="fa-solid fa-fire" style="color:red"></i>
+                        <span>Tema Fuego Carmesí</span><i class="fa-solid fa-fire" style="color:red"></i>
                     </div>
                     <div class="setting-item" style="padding:15px; display:flex; justify-content:space-between;" onclick="setTheme('default')">
-                        <span>Tema Noche</span><i class="fa-solid fa-moon"></i>
+                        <span>Tema Noche Azul</span><i class="fa-solid fa-moon"></i>
                     </div>
                 </div>
-                <button onclick="location.reload()" style="margin-top:30px; color:red; background:none; border:none; font-weight:bold;">CERRAR SESIÓN</button>
+                <button onclick="location.reload()" style="margin-top:30px; color:red; background:none; border:none; font-weight:bold; cursor:pointer;">CERRAR SESIÓN</button>
             </div>
         </div>
 
@@ -119,41 +120,78 @@
     </div>
 
     <script>
-        // --- DATOS ---
-        const movies = [
-            { id: 1, title: "Amor Prohibido", desc: "Un romance intenso que desafía todas las reglas sociales y familiares.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", cat: "Romance" },
-            { id: 2, title: "Booyah Master", desc: "El camino de un jugador de Free Fire hasta convertirse en leyenda mundial.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", cat: "Acción" },
-            { id: 3, title: "Venganza Coreana", desc: "Tras perderlo todo, un hombre busca justicia en las calles de Seúl.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", cat: "Drama" }
-        ];
+        let moviesData = [];
+        const API_URL = 'http://localhost:3000/api';
 
-        // --- INICIALIZAR ---
-        window.onload = () => {
+        // --- 1. CARGA DE DATOS DESDE LAS APIs ---
+        async function loadAllContent() {
+            try {
+                // Traer películas generales
+                const res = await fetch(`${API_URL}/movies`);
+                moviesData = await res.json();
+                renderUI(moviesData);
+
+                // Revisar notificaciones
+                const nRes = await fetch(`${API_URL}/notifications`);
+                const notifs = await nRes.json();
+                if(notifs.length > 0) document.getElementById('notif-badge').style.display = 'block';
+
+            } catch (e) {
+                console.warn("API Offline, cargando modo local...");
+                // Datos de emergencia si el servidor está apagado
+                moviesData = [
+                    { id: 1, title: "Amor Prohibido", desc: "Un romance intenso.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", cat: "Romance" },
+                    { id: 2, title: "Booyah Master", desc: "Acción en Free Fire.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", cat: "Acción" }
+                ];
+                renderUI(moviesData);
+            }
+        }
+
+        // --- 2. RENDERIZADO DE INTERFAZ ---
+        function renderUI(data) {
             const hList = document.getElementById('trends-list');
+            const aList = document.getElementById('action-list');
             const eGrid = document.getElementById('explore-grid');
             
-            movies.forEach(m => {
-                const img = `<img class="poster" src="${m.img}" onclick="openInfo(${m.id})">`;
-                hList.innerHTML += img;
-                eGrid.innerHTML += img;
-            });
-            document.getElementById('rec-list').innerHTML = hList.innerHTML;
-        };
+            hList.innerHTML = ''; aList.innerHTML = ''; eGrid.innerHTML = '';
 
-        // --- FUNCIONES INFO MODAL ---
+            data.forEach(m => {
+                const imgHTML = `<img class="poster" src="${m.img}" onclick="openInfo(${m.id})">`;
+                hList.innerHTML += imgHTML;
+                eGrid.innerHTML += imgHTML;
+                if(m.cat === 'Acción' || m.cat === 'Free Fire') aList.innerHTML += imgHTML;
+            });
+        }
+
+        // --- 3. BUSCADOR CON LA API /SEARCH ---
+        document.getElementById('search-inp').addEventListener('input', async (e) => {
+            const query = e.target.value;
+            try {
+                const res = await fetch(`${API_URL}/search?q=${query}`);
+                const filtered = await res.json();
+                renderUI(filtered); // Reutilizamos el renderizado
+            } catch(err) {
+                // Fallback local si la API falla
+                const local = moviesData.filter(m => m.title.toLowerCase().includes(query.toLowerCase()));
+                renderUI(local);
+            }
+        });
+
+        // --- 4. MODAL DE INFO (DETALLES) ---
         function openInfo(id) {
-            const m = movies.find(x => x.id === id);
+            const m = moviesData.find(x => x.id === id);
             document.getElementById('info-content').innerHTML = `
                 <div class="modal-hero">
                     <img src="${m.img}">
                 </div>
                 <div class="modal-body">
                     <h2 style="margin:0 0 10px;">${m.title}</h2>
-                    <p style="color:var(--primary); font-size:13px; font-weight:bold; margin-bottom:10px;">${m.cat} • 98% Match</p>
-                    <p style="color:var(--text-sec); font-size:14px; line-height:1.5; margin-bottom:25px;">${m.desc}</p>
+                    <p style="color:var(--primary); font-weight:bold; margin-bottom:10px;">${m.cat} • HD</p>
+                    <p style="color:var(--text-sec); font-size:14px; line-height:1.5; margin-bottom:25px;">${m.desc || 'Sin descripción disponible.'}</p>
                     <button class="btn-play" onclick="playVideo('${m.video}')">
                         <i class="fa-solid fa-play"></i> VER AHORA
                     </button>
-                    <button class="btn-list" onclick="alert('Agregado a tu lista')">
+                    <button class="btn-list" onclick="alert('Agregado a Mi Lista')">
                         <i class="fa-solid fa-plus"></i> MI LISTA
                     </button>
                 </div>
@@ -161,18 +199,16 @@
             document.getElementById('info-modal').style.display = 'flex';
         }
 
-        function closeInfo() {
-            document.getElementById('info-modal').style.display = 'none';
-        }
+        function closeInfo() { document.getElementById('info-modal').style.display = 'none'; }
 
-        // --- VIDEO PLAYER ---
+        // --- 5. REPRODUCTOR ---
         function playVideo(url) {
             const p = document.getElementById('player-overlay');
             const v = document.getElementById('main-video');
             v.src = url;
             p.style.display = 'flex';
             v.play();
-            closeInfo(); // Cierra el modal de info al empezar el video
+            closeInfo();
         }
 
         function stopVideo() {
@@ -180,7 +216,7 @@
             document.getElementById('player-overlay').style.display = 'none';
         }
 
-        // --- NAVEGACIÓN ---
+        // --- 6. NAVEGACIÓN Y TEMAS ---
         function switchTab(tab, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('screen-'+tab).classList.remove('hidden');
@@ -192,6 +228,8 @@
         function setTheme(t) {
             document.body.className = (t === 'default') ? '' : 'theme-' + t;
         }
+
+        window.onload = loadAllContent;
     </script>
 </body>
 </html>
