@@ -5,550 +5,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
-    <title>Flechazo TV - Ultimate</title>
+    <title>Flechazo TV</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. CONFIGURACIÓN BASE --- */
+        /* --- ESTILOS BASE --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        :root { 
-            --bg-dark: #0f0f1a; 
-            --card-bg: #1e1e2d;
-            --primary: #ff4b4b; 
-            --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa); 
-            --gold: #FFD700; 
-            --text: #fff; 
-            --text-sec: #aaa;
-        }
-        body { 
-            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-dark); color: var(--text); padding-bottom: 80px; 
-            user-select: none; overflow-x: hidden; 
-        }
-
-        /* --- 2. UTILIDADES VISUALES --- */
+        :root { --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; --text: #fff; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; user-select: none; }
         .hidden { display: none !important; }
-        .logo { font-size: 22px; margin: 0; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: -0.5px; }
-        
-        /* Toast Notification */
-        .toast { 
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
-            background: rgba(30, 30, 40, 0.95); color: white; padding: 12px 25px; 
-            border-radius: 50px; z-index: 3000; display: none; font-size: 13px; 
-            border-left: 3px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            animation: slideInTop 0.4s; backdrop-filter: blur(5px);
-        }
 
-        /* --- 3. COMPONENTES DE PANTALLAS --- */
-        .header { 
-            padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; 
-            z-index: 50; backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; 
-        }
-
-        /* Home */
-        .hero-banner {
-            width: 100%; height: 50vh; position: relative; overflow: hidden;
-            background-image: url('https://image.tmdb.org/t/p/original/jXJxMcVoEuXzym3vFnjqDW4ifo6.jpg');
-            background-size: cover; background-position: center;
-            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-        }
-        .hero-content { position: absolute; bottom: 20px; left: 20px; right: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .hero-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
-        
-        .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; gap: 12px; }
-        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; position: relative; transition: transform 0.1s; }
-        .poster-card:active { transform: scale(0.95); }
+        /* --- UI COMPONENTS --- */
+        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; margin-right: 10px; position: relative; }
         .poster-card img { width: 100%; height: 100%; object-fit: cover; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
+        .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
+        .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        .logo { font-size: 22px; font-weight: 800; background: linear-gradient(45deg, #ff4b4b, #a24bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
 
-        /* Explorar (Search) */
-        .search-box {
-            background:#252535; width:100%; padding:12px; border-radius:12px; 
-            display:flex; align-items:center; border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.3s;
-        }
-        .search-box:focus-within { border-color: var(--primary); background: #2a2a3d; }
-        
-        .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; position: relative; animation: fadeIn 0.4s; }
-        .explore-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .category-pill { display: inline-block; padding: 8px 15px; background: #252535; border-radius: 20px; margin-right: 8px; font-size: 12px; color: #ccc; transition: 0.3s; }
-        .category-pill.active { background: var(--primary); color: white; }
-        .categories-scroll { overflow-x: auto; white-space: nowrap; padding: 10px 20px; }
-
-        /* Shorts */
-        .shorts-container {
-            width: 100vw; height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; 
-            background: black; position: fixed; top: 0; left: 0; z-index: 200; padding-bottom: 70px;
-        }
-        .short-item {
-            width: 100%; height: 100%; scroll-snap-align: start; position: relative;
-            background: #111; display: flex; justify-content: center; align-items: center;
-        }
-        .short-video { width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        .short-overlay {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
-            pointer-events: none; z-index: 2;
-        }
-        .play-icon-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 80px; color: rgba(255,255,255,0.6); display: none; 
-            pointer-events: none; z-index: 5; animation: pulse 0.5s;
-        }
-        .short-info { position: absolute; bottom: 90px; left: 15px; width: 75%; pointer-events: none; z-index: 10; text-shadow: 1px 1px 3px black; }
-        .short-actions { position: absolute; bottom: 100px; right: 10px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
-        .action-btn { text-align: center; cursor: pointer; pointer-events: auto; }
-        .action-icon { 
-            width: 45px; height: 45px; background: rgba(255,255,255,0.2); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 22px; color: white; transition: 0.2s; backdrop-filter: blur(5px);
-        }
-        .liked { color: #ff4b4b !important; animation: pop 0.3s; }
-
-        /* Perfil */
-        .profile-header { background: linear-gradient(to bottom, #2a2a40, var(--bg-dark)); padding: 40px 20px 20px; text-align: center; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
-        .stats-row { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 18px; font-weight: bold; display: block; }
-        .stat-label { font-size: 11px; color: var(--text-sec); }
-        
-        .profile-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        .btn-profile {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; cursor: pointer;
-        }
-        .btn-logout { background: rgba(255, 75, 75, 0.15); border-color: var(--primary); color: #ff4b4b; }
-
-        /* Listas Perfil */
-        .history-item { 
-            display: flex; align-items: center; gap: 15px; margin-bottom: 15px; 
-            background: #1a1a24; padding: 10px; border-radius: 12px; 
-            transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .history-item:active { transform: scale(0.98); background: #252535; }
-        .h-img { width: 60px; height: 80px; object-fit: cover; border-radius: 8px; }
-        .h-info { flex: 1; }
-        .h-title { font-weight: bold; font-size: 14px; margin-bottom: 4px; color: white; }
-        .h-meta { font-size: 11px; color: #888; }
-        .btn-delete { padding: 10px; color: #ff4b4b; background: transparent; border: none; font-size: 16px; cursor: pointer; }
-
-        /* --- 4. MODALES --- */
+        /* --- MODAL DETALLE (ARREGLADO Y BONITO) --- */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 500; display: none; 
-            justify-content: center; align-items: flex-end; backdrop-filter: blur(5px);
+            justify-content: center; align-items: flex-end; backdrop-filter: blur(8px);
         }
         .modal-overlay.open { display: flex; animation: fadeIn 0.3s; }
         .modal-sheet { 
-            background: #1a1a24; width: 100%; max-width: 500px; 
-            border-radius: 25px 25px 0 0; padding: 25px; 
-            max-height: 85vh; overflow-y: auto; 
+            background: #15151e; width: 100%; max-width: 500px; 
+            border-radius: 25px 25px 0 0; padding: 0; /* Padding 0 para que la imagen toque bordes */
+            max-height: 90vh; overflow-y: auto; 
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
-            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            position: relative;
         }
+
+        /* Estilo Hero del Modal */
+        .detail-hero { 
+            width: 100%; height: 250px; 
+            position: relative; 
+            overflow: hidden;
+        }
+        .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to top, #15151e, transparent);
+        }
+        .btn-play-hero {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: rgba(255, 75, 75, 0.9);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: white; box-shadow: 0 0 20px rgba(255, 75, 75, 0.5);
+            z-index: 2; cursor: pointer; transition: transform 0.2s;
+        }
+        .btn-play-hero:active { transform: translate(-50%, -50%) scale(0.9); }
+
+        /* Contenido del Modal */
+        .detail-content { padding: 25px; margin-top: -20px; position: relative; z-index: 3; }
+        .detail-title { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.1; }
+        .detail-meta { font-size: 13px; color: #aaa; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        .tag-hd { border: 1px solid #aaa; padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+        .detail-desc { font-size: 14px; color: #ddd; line-height: 1.6; margin-bottom: 25px; }
+
+        /* Botones de Acción */
+        .action-row { display: flex; gap: 12px; }
+        .btn-main {
+            flex: 1; padding: 14px; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary { background: white; color: black; }
+        .btn-secondary { background: #2a2a35; color: white; }
         
-        .edit-input { width: 100%; background: #222; border: 1px solid #444; padding: 12px; color: white; border-radius: 8px; margin-bottom: 15px; }
-        .avatar-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
-        .avatar-option { width: 50px; height: 50px; border-radius: 50%; border: 2px solid transparent; opacity: 0.6; }
-        .avatar-option.selected { border-color: var(--primary); opacity: 1; }
-
-        /* Reproductor Fullscreen */
-        .player-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 2500; display: flex; justify-content: center; align-items: center;
-        }
-        #main-video-player { width: 100%; height: auto; max-height: 100vh; }
-        .close-player-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0, 0, 0, 0.5); color: white;
-            border: none; width: 40px; height: 40px; border-radius: 50%;
-            font-size: 20px; cursor: pointer; z-index: 2501; backdrop-filter: blur(5px);
+        /* Botón cerrar flotante */
+        .btn-close-modal {
+            position: absolute; top: 15px; right: 15px; z-index: 10;
+            background: rgba(0,0,0,0.5); width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: white;
+            backdrop-filter: blur(4px); font-size: 14px; cursor: pointer;
         }
 
-        /* --- 5. NAV INFERIOR --- */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; background: #0f0f1a; 
-            display: flex; justify-content: space-around; padding: 10px 0 25px 0; 
-            z-index: 300; border-top: 1px solid rgba(255,255,255,0.1); 
-        }
-        .nav-item { text-align: center; color: #666; font-size: 10px; transition: 0.2s; flex: 1; cursor: pointer; }
-        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        /* --- NAV --- */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0f0f1a; display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
+        .nav-item { text-align: center; color: #666; font-size: 10px; flex: 1; }
+        .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
 
-        /* Animations */
-        @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
-        @keyframes pulse { 0%{opacity:0; transform: translate(-50%, -50%) scale(0.5);} 100%{opacity:1; transform: translate(-50%, -50%) scale(1);} }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .fa-spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
 
-    <div id="toast" class="toast">Notificación</div>
-
-    <div id="video-player-overlay" class="player-overlay hidden">
-        <button class="close-player-btn" onclick="closePlayer()"><i class="fa-solid fa-xmark"></i></button>
-        <video id="main-video-player" controls playsinline>
-            <source src="" type="video/mp4">
-        </video>
-    </div>
-
-    <div id="tab-home" class="screen">
+    <div id="tab-home">
         <div class="header">
             <h2 class="logo">Flechazo TV</h2>
-            <i class="fa-regular fa-bell"></i>
+            <i class="fa-regular fa-bell" style="font-size: 20px;"></i>
         </div>
-        <div class="hero-banner">
-            <div class="hero-content">
-                <div class="hero-title">Amor Prohibido</div>
-                <div style="font-size:12px; margin-bottom:10px; color:#ddd;">N° 1 en Tendencias • Drama</div>
-                <button onclick="playMovie(1)" style="background:white; color:black; border:none; padding:10px 20px; border-radius:5px; font-weight:bold;"><i class="fa-solid fa-play"></i> Reproducir</button>
-                <button onclick="toggleMyList(1)" style="background:rgba(255,255,255,0.3); color:white; border:none; padding:10px 20px; border-radius:5px; margin-left:10px; backdrop-filter:blur(5px);"><i class="fa-solid fa-plus"></i> Lista</button>
-            </div>
-        </div>
+
         <div class="section-title">🔥 Tendencias</div>
-        <div class="horizontal-scroll" id="home-list"></div>
+        <div class="horizontal-scroll" id="home-list">
+            <div style="padding:20px; color:#666;">Cargando...</div>
+        </div>
+        
         <div class="section-title">⚔️ Acción y Free Fire</div>
         <div class="horizontal-scroll" id="action-list"></div>
-        <br><br><br>
     </div>
 
-    <div id="tab-explore" class="screen hidden">
-        <div class="header" style="display:block;">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#666; margin-right:10px;"></i>
-                <input type="text" id="search-input" placeholder="Buscar dramas, actores..." style="background:transparent; border:none; color:white; width:100%; font-size:15px;">
-            </div>
-        </div>
-        <div class="categories-scroll">
-            <span class="category-pill active" onclick="filterCat('Todo', this)">Todo</span>
-            <span class="category-pill" onclick="filterCat('Acción', this)">Acción</span>
-            <span class="category-pill" onclick="filterCat('Romance', this)">Romance</span>
-            <span class="category-pill" onclick="filterCat('Free Fire', this)">Free Fire</span>
-        </div>
-        <div class="explore-grid" id="explore-grid"></div>
-        <br><br><br>
-    </div>
-
-    <div id="tab-shorts" class="screen hidden" style="background: black;">
-        <div class="shorts-container" id="shorts-feed"></div>
-    </div>
-
-    <div id="tab-profile" class="screen hidden">
-        <div class="profile-header">
-            <div style="position: relative; display: inline-block;">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar" id="current-avatar">
-                <div style="position:absolute; bottom:0; right:0; background:var(--primary); width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #2a2a40;">
-                    <i class="fa-solid fa-camera" style="font-size:10px;"></i>
-                </div>
-            </div>
-            
-            <h2 id="profile-name" style="margin: 10px 0 5px;">Gamer Pro</h2>
-            <div style="font-size:12px; color:#aaa;">ID: 839201 • Free Fire Lover</div>
-    
-            <div class="profile-actions">
-                <button class="btn-profile" onclick="openEditProfile()">Editar Perfil</button>
-                <button class="btn-profile" onclick="openModal('premium-modal')">💎 Premium</button>
-                <button class="btn-profile btn-logout" onclick="logoutApp()"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
-    
-            <div class="stats-row">
-                <div class="stat-item" onclick="showHistory('list')">
-                    <span class="stat-num" id="count-list">0</span>
-                    <span class="stat-label">Mi Lista</span>
-                </div>
-                <div class="stat-item" onclick="showHistory('history')">
-                    <span class="stat-num" id="count-history">0</span>
-                    <span class="stat-label">Historial</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-num">15</span>
-                    <span class="stat-label">Nivel</span>
-                </div>
-            </div>
-        </div>
-    
-        <div style="padding: 20px;">
-            <h3 id="history-title" style="margin-top:0;">Actividad</h3>
-            <div id="history-container"></div>
-        </div>
-        <br><br><br>
-    </div>
-
-    <div class="modal-overlay" id="detail-modal" onclick="closeModalIfOutside(event, 'detail-modal')">
-        <div class="modal-sheet"><div id="detail-content"></div></div>
-    </div>
-
-    <div class="modal-overlay" id="edit-modal" onclick="closeModalIfOutside(event, 'edit-modal')">
+    <div class="modal-overlay" id="detail-modal" onclick="if(event.target.id==='detail-modal') closeModal()">
         <div class="modal-sheet">
-            <h3>Editar Perfil</h3>
-            <div class="avatar-grid">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-option" onclick="selectAvatar(this)">
-                <img src="https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg" class="avatar-option" onclick="selectAvatar(this)">
-                <img src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png" class="avatar-option" onclick="selectAvatar(this)">
-            </div>
-            <input type="text" id="edit-name-input" class="edit-input" placeholder="Nuevo nombre...">
-            <button onclick="saveProfile()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">Guardar</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="premium-modal" onclick="closeModalIfOutside(event, 'premium-modal')">
-        <div class="modal-sheet">
-            <h2 style="color:var(--gold); text-align:center;">Premium</h2>
-            <p style="text-align:center; color:#ccc; font-size:13px;">S/ 15.00 via Yape</p>
-            <div style="text-align:center; margin:20px 0;"><img src="https://i.ibb.co/PGZndj1h/IMG-0316.jpg" style="width:200px; border-radius:10px;"></div>
-            <button onclick="showToast('Enviando...', 'success'); closeModal('premium-modal')" style="width:100%; background:white; color:black; padding:15px; border:none; border-radius:10px;">ENVIAR</button>
+            <div id="modal-injector"></div>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-item" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+        <div class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-item"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-item"><i class="fa-brands fa-tiktok"></i>Shorts</div>
+        <div class="nav-item"><i class="fa-solid fa-user"></i>Perfil</div>
     </nav>
 
     <script>
-        /* --- 1. DATOS --- */
-        const moviesDB = [
-            { id: 1, title: "Amor Prohibido", desc: "El amor entre dos mundos opuestos.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Romance", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { id: 2, title: "Free Fire: Booyah", desc: "La batalla real comienza ahora.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-            { id: 3, title: "Venganza Mortal", desc: "Nadie escapa de su pasado.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", cat: "Acción", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
-            { id: 4, title: "El Hacker", desc: "Código rojo en la red.", img: "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", cat: "Suspenso", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
-            { id: 5, title: "Romance Real", desc: "Un príncipe busca el amor.", img: "https://image.tmdb.org/t/p/w300/q719jXXEzOoYaps6babgKnONONX.jpg", cat: "Romance", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
-            { id: 6, title: "Heroico", desc: "El camino al gran maestro.", img: "https://image.tmdb.org/t/p/w300/iuFNMS8U5cb6xfzi513hSCzxdn5.jpg", cat: "Free Fire", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" }
-        ];
+        // --- VARIABLES GLOBALES ---
+        let allMovies = []; // Aquí guardaremos lo que venga de la API
 
-        const shortsMockData = [
-            { id: 101, user: "ElTioSpoiler", desc: "¡Jugada maestra! 😱🔥", likes: "10k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" },
-            { id: 102, user: "FlechazoClips", desc: "Final inesperado... 💔", likes: "5k", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-            { id: 103, user: "ProGamer", desc: "Bug encontrado 👀", likes: "340", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
-        ];
-
-        let myList = [];
-        let myHistory = [];
-        let tempAvatar = "";
-        let searchTimeout;
-
-        /* --- 2. INIT & PERSISTENCIA --- */
-        function init() {
-            loadUserData(); // Cargar datos guardados
-            renderHome();
-            renderExplore(moviesDB);
-            loadShorts();
-            showHistory('history');
-            setupSearch();
-        }
-
-        function loadUserData() {
-            const savedList = localStorage.getItem('myList');
-            const savedHist = localStorage.getItem('myHistory');
-            const savedName = localStorage.getItem('userName');
-            const savedAvatar = localStorage.getItem('userAvatar');
-
-            if(savedList) myList = JSON.parse(savedList);
-            if(savedHist) myHistory = JSON.parse(savedHist);
-            if(savedName) document.getElementById('profile-name').innerText = savedName;
-            if(savedAvatar) document.getElementById('current-avatar').src = savedAvatar;
-        }
-
-        function saveData() {
-            localStorage.setItem('myList', JSON.stringify(myList));
-            localStorage.setItem('myHistory', JSON.stringify(myHistory));
-        }
-
-        /* --- 3. LÓGICA DE BÚSQUEDA (API + DEBOUNCE) --- */
-        function setupSearch() {
-            const input = document.getElementById('search-input');
-            const grid = document.getElementById('explore-grid');
-
-            input.addEventListener('input', (e) => {
-                const txt = e.target.value.trim();
-                clearTimeout(searchTimeout);
-
-                if(!txt) { renderExplore(moviesDB); return; }
-
-                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:30px;"></i><p>Buscando...</p></div>`;
-
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        // Intenta llamar a tu API
-                        const controller = new AbortController();
-                        const id = setTimeout(() => controller.abort(), 1000);
-                        const res = await fetch(`https://flechazotv.vercel.app/api/search?q=${txt}`, { signal: controller.signal });
-                        clearTimeout(id);
-                        if(!res.ok) throw new Error();
-                        renderExplore(await res.json());
-                    } catch (e) {
-                        // Fallback local
-                        const local = moviesDB.filter(m => m.title.toLowerCase().includes(txt.toLowerCase()) || m.cat.toLowerCase().includes(txt.toLowerCase()));
-                        renderExplore(local);
-                    }
-                }, 500);
-            });
-        }
-
-        /* --- 4. RENDERIZADORES --- */
-        function renderHome() {
-            const h = document.getElementById('home-list');
-            const a = document.getElementById('action-list');
-            moviesDB.forEach(m => {
-                const card = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-                h.innerHTML += card;
-                if(m.cat === 'Acción' || m.cat === 'Free Fire') a.innerHTML += card;
-            });
-        }
-
-        function renderExplore(data) {
-            const g = document.getElementById('explore-grid');
-            g.innerHTML = '';
-            if(data.length === 0) g.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">Sin resultados</div>';
-            data.forEach(m => g.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`);
-        }
-
-        function filterCat(cat, el) {
-            document.querySelectorAll('.category-pill').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            renderExplore(cat === 'Todo' ? moviesDB : moviesDB.filter(m => m.cat === cat));
-        }
-
-        /* --- 5. SHORTS --- */
-        function loadShorts() {
-            const c = document.getElementById('shorts-feed');
-            c.innerHTML = '';
-            shortsMockData.forEach(s => {
-                c.insertAdjacentHTML('beforeend', `
-                <div class="short-item" onclick="toggleShortPlay(this)">
-                    <video class="short-video" src="${s.videoUrl}" loop playsinline></video>
-                    <div class="play-icon-overlay"><i class="fa-solid fa-play"></i></div>
-                    <div class="short-overlay"></div>
-                    <div class="short-actions">
-                        <div class="action-btn" onclick="toggleLike(this, event)"><div class="action-icon"><i class="fa-solid fa-heart"></i></div><span>${s.likes}</span></div>
-                        <div class="action-btn" onclick="shareShort(event)"><div class="action-icon"><i class="fa-solid fa-share"></i></div><span>Share</span></div>
-                    </div>
-                    <div class="short-info"><div><b>@${s.user}</b></div><div style="font-size:13px;color:#ddd;">${s.desc}</div></div>
-                </div>`);
-            });
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    const i = e.target.querySelector('.play-icon-overlay');
-                    if(e.isIntersecting) { v.currentTime=0; v.play().catch(()=>{}); i.style.display='none'; } else { v.pause(); }
-                });
-            }, { threshold: 0.7 });
-            document.querySelectorAll('.short-item').forEach(i => observer.observe(i));
-        }
-
-        window.toggleShortPlay = (el) => {
-            const v = el.querySelector('video'); const i = el.querySelector('.play-icon-overlay');
-            if(v.paused) { v.play(); i.style.display='none'; } else { v.pause(); i.style.display='block'; }
-        }
-        window.toggleLike = (btn, e) => { e.stopPropagation(); btn.querySelector('.action-icon').classList.toggle('liked'); }
-        window.shareShort = (e) => { e.stopPropagation(); showToast("Enlace copiado"); }
-
-        /* --- 6. PLAYER & DETALLE --- */
-        window.openDetail = (id) => {
-            const m = moviesDB.find(x => x.id === id);
-            document.getElementById('detail-content').innerHTML = `
-                <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
-                <div class="detail-hero" onclick="playMovie(${m.id})"><img src="${m.img}"><div class="play-float"><i class="fa-solid fa-circle-play"></i></div></div>
-                <h2>${m.title}</h2><p style="color:#aaa;font-size:12px;">${m.cat} • 2024</p><p style="color:#ddd;">${m.desc}</p>
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button onclick="playMovie(${m.id})" style="flex:1;background:white;color:black;border:none;padding:12px;border-radius:10px;font-weight:bold;">Ver</button>
-                    <button onclick="toggleMyList(${m.id})" style="flex:1;background:#333;color:white;border:none;padding:12px;border-radius:10px;">Lista</button>
-                </div>`;
-            openModal('detail-modal');
-        }
-
-        window.playMovie = (id) => {
-            const m = moviesDB.find(x => x.id === id);
-            const v = document.getElementById('main-video-player');
-            v.src = m.videoUrl;
-            document.getElementById('video-player-overlay').classList.remove('hidden');
-            v.play().catch(()=>{});
-            
-            if(!myHistory.find(h=>h.id===id)) { myHistory.unshift(m); saveData(); }
-            closeModal('detail-modal');
-            showHistory('history');
-        }
-
-        window.closePlayer = () => {
-            const v = document.getElementById('main-video-player');
-            v.pause(); v.src="";
-            document.getElementById('video-player-overlay').classList.add('hidden');
-        }
-
-        /* --- 7. PERFIL & LOGOUT --- */
-        window.toggleMyList = (id) => {
-            const m = moviesDB.find(x => x.id === id);
-            const idx = myList.findIndex(x => x.id === id);
-            if(idx === -1) { myList.push(m); showToast("Agregado"); } else { myList.splice(idx,1); showToast("Eliminado"); }
-            saveData(); showHistory('list'); closeModal('detail-modal');
-        }
-
-        window.showHistory = (type) => {
-            const c = document.getElementById('history-container');
-            const data = type === 'list' ? myList : myHistory;
-            document.getElementById('history-title').innerText = type === 'list' ? "Mi Lista" : "Actividad";
-            document.getElementById('count-list').innerText = myList.length;
-            document.getElementById('count-history').innerText = myHistory.length;
-            
-            c.innerHTML = data.length ? '' : '<div style="text-align:center;color:#666;padding:20px;">Vacío</div>';
-            data.forEach(m => {
-                c.innerHTML += `<div class="history-item"><div style="flex:1;display:flex;gap:10px;align-items:center;" onclick="openDetail(${m.id})"><img src="${m.img}" class="h-img"><div><b>${m.title}</b><div class="h-meta">${m.cat}</div></div></div><button class="btn-delete" onclick="removeItem(${m.id}, '${type}')"><i class="fa-solid fa-trash"></i></button></div>`;
-            });
-        }
-
-        window.removeItem = (id, type) => {
-            if(type === 'list') myList = myList.filter(x => x.id !== id);
-            else myHistory = myHistory.filter(x => x.id !== id);
-            saveData(); showHistory(type);
-        }
-
-        window.logoutApp = () => {
-            if(confirm("¿Cerrar sesión?")) {
-                showToast("Cerrando...", "error");
-                localStorage.clear();
-                setTimeout(() => location.reload(), 1500);
+        // --- INICIALIZAR ---
+        async function init() {
+            try {
+                // INTENTO CARGAR DE LA API
+                const res = await fetch('http://localhost:3000/api/movies');
+                if(!res.ok) throw new Error("API Offline");
+                allMovies = await res.json();
+            } catch (e) {
+                console.warn("Usando datos de respaldo (API offline)");
+                // DATOS DE RESPALDO (Por si no tienes el servidor prendido)
+                allMovies = [
+                    { id: 1, title: "Amor Prohibido", desc: "El amor entre dos mundos opuestos.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Romance" },
+                    { id: 2, title: "Free Fire: Booyah", desc: "La batalla real comienza ahora.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción" },
+                    { id: 3, title: "Venganza Mortal", desc: "Nadie escapa de su pasado.", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", cat: "Acción" },
+                    { id: 4, title: "El Hacker", desc: "Código rojo en la red.", img: "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", cat: "Suspenso" }
+                ];
             }
+            renderApp();
         }
 
-        window.saveProfile = () => {
-            const name = document.getElementById('edit-name-input').value;
-            if(name) { document.getElementById('profile-name').innerText = name; localStorage.setItem('userName', name); }
-            if(tempAvatar) { document.getElementById('current-avatar').src = tempAvatar; localStorage.setItem('userAvatar', tempAvatar); }
-            closeModal('edit-modal');
-        }
-        
-        /* --- 8. HELPERS --- */
-        window.switchTab = (id, el) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('tab-'+id).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
-        }
-        window.openModal = (id) => document.getElementById(id).classList.add('open');
-        window.closeModal = (id) => document.getElementById(id).classList.remove('open');
-        window.closeModalIfOutside = (e, id) => { if(e.target.id === id) closeModal(id); }
-        window.showToast = (msg, type='info') => {
-            const t = document.getElementById('toast'); t.innerText = msg; t.style.display='block';
-            t.style.borderLeftColor = type==='error'?'red':'var(--primary)';
-            setTimeout(()=>t.style.display='none', 3000);
-        }
-        window.selectAvatar = (img) => {
-            document.querySelectorAll('.avatar-option').forEach(a=>a.classList.remove('selected'));
-            img.classList.add('selected'); tempAvatar = img.src;
-        }
-        window.openEditProfile = () => { document.getElementById('edit-name-input').value = document.getElementById('profile-name').innerText; openModal('edit-modal'); }
+        // --- RENDERIZAR LISTAS ---
+        function renderApp() {
+            const hList = document.getElementById('home-list');
+            const aList = document.getElementById('action-list');
+            hList.innerHTML = ''; aList.innerHTML = '';
 
+            allMovies.forEach(m => {
+                const card = `
+                <div class="poster-card" onclick="openDetail(${m.id})">
+                    <img src="${m.img}">
+                </div>`;
+                
+                hList.innerHTML += card;
+                if(m.cat === 'Acción' || m.cat === 'Free Fire') aList.innerHTML += card;
+            });
+        }
+
+        // --- FUNCIÓN DEL MODAL (LA PARTE QUE SE VEÍA FEA, AHORA ARREGLADA) ---
+        window.openDetail = (id) => {
+            const m = allMovies.find(x => x.id === id);
+            if(!m) return;
+
+            const injector = document.getElementById('modal-injector');
+            
+            // HTML DISEÑADO PARA VERSE BIEN
+            injector.innerHTML = `
+                <div class="detail-hero" onclick="alert('Reproduciendo ${m.title}')">
+                    <img src="${m.img}">
+                    <div class="btn-close-modal" onclick="event.stopPropagation(); closeModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
+                    <div class="btn-play-hero">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                </div>
+
+                <div class="detail-content">
+                    <h2 class="detail-title">${m.title}</h2>
+                    <div class="detail-meta">
+                        <span style="color:#46d369; font-weight:bold;">98% Match</span>
+                        <span>2024</span>
+                        <span class="tag-hd">HD</span>
+                        <span>${m.cat}</span>
+                    </div>
+                    
+                    <p class="detail-desc">${m.desc}</p>
+
+                    <div class="action-row">
+                        <button class="btn-main btn-primary" onclick="alert('Reproduciendo...')">
+                            <i class="fa-solid fa-play"></i> Ver Ahora
+                        </button>
+                        <button class="btn-main btn-secondary">
+                            <i class="fa-solid fa-plus"></i> Mi Lista
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detail-modal').classList.add('open');
+        }
+
+        window.closeModal = () => {
+            document.getElementById('detail-modal').classList.remove('open');
+        }
+
+        // ARRANCAR
         init();
     </script>
 </body>
