@@ -1,0 +1,18 @@
+[
+  { 
+    "id": 1, 
+    "title": "Amor Prohibido", 
+    "desc": "El amor entre dos mundos opuestos.", 
+    "img": "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", 
+    "cat": "Romance",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  },
+  { 
+    "id": 2, 
+    "title": "Free Fire: La Película", 
+    "desc": "Booyah! La batalla real comienza.", 
+    "img": "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", 
+    "cat": "Acción",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+  }
+]
