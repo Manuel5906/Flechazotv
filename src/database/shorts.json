@@ -1,23 +1,16 @@
 [
   {
-    "id": 1,
+    "id": 101,
     "user": "ElTioSpoiler",
-    "desc": "Jugada maestra en Free Fire 😱🔥",
-    "likes": 1200,
+    "desc": "¡Jugada maestra en Free Fire!",
+    "likes": "10.2k",
     "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
   },
   {
-    "id": 2,
+    "id": 102,
     "user": "FlechazoClips",
-    "desc": "El final de este drama... 💔😭",
-    "likes": 5000,
+    "desc": "Drama coreano triste",
+    "likes": "5k",
     "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  },
-  {
-    "id": 3,
-    "user": "GamerPro",
-    "desc": "Bug encontrado en la actualización 👀",
-    "likes": 340,
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
   }
 ]
