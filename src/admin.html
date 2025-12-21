@@ -1,83 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flechazo Admin</title>
+    <title>Panel Admin - Flechazo TV</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; padding: 20px; }
-        h1 { color: #ff4b4b; text-align: center; }
-        .card { background: #222; border: 1px solid #333; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
-        .card img { max-width: 100%; height: auto; border-radius: 5px; border: 1px solid #555; }
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
-        .btn-yes { background: #4CAF50; }
-        .btn-no { background: #f44336; }
-        .empty { text-align: center; color: #777; margin-top: 50px; }
+        body { font-family: sans-serif; background: #121212; color: white; padding: 40px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; background: #333; color: white; border: 1px solid #444; border-radius: 5px; }
+        button { width: 100%; padding: 15px; background: #ff4b4b; border: none; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <h2>🚀 Enviar Notificación Push</h2>
+        <input type="text" id="t" placeholder="Título (ej: ¡Nueva Película!)">
+        <textarea id="m" placeholder="Mensaje para los usuarios..."></textarea>
+        <select id="ty">
+            <option value="info">Informativa</option>
+            <option value="promo">Promoción</option>
+            <option value="alert">Alerta</option>
+        </select>
+        <button onclick="send()">ENVIAR A TODOS</button>
+    </div>
 
-    <h1>👮‍♂️ Panel de Pagos</h1>
-    <div id="request-list">Cargando solicitudes...</div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // MISMA CONFIG QUE TU APP
-        const firebaseConfig = { apiKey: "AIzaSyA29NMaEBVEApTr7qYbYmHuypZPMqA6jCQ", authDomain: "flechazo-tv.firebaseapp.com", projectId: "flechazo-tv", storageBucket: "flechazo-tv.firebasestorage.app", messagingSenderId: "382962164040", appId: "1:382962164040:web:6f24cad4108f824437137d" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // ESCUCHAR SOLICITUDES PENDIENTES
-        const q = query(collection(db, "solicitudes_pago"), where("estado", "==", "pendiente"), orderBy("fecha", "desc"));
-
-        onSnapshot(q, (snapshot) => {
-            const container = document.getElementById('request-list');
-            container.innerHTML = "";
-
-            if(snapshot.empty) {
-                container.innerHTML = "<div class='empty'>No hay pagos pendientes por revisar.</div>";
-                return;
-            }
-
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const card = document.createElement('div');
-                card.className = "card";
-                
-                // Formato de fecha
-                const date = data.fecha ? new Date(data.fecha.seconds * 1000).toLocaleString() : "Reciente";
-
-                card.innerHTML = `
-                    <div style="font-weight:bold; font-size:18px;">${data.email}</div>
-                    <div style="color:#aaa; font-size:12px;">📅 ${date}</div>
-                    <div style="background:#000; padding:5px; text-align:center;">
-                        <a href="${data.foto}" target="_blank">
-                            <img src="${data.foto}" alt="Comprobante">
-                        </a>
-                        <div style="font-size:10px; color:#ccc; margin-top:5px;">Click en imagen para ampliar</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn-yes" id="ap-${docSnap.id}">✅ APROBAR</button>
-                        <button class="btn-no" id="re-${docSnap.id}">❌ RECHAZAR</button>
-                    </div>
-                `;
-                container.appendChild(card);
-
-                // EVENTOS
-                document.getElementById(`ap-${docSnap.id}`).onclick = () => processPayment(docSnap.id, 'aprobado');
-                document.getElementById(`re-${docSnap.id}`).onclick = () => processPayment(docSnap.id, 'rechazado');
+    <script>
+        async function send() {
+            const data = {
+                title: document.getElementById('t').value,
+                msg: document.getElementById('m').value,
+                type: document.getElementById('ty').value
+            };
+            const res = await fetch('http://localhost:3000/api/notifications', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
             });
-        });
-
-        async function processPayment(id, status) {
-            if(!confirm(`¿Estás seguro de marcar esto como ${status.toUpperCase()}?`)) return;
-            try {
-                await updateDoc(doc(db, "solicitudes_pago", id), { estado: status });
-                // No necesitamos alert, el snapshot lo quitará de la lista automáticamente
-            } catch(e) { alert("Error: " + e.message); }
+            if(res.ok) alert("¡Notificación enviada con éxito!");
         }
     </script>
 </body>
