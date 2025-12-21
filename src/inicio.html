@@ -5,81 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Flechazo TV - Premium</title>
+    <title>Flechazo TV - Real Progress</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. VARIABLES & RESET --- */
+        /* --- ESTILOS IGUALES AL PREMIUM --- */
         :root { 
-            --bg: #0f0f1a; --card: #1e1e2d; --primary: #e50914; /* Rojo tipo Netflix */
-            --text-gray: #b3b3b3;
-            --gradient: linear-gradient(180deg, rgba(15,15,26,0) 0%, rgba(15,15,26,1) 100%);
+            --bg: #0f0f1a; --card: #1e1e2d; --primary: #e50914;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #fff; padding-bottom: calc(80px + var(--safe-bottom)); overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: #fff; padding-bottom: calc(80px + var(--safe-bottom)); }
 
-        /* --- 2. HEADER FLOTANTE --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; padding: calc(10px + var(--safe-top)) 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); transition: 0.3s; }
-        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(229,9,20,0.5); }
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; padding: calc(10px + var(--safe-top)) 20px 10px; background: linear-gradient(180deg, rgba(0,0,0,0.9), transparent); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--primary); font-weight: 900; font-size: 22px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(229,9,20,0.6); }
+
+        /* HERO */
+        .hero-banner { height: 65vh; position: relative; display: flex; align-items: flex-end; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: -1; }
+        .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(15,15,26,0.1), var(--bg)); }
+        .hero-content { padding: 20px; z-index: 2; width: 100%; }
+        .hero-title { font-size: 38px; font-weight: 900; line-height: 1; margin-bottom: 10px; text-shadow: 2px 2px 4px #000; }
+        .hero-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .btn-play { background: #fff; color: #000; }
+        .btn-list { background: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(5px); }
+
+        /* LISTAS */
+        .section { margin-top: 30px; }
+        .sec-title { padding: 0 20px 10px; font-size: 16px; font-weight: 700; color: #ddd; }
+        .h-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px; scrollbar-width: none; }
         
-        /* --- 3. HERO BANNER (PORTADA) --- */
-        .hero-banner { height: 70vh; position: relative; display: flex; align-items: flex-end; }
-        .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(15,15,26,0.2), var(--bg)); }
-        .hero-content { padding: 0 20px 40px; width: 100%; z-index: 2; position: relative; }
-        .hero-tags { font-size: 12px; color: #fff; display: flex; gap: 10px; margin-bottom: 10px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        .hero-title { font-size: 40px; line-height: 1; margin-bottom: 10px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .hero-desc { font-size: 14px; color: #ddd; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 2px rgba(0,0,0,0.8); max-width: 90%; }
+        /* CARDS */
+        .card { flex-shrink: 0; width: 110px; position: relative; cursor: pointer; }
+        .card-img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; background: #222; }
         
-        .hero-btns { display: flex; gap: 15px; }
-        .btn-play { flex: 1; background: #fff; color: #000; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-list { flex: 1; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        /* BARRA DE PROGRESO REAL */
+        .cw-card { width: 140px; } /* Más ancha para ver mejor el progreso */
+        .cw-img { height: 90px; }
+        .progress-bg { width: 100%; height: 3px; background: #444; margin-top: 6px; border-radius: 2px; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+        .cw-info { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-top: 4px; }
 
-        /* --- 4. CATEGORÍAS (PILLS) --- */
-        .category-scroll { display: flex; gap: 10px; padding: 10px 20px; overflow-x: auto; scrollbar-width: none; margin-top: -20px; position: relative; z-index: 10; }
-        .cat-pill { padding: 6px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; }
-        .cat-pill.active { background: #fff; color: #000; font-weight: bold; border-color: #fff; }
-
-        /* --- 5. LISTAS HORIZONTALES --- */
-        .section { margin-top: 25px; }
-        .section-header { padding: 0 20px 10px; font-size: 17px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .see-all { font-size: 12px; color: var(--primary); font-weight: 600; }
-        
-        .h-list { display: flex; overflow-x: auto; padding: 0 20px; gap: 12px; scrollbar-width: none; }
-        .card { width: 110px; flex-shrink: 0; position: relative; }
-        .card-img { width: 100%; height: 160px; border-radius: 6px; object-fit: cover; background: #222; }
-        
-        /* Estilo Continuar Viendo */
-        .progress-cont { height: 3px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--primary); width: 45%; }
-        .card-info { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .card-icon { color: #fff; font-size: 14px; }
-
-        /* Estilo Top 10 */
-        .top10-card { display: flex; align-items: flex-end; width: 140px; position: relative; margin-right: 10px; }
-        .big-number { font-size: 90px; font-weight: 900; color: #000; -webkit-text-stroke: 2px #555; position: absolute; left: -15px; bottom: -10px; z-index: -1; font-family: impact, sans-serif; letter-spacing: -5px; }
-        .top10-img { width: 100px; height: 150px; border-radius: 6px; margin-left: auto; object-fit: cover; }
-
-        /* --- 6. NAV BAR --- */
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.95); backdrop-filter: blur(10px); border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 2000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 10px; gap: 4px; }
-        .nav-item i { font-size: 20px; }
-        .nav-item.active { color: #fff; }
-
-        /* --- 7. PLAYER & MODAL (Mismo código optimizado) --- */
+        /* PLAYER */
         .player-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; }
-        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; color: #fff; font-size: 30px; z-index: 5001; cursor: pointer; text-shadow: 0 2px 5px #000; }
-        #dynamic-player { width: 100%; height: 100%; }
-        #dynamic-player iframe { width: 100%; height: 100%; border: none; }
-        #dynamic-player video { width: 100%; height: auto; max-height: 100vh; }
-        
-        /* Modal Info */
-        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 4000; display: none; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-card { width: 100%; background: #1a1a1a; border-radius: 20px 20px 0 0; overflow: hidden; animation: slideUp 0.3s; max-width: 500px; margin: 0 auto; }
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+        .close-player { position: absolute; top: calc(20px + var(--safe-top)); left: 20px; font-size: 28px; color: #fff; z-index: 5001; cursor: pointer; text-shadow: 0 2px 5px #000; }
+        #dynamic-player { width: 100%; height: 100%; display: flex; align-items: center; background: #000; }
+        video { width: 100%; height: auto; max-height: 100vh; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #15151f; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 12px 0 calc(10px + var(--safe-bottom)); z-index: 2000; }
+        .nav-item { color: #666; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item.active { color: #fff; }
+        .nav-item i { font-size: 20px; }
 
         .hidden { display: none !important; }
     </style>
@@ -87,208 +69,239 @@
 <body>
 
     <div id="player-overlay" class="player-overlay">
-        <i class="fa-solid fa-chevron-left close-player" onclick="stopVideo()"></i>
+        <i class="fa-solid fa-chevron-left close-player" onclick="closePlayer()"></i>
         <div id="dynamic-player"></div>
     </div>
 
     <div id="app">
-        
         <header class="header">
             <div class="logo">Flechazo TV</div>
-            <i class="fa-solid fa-chromecast" style="font-size: 22px;"></i>
+            <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
         </header>
 
-        <div id="screen-home">
-            <div id="hero" class="hero-banner">
+        <div id="hero-container"></div>
+
+        <div class="h-scroll" style="margin-top: -20px; position: relative; z-index: 10; padding-bottom: 10px;">
+            <span style="padding: 6px 15px; background: #fff; color: #000; border-radius: 20px; font-size: 12px; font-weight: bold;">Todos</span>
+            <span style="padding: 6px 15px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px;">Dramas</span>
+            <span style="padding: 6px 15px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px;">Acción</span>
+            <span style="padding: 6px 15px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px;">Romance</span>
+        </div>
+
+        <div class="section hidden" id="section-continue">
+            <div class="sec-title">Continuar viendo como Gamer Pro</div>
+            <div class="h-scroll" id="continue-list">
                 </div>
+        </div>
 
-            <div class="category-scroll">
-                <div class="cat-pill active">Todos</div>
-                <div class="cat-pill">Dramas</div>
-                <div class="cat-pill">CEO</div>
-                <div class="cat-pill">Histórico</div>
-                <div class="cat-pill">Venganza</div>
-                <div class="cat-pill">Comedia</div>
-            </div>
+        <div class="section">
+            <div class="sec-title">Tendencias ahora</div>
+            <div class="h-scroll" id="trends-list"></div>
+        </div>
 
-            <div class="section">
-                <div class="section-header">
-                    Continuar Viendo
-                </div>
-                <div class="h-list" id="continue-list">
-                    </div>
-            </div>
+        <div class="section">
+            <div class="sec-title">Zona de Acción</div>
+            <div class="h-scroll" id="action-list"></div>
+        </div>
 
-            <div class="section">
-                <div class="section-header">
-                    Top 10 en Perú hoy
-                </div>
-                <div class="h-list" id="top10-list">
-                    </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header">
-                    <span>Tendencias Semanales</span>
-                    <span class="see-all">Ver todo</span>
-                </div>
-                <div class="h-list" id="trends-list">
-                    </div>
-            </div>
-
-            <div class="section">
-                <div class="section-header">
-                    <span>Zona Gamer & Acción</span>
-                </div>
-                <div class="h-list" id="action-list"></div>
-            </div>
-
-            <br><br> </div>
+        <br><br><br>
 
         <nav class="nav">
             <div class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</div>
-            <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Buscar</div>
-            <div class="nav-item"><i class="fa-solid fa-clapperboard"></i>Shorts</div>
-            <div class="nav-item"><i class="fa-regular fa-user"></i>Mi Perfil</div>
+            <div class="nav-item"><i class="fa-solid fa-compass"></i>Explorar</div>
+            <div class="nav-item"><i class="fa-solid fa-bolt"></i>Shorts</div>
+            <div class="nav-item"><i class="fa-solid fa-user"></i>Perfil</div>
         </nav>
-
     </div>
 
     <script>
-        // --- BASE DE DATOS SIMULADA (La API de vercel se usa aquí) ---
-        let moviesData = [];
-        // Puedes cambiar esto por tu URL de API real
-        const API_URL = 'https://flechazotv.vercel.app/api/movies'; 
-
-        // Datos de respaldo por si falla la API (Para que veas el diseño ya)
-        const backupData = [
-            { id: 1, title: "Amor de Contrato", img: "https://i.pinimg.com/564x/a8/50/26/a850262450375a24209938f323719036.jpg", cat: "Romance", video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", desc: "Un CEO millonario y una chica humilde firman un contrato de matrimonio." },
-            { id: 2, title: "Venganza de Fuego", img: "https://i.pinimg.com/564x/f3/f9/d6/f3f9d651543883a88701918a974b9409.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { id: 3, title: "El Heredero", img: "https://i.pinimg.com/564x/96/8c/dc/968cdc637311140026e643032549d448.jpg", cat: "Drama" },
-            { id: 4, title: "Free Fire League", img: "https://i.pinimg.com/736x/21/fd/8b/21fd8b4618ee31548cc0443317c96350.jpg", cat: "Free Fire" },
-            { id: 5, title: "Secretos de Palacio", img: "https://i.pinimg.com/564x/e7/5d/3c/e75d3c8c760220677891823101897e06.jpg", cat: "Histórico" }
+        // --- BASE DE DATOS LOCAL ---
+        const moviesDB = [
+            { id: 101, title: "Amor Eterno", cat: "Drama", img: "https://i.pinimg.com/564x/a8/50/26/a850262450375a24209938f323719036.jpg", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+            { id: 102, title: "Free Fire: La Final", cat: "Acción", img: "https://i.pinimg.com/736x/21/fd/8b/21fd8b4618ee31548cc0443317c96350.jpg", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { id: 103, title: "Venganza CEO", cat: "Romance", img: "https://i.pinimg.com/564x/96/8c/dc/968cdc637311140026e643032549d448.jpg", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+            { id: 104, title: "Cyber Hacker", cat: "Acción", img: "https://i.pinimg.com/564x/f3/f9/d6/f3f9d651543883a88701918a974b9409.jpg", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" },
+            { id: 105, title: "Drama Real", cat: "Drama", img: "https://i.pinimg.com/564x/e7/5d/3c/e75d3c8c760220677891823101897e06.jpg", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" } // Ejemplo YouTube
         ];
 
-        async function init() {
-            try {
-                // Intentamos cargar API, si falla usamos backup
-                const res = await fetch(API_URL);
-                if(res.ok) {
-                    moviesData = await res.json();
-                } else {
-                    moviesData = backupData;
-                }
-            } catch(e) {
-                moviesData = backupData;
-            }
+        // --- SISTEMA DE GUARDADO (LOCALSTORAGE) ---
+        // Clave donde guardaremos el progreso
+        const STORAGE_KEY = 'flechazo_progress_v1';
 
-            // 1. Configurar Hero Banner (Usamos la primera película como destacada)
-            setupHero(moviesData[0] || backupData[0]);
-
-            // 2. Llenar Listas
-            renderList('trends-list', moviesData);
-            renderList('action-list', moviesData.filter(m => m.cat === 'Acción' || m.cat === 'Free Fire'));
-            renderContinueWatching(moviesData.slice(0,3)); // Simulamos 3 pelis viendo
-            renderTop10(moviesData.slice(0,5)); // Top 5
+        function getProgress() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         }
 
-        // --- RENDERIZADO DE UI ---
+        function saveProgress(id, currentTime, duration) {
+            const data = getProgress();
+            data[id] = {
+                time: currentTime,
+                duration: duration || 0,
+                lastWatched: Date.now()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            // Actualizar la lista en tiempo real si está visible
+            renderContinueWatching(); 
+        }
 
-        function setupHero(movie) {
-            const hero = document.getElementById('hero');
-            // Usamos una imagen de alta calidad si es posible
-            const imgUrl = movie.img; 
-            
-            hero.innerHTML = `
-                <img src="${imgUrl}" class="hero-img">
-                <div class="hero-overlay"></div>
-                <div class="hero-content">
-                    <div class="hero-tags">
-                        <span style="color:#46d369">98% Coincidencia</span>
-                        <span>${movie.cat}</span>
-                        <span>2025</span>
-                    </div>
-                    <h1 class="hero-title">${movie.title}</h1>
-                    <p class="hero-desc">${movie.desc || "La serie más esperada del año llega a Flechazo TV. Drama, pasión y secretos revelados."}</p>
-                    <div class="hero-btns">
-                        <button class="btn-play" onclick="playVideo('${movie.video || movie.videoUrl || ''}')">
-                            <i class="fa-solid fa-play"></i> Reproducir
-                        </button>
-                        <button class="btn-list">
-                            <i class="fa-solid fa-plus"></i> Mi Lista
-                        </button>
+        // --- INICIALIZAR APP ---
+        function initApp() {
+            // 1. Render Hero (Aleatorio)
+            const heroMovie = moviesDB[Math.floor(Math.random() * moviesDB.length)];
+            document.getElementById('hero-container').innerHTML = `
+                <div class="hero-banner">
+                    <img src="${heroMovie.img}" class="hero-img">
+                    <div class="hero-gradient"></div>
+                    <div class="hero-content">
+                        <div class="hero-title">${heroMovie.title}</div>
+                        <p style="color:#ddd; font-size:14px; margin-bottom:15px;">La serie número #1 en tendencias hoy.</p>
+                        <div class="hero-btns">
+                            <button class="btn btn-play" onclick="openPlayer(${heroMovie.id})"><i class="fa-solid fa-play"></i> Reproducir</button>
+                            <button class="btn btn-list"><i class="fa-solid fa-plus"></i> Mi Lista</button>
+                        </div>
                     </div>
                 </div>
             `;
+
+            // 2. Render Listas Normales
+            renderList('trends-list', moviesDB);
+            renderList('action-list', moviesDB.filter(m => m.cat === 'Acción'));
+
+            // 3. Render Continuar Viendo (La parte importante)
+            renderContinueWatching();
         }
 
-        function renderList(elementId, data) {
-            const container = document.getElementById(elementId);
-            container.innerHTML = data.map(m => `
-                <div class="card" onclick="playVideo('${m.video || m.videoUrl || ''}')">
+        function renderList(containerId, list) {
+            document.getElementById(containerId).innerHTML = list.map(m => `
+                <div class="card" onclick="openPlayer(${m.id})">
                     <img src="${m.img}" class="card-img">
                 </div>
             `).join('');
         }
 
-        function renderContinueWatching(data) {
+        // --- LÓGICA DE CONTINUAR VIENDO ---
+        function renderContinueWatching() {
+            const progressData = getProgress();
             const container = document.getElementById('continue-list');
-            container.innerHTML = data.map(m => `
-                <div class="card" onclick="playVideo('${m.video || ''}')">
-                    <img src="${m.img}" class="card-img" style="height:100px;"> <div class="progress-cont">
-                        <div class="progress-bar" style="width: ${Math.floor(Math.random() * 80) + 10}%"></div>
-                    </div>
-                    <div class="card-info">
-                        <i class="fa-solid fa-circle-info" style="color:#aaa;"></i>
-                        <i class="fa-solid fa-ellipsis-vertical" style="color:#aaa;"></i>
-                    </div>
-                </div>
-            `).join('');
+            const section = document.getElementById('section-continue');
+            
+            // Obtener IDs guardados y ordenar por "visto recientemente"
+            const watchedIDs = Object.keys(progressData).sort((a,b) => progressData[b].lastWatched - progressData[a].lastWatched);
+
+            if (watchedIDs.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            container.innerHTML = '';
+
+            watchedIDs.forEach(id => {
+                const movie = moviesDB.find(m => m.id == id);
+                if (movie) {
+                    const prog = progressData[id];
+                    // Calcular porcentaje
+                    let pct = 0;
+                    if(prog.duration > 0) pct = (prog.time / prog.duration) * 100;
+                    if(pct > 95) pct = 100; // Si casi termina, mostrar lleno
+
+                    // Convertir segundos a min:seg para mostrar (Opcional)
+                    const timeLeft = Math.floor((prog.duration - prog.time) / 60);
+
+                    container.innerHTML += `
+                        <div class="card cw-card" onclick="openPlayer(${movie.id})">
+                            <img src="${movie.img}" class="card-img cw-img">
+                            <div class="progress-bg">
+                                <div class="progress-fill" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="cw-info">
+                                <span><i class="fa-solid fa-play" style="font-size:8px"></i> Continuar</span>
+                                <span>${timeLeft > 0 ? timeLeft + ' min rest' : 'Ver'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
         }
 
-        function renderTop10(data) {
-            const container = document.getElementById('top10-list');
-            container.innerHTML = data.map((m, index) => `
-                <div class="top10-card" onclick="playVideo('${m.video || ''}')">
-                    <span class="big-number">${index + 1}</span>
-                    <img src="${m.img}" class="top10-img">
-                </div>
-            `).join('');
-        }
+        // --- REPRODUCTOR INTELIGENTE CON MEMORIA ---
+        let currentVideoElement = null;
+        let saveInterval = null;
 
-        // --- LÓGICA DEL REPRODUCTOR (ADAPTATIVA) ---
-        // Esta es la misma lógica avanzada que te di antes
+        function openPlayer(id) {
+            const movie = moviesDB.find(m => m.id === id);
+            if(!movie) return;
 
-        function getEmbedHTML(url) {
-            if (!url) return '<h2 style="color:white;text-align:center;">Video no disponible</h2>';
-
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                let videoId = url.includes('youtu.be') ? url.split('/').pop() : new URLSearchParams(new URL(url).search).get('v');
-                return `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            }
-            if (url.includes('vimeo.com')) {
-                const videoId = url.split('/').pop();
-                return `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-            }
-            if (url.match(/\.(mp4|webm|ogg|mkv)$/i)) {
-                return `<video controls playsinline autoplay style="width:100%; height:auto;"><source src="${url}" type="video/mp4"></video>`;
-            }
-            return `<iframe src="${url}" allowfullscreen allow="autoplay"></iframe>`;
-        }
-
-        window.playVideo = url => {
             const container = document.getElementById('dynamic-player');
-            container.innerHTML = getEmbedHTML(url);
-            document.getElementById('player-overlay').style.display = 'flex';
-        };
+            const overlay = document.getElementById('player-overlay');
+            const savedData = getProgress()[id];
+            
+            // Limpiar anterior
+            container.innerHTML = '';
+            
+            // Lógica según tipo de video
+            if (movie.url.match(/\.(mp4|webm|ogg)$/i)) {
+                // VIDEO NATIVO (Soporta guardar segundo exacto)
+                const video = document.createElement('video');
+                video.src = movie.url;
+                video.controls = true;
+                video.playsInline = true;
+                video.autoplay = true;
+                
+                // RESTAURAR TIEMPO si existe
+                if(savedData && savedData.time) {
+                    video.currentTime = savedData.time;
+                }
 
-        window.stopVideo = () => {
-            document.getElementById('dynamic-player').innerHTML = '';
-            document.getElementById('player-overlay').style.display = 'none';
-        };
+                // EVENTO: Guardar cada vez que el tiempo avanza
+                video.addEventListener('timeupdate', () => {
+                    // Guardamos cada vez que cambia el tiempo (frecuente)
+                    // Para no saturar, podríamos usar un intervalo, pero localStorage es rápido.
+                    if(video.currentTime > 1) { // Solo guardar si pasó 1 seg
+                        saveProgress(id, video.currentTime, video.duration);
+                    }
+                });
 
-        // Iniciar
-        init();
+                container.appendChild(video);
+                currentVideoElement = video;
+
+            } else {
+                // YOUTUBE / OTROS (No podemos detectar el segundo exacto por seguridad del navegador con Iframes externos)
+                // Pero sí podemos marcarlo como "Visto recientemente"
+                saveProgress(id, 10, 100); // Guardamos un progreso ficticio (10%) para que salga en la lista
+                
+                let embedUrl = movie.url;
+                if(movie.url.includes('youtu')) {
+                    // Convertir a embed si es necesario
+                    const vId = movie.url.includes('v=') ? movie.url.split('v=')[1] : movie.url.split('/').pop();
+                    embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1`;
+                }
+                
+                container.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            }
+
+            overlay.style.display = 'flex';
+        }
+
+        function closePlayer() {
+            const overlay = document.getElementById('player-overlay');
+            const container = document.getElementById('dynamic-player');
+            
+            // Detener video si es nativo
+            if(currentVideoElement) {
+                currentVideoElement.pause();
+                currentVideoElement = null;
+            }
+            
+            container.innerHTML = ''; // Destruir iframe/video
+            overlay.style.display = 'none';
+            
+            // Recargar la lista para ver el progreso actualizado
+            renderContinueWatching();
+        }
+
+        // Arrancar
+        initApp();
 
     </script>
 </body>
