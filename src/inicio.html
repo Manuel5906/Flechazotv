@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
-    <title>Flechazo TV - Super App</title>
+    <title>Flechazo TV - Ultimate</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. RESET Y VARIABLES --- */
+        /* --- 1. CONFIGURACIÓN BASE --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         :root { 
             --bg-dark: #0f0f1a; 
@@ -26,7 +26,7 @@
             user-select: none; overflow-x: hidden; 
         }
 
-        /* --- 2. COMPONENTES GLOBALES --- */
+        /* --- 2. UTILIDADES VISUALES --- */
         .hidden { display: none !important; }
         .logo { font-size: 22px; margin: 0; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: -0.5px; }
         
@@ -38,15 +38,14 @@
             border-left: 3px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             animation: slideInTop 0.4s; backdrop-filter: blur(5px);
         }
-        @keyframes slideInTop { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
-        /* Header */
+        /* --- 3. COMPONENTES DE PANTALLAS --- */
         .header { 
             padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; 
             z-index: 50; backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; 
         }
 
-        /* --- 3. PANTALLA: HOME --- */
+        /* Home */
         .hero-banner {
             width: 100%; height: 50vh; position: relative; overflow: hidden;
             background-image: url('https://image.tmdb.org/t/p/original/jXJxMcVoEuXzym3vFnjqDW4ifo6.jpg');
@@ -63,55 +62,44 @@
         .poster-card:active { transform: scale(0.95); }
         .poster-card img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- 4. PANTALLA: EXPLORAR (Buscador) --- */
+        /* Explorar (Search) */
         .search-box {
             background:#252535; width:100%; padding:12px; border-radius:12px; 
             display:flex; align-items:center; border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
         }
+        .search-box:focus-within { border-color: var(--primary); background: #2a2a3d; }
+        
         .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; position: relative; }
+        .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; position: relative; animation: fadeIn 0.4s; }
         .explore-item img { width: 100%; height: 100%; object-fit: cover; }
+        
         .category-pill { display: inline-block; padding: 8px 15px; background: #252535; border-radius: 20px; margin-right: 8px; font-size: 12px; color: #ccc; transition: 0.3s; }
         .category-pill.active { background: var(--primary); color: white; }
         .categories-scroll { overflow-x: auto; white-space: nowrap; padding: 10px 20px; }
 
-        /* --- 5. PANTALLA: SHORTS (TikTok Style) --- */
+        /* Shorts */
         .shorts-container {
-            width: 100vw; height: 100vh; 
-            scroll-snap-type: y mandatory; 
-            overflow-y: scroll; 
-            background: black;
-            position: fixed; top: 0; left: 0; z-index: 200;
-            padding-bottom: 70px;
+            width: 100vw; height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; 
+            background: black; position: fixed; top: 0; left: 0; z-index: 200; padding-bottom: 70px;
         }
         .short-item {
-            width: 100%; height: 100%;
-            scroll-snap-align: start;
-            position: relative;
-            background: #111;
-            display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 100%; scroll-snap-align: start; position: relative;
+            background: #111; display: flex; justify-content: center; align-items: center;
         }
         .short-video { width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        
         .short-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
             background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
             pointer-events: none; z-index: 2;
         }
-        /* Icono Play Fantasma (No bloquea clicks) */
         .play-icon-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 80px; color: rgba(255,255,255,0.6); display: none; 
             pointer-events: none; z-index: 5; animation: pulse 0.5s;
         }
-        .short-info {
-            position: absolute; bottom: 90px; left: 15px; width: 75%;
-            pointer-events: none; z-index: 10; text-shadow: 1px 1px 3px black;
-        }
-        .short-actions {
-            position: absolute; bottom: 100px; right: 10px;
-            display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20;
-        }
+        .short-info { position: absolute; bottom: 90px; left: 15px; width: 75%; pointer-events: none; z-index: 10; text-shadow: 1px 1px 3px black; }
+        .short-actions { position: absolute; bottom: 100px; right: 10px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
         .action-btn { text-align: center; cursor: pointer; pointer-events: auto; }
         .action-icon { 
             width: 45px; height: 45px; background: rgba(255,255,255,0.2); 
@@ -120,7 +108,7 @@
         }
         .liked { color: #ff4b4b !important; animation: pop 0.3s; }
 
-        /* --- 6. PANTALLA: PERFIL --- */
+        /* Perfil */
         .profile-header { background: linear-gradient(to bottom, #2a2a40, var(--bg-dark)); padding: 40px 20px 20px; text-align: center; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
         .stats-row { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
@@ -128,13 +116,14 @@
         .stat-num { font-size: 18px; font-weight: bold; display: block; }
         .stat-label { font-size: 11px; color: var(--text-sec); }
         
-        .profile-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .btn-edit {
+        .profile-actions { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-profile {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px;
+            color: white; padding: 8px 20px; border-radius: 20px; font-size: 12px; cursor: pointer;
         }
+        .btn-logout { background: rgba(255, 75, 75, 0.15); border-color: var(--primary); color: #ff4b4b; }
 
-        /* Lista Historial */
+        /* Listas Perfil */
         .history-item { 
             display: flex; align-items: center; gap: 15px; margin-bottom: 15px; 
             background: #1a1a24; padding: 10px; border-radius: 12px; 
@@ -145,9 +134,9 @@
         .h-info { flex: 1; }
         .h-title { font-weight: bold; font-size: 14px; margin-bottom: 4px; color: white; }
         .h-meta { font-size: 11px; color: #888; }
-        .btn-delete { padding: 10px; color: #ff4b4b; background: transparent; border: none; font-size: 16px; }
+        .btn-delete { padding: 10px; color: #ff4b4b; background: transparent; border: none; font-size: 16px; cursor: pointer; }
 
-        /* --- 7. MODALES --- */
+        /* --- 4. MODALES --- */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); z-index: 500; display: none; 
@@ -167,40 +156,36 @@
         .avatar-option { width: 50px; height: 50px; border-radius: 50%; border: 2px solid transparent; opacity: 0.6; }
         .avatar-option.selected { border-color: var(--primary); opacity: 1; }
 
-        .detail-hero { width: 100%; height: 200px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; position: relative; }
-        .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .play-float { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,0.9); filter: drop-shadow(0 0 10px black); }
-
-        /* --- 8. REPRODUCTOR DE VIDEO FULLSCREEN (Overlay) --- */
+        /* Reproductor Fullscreen */
         .player-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 2500; /* Encima de todo */
-            display: flex; justify-content: center; align-items: center;
+            background: black; z-index: 2500; display: flex; justify-content: center; align-items: center;
         }
         #main-video-player { width: 100%; height: auto; max-height: 100vh; }
         .close-player-btn {
             position: absolute; top: 20px; right: 20px;
             background: rgba(0, 0, 0, 0.5); color: white;
             border: none; width: 40px; height: 40px; border-radius: 50%;
-            font-size: 20px; cursor: pointer; z-index: 2501;
-            backdrop-filter: blur(5px);
+            font-size: 20px; cursor: pointer; z-index: 2501; backdrop-filter: blur(5px);
         }
 
-        /* --- 9. NAV --- */
+        /* --- 5. NAV INFERIOR --- */
         .bottom-nav { 
             position: fixed; bottom: 0; width: 100%; background: #0f0f1a; 
             display: flex; justify-content: space-around; padding: 10px 0 25px 0; 
             z-index: 300; border-top: 1px solid rgba(255,255,255,0.1); 
         }
-        .nav-item { text-align: center; color: #666; font-size: 10px; transition: 0.2s; flex: 1; }
+        .nav-item { text-align: center; color: #666; font-size: 10px; transition: 0.2s; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
 
-        /* Animaciones */
+        /* Animations */
         @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
         @keyframes pulse { 0%{opacity:0; transform: translate(-50%, -50%) scale(0.5);} 100%{opacity:1; transform: translate(-50%, -50%) scale(1);} }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .fa-spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
@@ -229,7 +214,6 @@
         </div>
         <div class="section-title">🔥 Tendencias</div>
         <div class="horizontal-scroll" id="home-list"></div>
-        
         <div class="section-title">⚔️ Acción y Free Fire</div>
         <div class="horizontal-scroll" id="action-list"></div>
         <br><br><br>
@@ -239,7 +223,7 @@
         <div class="header" style="display:block;">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass" style="color:#666; margin-right:10px;"></i>
-                <input type="text" id="search-input" placeholder="Buscar películas, anime, clips..." style="background:transparent; border:none; color:white; width:100%; font-size:15px;">
+                <input type="text" id="search-input" placeholder="Buscar dramas, actores..." style="background:transparent; border:none; color:white; width:100%; font-size:15px;">
             </div>
         </div>
         <div class="categories-scroll">
@@ -247,15 +231,13 @@
             <span class="category-pill" onclick="filterCat('Acción', this)">Acción</span>
             <span class="category-pill" onclick="filterCat('Romance', this)">Romance</span>
             <span class="category-pill" onclick="filterCat('Free Fire', this)">Free Fire</span>
-            <span class="category-pill" onclick="filterCat('Suspenso', this)">Suspenso</span>
         </div>
         <div class="explore-grid" id="explore-grid"></div>
         <br><br><br>
     </div>
 
     <div id="tab-shorts" class="screen hidden" style="background: black;">
-        <div class="shorts-container" id="shorts-feed">
-            </div>
+        <div class="shorts-container" id="shorts-feed"></div>
     </div>
 
     <div id="tab-profile" class="screen hidden">
@@ -271,8 +253,9 @@
             <div style="font-size:12px; color:#aaa;">ID: 839201 • Free Fire Lover</div>
     
             <div class="profile-actions">
-                <button class="btn-edit" onclick="openEditProfile()">Editar Perfil</button>
-                <button class="btn-edit" onclick="openModal('premium-modal')">💎 Premium</button>
+                <button class="btn-profile" onclick="openEditProfile()">Editar Perfil</button>
+                <button class="btn-profile" onclick="openModal('premium-modal')">💎 Premium</button>
+                <button class="btn-profile btn-logout" onclick="logoutApp()"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
     
             <div class="stats-row">
@@ -299,34 +282,28 @@
     </div>
 
     <div class="modal-overlay" id="detail-modal" onclick="closeModalIfOutside(event, 'detail-modal')">
-        <div class="modal-sheet">
-            <div id="detail-content"></div>
-        </div>
+        <div class="modal-sheet"><div id="detail-content"></div></div>
     </div>
 
     <div class="modal-overlay" id="edit-modal" onclick="closeModalIfOutside(event, 'edit-modal')">
         <div class="modal-sheet">
             <h3>Editar Perfil</h3>
-            <label style="font-size:12px; color:#aaa;">Elige un Avatar</label>
             <div class="avatar-grid">
                 <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-option" onclick="selectAvatar(this)">
                 <img src="https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg" class="avatar-option" onclick="selectAvatar(this)">
                 <img src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png" class="avatar-option" onclick="selectAvatar(this)">
             </div>
-            <label style="font-size:12px; color:#aaa;">Nombre de usuario</label>
             <input type="text" id="edit-name-input" class="edit-input" placeholder="Nuevo nombre...">
-            <button onclick="saveProfile()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">Guardar Cambios</button>
+            <button onclick="saveProfile()" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">Guardar</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="premium-modal" onclick="closeModalIfOutside(event, 'premium-modal')">
         <div class="modal-sheet">
-            <h2 style="color:var(--gold); text-align:center;">Plan Premium</h2>
-            <p style="text-align:center; color:#ccc; font-size:13px;">Paga S/ 15.00 por Yape/Plin</p>
-            <div style="text-align:center; margin:20px 0;">
-                <img src="https://i.ibb.co/PGZndj1h/IMG-0316.jpg" style="width:200px; border-radius:10px;">
-            </div>
-            <button onclick="showToast('Enviando solicitud...', 'success'); closeModal('premium-modal')" style="width:100%; background:white; color:black; padding:15px; border:none; border-radius:10px; font-weight:bold;">ENVIAR COMPROBANTE</button>
+            <h2 style="color:var(--gold); text-align:center;">Premium</h2>
+            <p style="text-align:center; color:#ccc; font-size:13px;">S/ 15.00 via Yape</p>
+            <div style="text-align:center; margin:20px 0;"><img src="https://i.ibb.co/PGZndj1h/IMG-0316.jpg" style="width:200px; border-radius:10px;"></div>
+            <button onclick="showToast('Enviando...', 'success'); closeModal('premium-modal')" style="width:100%; background:white; color:black; padding:15px; border:none; border-radius:10px;">ENVIAR</button>
         </div>
     </div>
 
@@ -338,10 +315,7 @@
     </nav>
 
     <script>
-        /* --- 1. BASE DE DATOS MOCK (Simulando API) --- */
-        // Aquí están los datos que vendrían de tu backend.
-        // He puesto enlaces de video reales para que funcione el reproductor.
-        
+        /* --- 1. DATOS --- */
         const moviesDB = [
             { id: 1, title: "Amor Prohibido", desc: "El amor entre dos mundos opuestos.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Romance", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
             { id: 2, title: "Free Fire: Booyah", desc: "La batalla real comienza ahora.", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", cat: "Acción", videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
@@ -360,248 +334,221 @@
         let myList = [];
         let myHistory = [];
         let tempAvatar = "";
+        let searchTimeout;
 
-        /* --- 2. INICIALIZACIÓN --- */
+        /* --- 2. INIT & PERSISTENCIA --- */
         function init() {
+            loadUserData(); // Cargar datos guardados
             renderHome();
-            renderExplore(moviesDB); // Cargar todo al inicio
+            renderExplore(moviesDB);
             loadShorts();
-            showHistory('history'); // Cargar perfil
-            
-            // Evento Buscador en Tiempo Real
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const filtered = moviesDB.filter(m => 
-                    m.title.toLowerCase().includes(val) || 
-                    m.cat.toLowerCase().includes(val)
-                );
-                renderExplore(filtered);
+            showHistory('history');
+            setupSearch();
+        }
+
+        function loadUserData() {
+            const savedList = localStorage.getItem('myList');
+            const savedHist = localStorage.getItem('myHistory');
+            const savedName = localStorage.getItem('userName');
+            const savedAvatar = localStorage.getItem('userAvatar');
+
+            if(savedList) myList = JSON.parse(savedList);
+            if(savedHist) myHistory = JSON.parse(savedHist);
+            if(savedName) document.getElementById('profile-name').innerText = savedName;
+            if(savedAvatar) document.getElementById('current-avatar').src = savedAvatar;
+        }
+
+        function saveData() {
+            localStorage.setItem('myList', JSON.stringify(myList));
+            localStorage.setItem('myHistory', JSON.stringify(myHistory));
+        }
+
+        /* --- 3. LÓGICA DE BÚSQUEDA (API + DEBOUNCE) --- */
+        function setupSearch() {
+            const input = document.getElementById('search-input');
+            const grid = document.getElementById('explore-grid');
+
+            input.addEventListener('input', (e) => {
+                const txt = e.target.value.trim();
+                clearTimeout(searchTimeout);
+
+                if(!txt) { renderExplore(moviesDB); return; }
+
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:30px;"></i><p>Buscando...</p></div>`;
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        // Intenta llamar a tu API
+                        const controller = new AbortController();
+                        const id = setTimeout(() => controller.abort(), 1000);
+                        const res = await fetch(`https://flechazotv.vercel.app/api/search?q=${txt}`, { signal: controller.signal });
+                        clearTimeout(id);
+                        if(!res.ok) throw new Error();
+                        renderExplore(await res.json());
+                    } catch (e) {
+                        // Fallback local
+                        const local = moviesDB.filter(m => m.title.toLowerCase().includes(txt.toLowerCase()) || m.cat.toLowerCase().includes(txt.toLowerCase()));
+                        renderExplore(local);
+                    }
+                }, 500);
             });
         }
 
+        /* --- 4. RENDERIZADORES --- */
         function renderHome() {
-            const homeList = document.getElementById('home-list');
-            const actionList = document.getElementById('action-list');
-            
+            const h = document.getElementById('home-list');
+            const a = document.getElementById('action-list');
             moviesDB.forEach(m => {
                 const card = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-                homeList.innerHTML += card;
-                if(m.cat === 'Acción' || m.cat === 'Free Fire') actionList.innerHTML += card;
+                h.innerHTML += card;
+                if(m.cat === 'Acción' || m.cat === 'Free Fire') a.innerHTML += card;
             });
         }
 
         function renderExplore(data) {
-            const grid = document.getElementById('explore-grid');
-            grid.innerHTML = '';
-            if(data.length === 0) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#666; padding:20px;">No se encontraron resultados 🔍</div>';
-            
-            data.forEach(m => {
-                grid.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-            });
+            const g = document.getElementById('explore-grid');
+            g.innerHTML = '';
+            if(data.length === 0) g.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">Sin resultados</div>';
+            data.forEach(m => g.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`);
         }
 
         function filterCat(cat, el) {
             document.querySelectorAll('.category-pill').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            
-            if(cat === 'Todo') renderExplore(moviesDB);
-            else {
-                const filtered = moviesDB.filter(m => m.cat === cat);
-                renderExplore(filtered);
-            }
+            renderExplore(cat === 'Todo' ? moviesDB : moviesDB.filter(m => m.cat === cat));
         }
 
-        /* --- 3. LÓGICA DE SHORTS --- */
+        /* --- 5. SHORTS --- */
         function loadShorts() {
-            const container = document.getElementById('shorts-feed');
-            // Simulamos carga de API
-            container.innerHTML = '';
-            shortsMockData.forEach(short => {
-                const html = `
+            const c = document.getElementById('shorts-feed');
+            c.innerHTML = '';
+            shortsMockData.forEach(s => {
+                c.insertAdjacentHTML('beforeend', `
                 <div class="short-item" onclick="toggleShortPlay(this)">
-                    <video class="short-video" src="${short.videoUrl}" loop playsinline></video>
+                    <video class="short-video" src="${s.videoUrl}" loop playsinline></video>
                     <div class="play-icon-overlay"><i class="fa-solid fa-play"></i></div>
                     <div class="short-overlay"></div>
                     <div class="short-actions">
-                        <div class="action-btn" onclick="toggleLike(this, event)">
-                            <div class="action-icon"><i class="fa-solid fa-heart"></i></div>
-                            <span class="action-label">${short.likes}</span>
-                        </div>
-                        <div class="action-btn" onclick="shareShort(event)">
-                            <div class="action-icon"><i class="fa-solid fa-share"></i></div>
-                            <span class="action-label">Share</span>
-                        </div>
+                        <div class="action-btn" onclick="toggleLike(this, event)"><div class="action-icon"><i class="fa-solid fa-heart"></i></div><span>${s.likes}</span></div>
+                        <div class="action-btn" onclick="shareShort(event)"><div class="action-icon"><i class="fa-solid fa-share"></i></div><span>Share</span></div>
                     </div>
-                    <div class="short-info">
-                        <div style="font-weight:bold; margin-bottom:5px;"><i class="fa-solid fa-gamepad" style="color:#FFD700"></i> @${short.user}</div>
-                        <div style="font-size:13px; color:#ddd;">${short.desc}</div>
-                    </div>
-                </div>`;
-                container.insertAdjacentHTML('beforeend', html);
+                    <div class="short-info"><div><b>@${s.user}</b></div><div style="font-size:13px;color:#ddd;">${s.desc}</div></div>
+                </div>`);
             });
-            setupShortsObserver();
-        }
-
-        window.toggleShortPlay = (container) => {
-            const video = container.querySelector('video');
-            const icon = container.querySelector('.play-icon-overlay');
-            if(video.paused) { video.play(); icon.style.display='none'; }
-            else { video.pause(); icon.style.display='block'; }
-        }
-
-        window.toggleLike = (btn, event) => {
-            event.stopPropagation();
-            btn.querySelector('.action-icon').classList.toggle('liked');
-        }
-        window.shareShort = (event) => {
-            event.stopPropagation();
-            showToast("Enlace copiado");
-        }
-
-        function setupShortsObserver() {
+            
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    const icon = entry.target.querySelector('.play-icon-overlay');
-                    if(entry.isIntersecting) { 
-                        video.currentTime = 0; video.play().catch(e=>{}); icon.style.display='none';
-                    } else { video.pause(); }
+                entries.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    const i = e.target.querySelector('.play-icon-overlay');
+                    if(e.isIntersecting) { v.currentTime=0; v.play().catch(()=>{}); i.style.display='none'; } else { v.pause(); }
                 });
             }, { threshold: 0.7 });
-            document.querySelectorAll('.short-item').forEach(item => observer.observe(item));
+            document.querySelectorAll('.short-item').forEach(i => observer.observe(i));
         }
 
-        /* --- 4. LÓGICA DE REPRODUCTOR & DETALLE --- */
+        window.toggleShortPlay = (el) => {
+            const v = el.querySelector('video'); const i = el.querySelector('.play-icon-overlay');
+            if(v.paused) { v.play(); i.style.display='none'; } else { v.pause(); i.style.display='block'; }
+        }
+        window.toggleLike = (btn, e) => { e.stopPropagation(); btn.querySelector('.action-icon').classList.toggle('liked'); }
+        window.shareShort = (e) => { e.stopPropagation(); showToast("Enlace copiado"); }
+
+        /* --- 6. PLAYER & DETALLE --- */
         window.openDetail = (id) => {
             const m = moviesDB.find(x => x.id === id);
-            const content = `
+            document.getElementById('detail-content').innerHTML = `
                 <div style="width:40px; height:5px; background:#444; border-radius:10px; margin:0 auto 20px;"></div>
-                <div class="detail-hero" onclick="playMovie(${m.id})">
-                    <img src="${m.img}">
-                    <div class="play-float"><i class="fa-solid fa-circle-play"></i></div>
-                </div>
-                <h2 style="margin:0 0 5px 0;">${m.title}</h2>
-                <div style="font-size:12px; color:#aaa; margin-bottom:10px;">${m.cat} • 2024 • HD</div>
-                <p style="font-size:14px; color:#ddd; line-height:1.5;">${m.desc}</p>
+                <div class="detail-hero" onclick="playMovie(${m.id})"><img src="${m.img}"><div class="play-float"><i class="fa-solid fa-circle-play"></i></div></div>
+                <h2>${m.title}</h2><p style="color:#aaa;font-size:12px;">${m.cat} • 2024</p><p style="color:#ddd;">${m.desc}</p>
                 <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button onclick="playMovie(${m.id})" style="flex:1; background:white; color:black; border:none; padding:12px; border-radius:10px; font-weight:bold;">Ver Ahora</button>
-                    <button onclick="toggleMyList(${m.id})" style="flex:1; background:#333; color:white; border:none; padding:12px; border-radius:10px;"><i class="fa-solid fa-plus"></i> Lista</button>
+                    <button onclick="playMovie(${m.id})" style="flex:1;background:white;color:black;border:none;padding:12px;border-radius:10px;font-weight:bold;">Ver</button>
+                    <button onclick="toggleMyList(${m.id})" style="flex:1;background:#333;color:white;border:none;padding:12px;border-radius:10px;">Lista</button>
                 </div>`;
-            document.getElementById('detail-content').innerHTML = content;
             openModal('detail-modal');
         }
 
-        // FUNCIÓN CLAVE: Abre el video Fullscreen
         window.playMovie = (id) => {
-            const movie = moviesDB.find(m => m.id === id);
-            const overlay = document.getElementById('video-player-overlay');
-            const videoTag = document.getElementById('main-video-player');
-
-            // Configurar video
-            videoTag.src = movie.videoUrl;
-            overlay.classList.remove('hidden');
-            videoTag.play().catch(e=>{});
-
-            // Guardar en historial
-            if(!myHistory.find(h => h.id === id)) myHistory.unshift(movie);
+            const m = moviesDB.find(x => x.id === id);
+            const v = document.getElementById('main-video-player');
+            v.src = m.videoUrl;
+            document.getElementById('video-player-overlay').classList.remove('hidden');
+            v.play().catch(()=>{});
             
+            if(!myHistory.find(h=>h.id===id)) { myHistory.unshift(m); saveData(); }
             closeModal('detail-modal');
-            showToast(`Reproduciendo: ${movie.title}`);
             showHistory('history');
         }
 
         window.closePlayer = () => {
-            const overlay = document.getElementById('video-player-overlay');
-            const videoTag = document.getElementById('main-video-player');
-            videoTag.pause();
-            videoTag.src = "";
-            overlay.classList.add('hidden');
+            const v = document.getElementById('main-video-player');
+            v.pause(); v.src="";
+            document.getElementById('video-player-overlay').classList.add('hidden');
         }
 
+        /* --- 7. PERFIL & LOGOUT --- */
         window.toggleMyList = (id) => {
-            const movie = moviesDB.find(m => m.id === id);
-            const idx = myList.findIndex(m => m.id === id);
-            if(idx === -1) { myList.push(movie); showToast("Agregado a Mi Lista"); }
-            else { myList.splice(idx, 1); showToast("Eliminado de la lista"); }
-            closeModal('detail-modal');
-            showHistory('list');
+            const m = moviesDB.find(x => x.id === id);
+            const idx = myList.findIndex(x => x.id === id);
+            if(idx === -1) { myList.push(m); showToast("Agregado"); } else { myList.splice(idx,1); showToast("Eliminado"); }
+            saveData(); showHistory('list'); closeModal('detail-modal');
         }
 
-        /* --- 5. LÓGICA DE PERFIL --- */
         window.showHistory = (type) => {
-            const container = document.getElementById('history-container');
-            const title = document.getElementById('history-title');
+            const c = document.getElementById('history-container');
             const data = type === 'list' ? myList : myHistory;
-            
-            title.innerText = type === 'list' ? "Mi Lista Guardada" : "Actividad Reciente";
+            document.getElementById('history-title').innerText = type === 'list' ? "Mi Lista" : "Actividad";
             document.getElementById('count-list').innerText = myList.length;
             document.getElementById('count-history').innerText = myHistory.length;
-
-            if(data.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#666; padding:30px;">Sin actividad reciente <i class="fa-solid fa-ghost"></i></div>`;
-                return;
-            }
-
-            let html = '';
+            
+            c.innerHTML = data.length ? '' : '<div style="text-align:center;color:#666;padding:20px;">Vacío</div>';
             data.forEach(m => {
-                html += `
-                <div class="history-item">
-                    <div style="display:flex; gap:15px; flex:1; align-items:center;" onclick="openDetail(${m.id})">
-                        <img src="${m.img}" class="h-img">
-                        <div class="h-info"><div class="h-title">${m.title}</div><div class="h-meta">${m.cat}</div></div>
-                    </div>
-                    <button class="btn-delete" onclick="removeFromList(${m.id}, '${type}')"><i class="fa-solid fa-trash"></i></button>
-                </div>`;
+                c.innerHTML += `<div class="history-item"><div style="flex:1;display:flex;gap:10px;align-items:center;" onclick="openDetail(${m.id})"><img src="${m.img}" class="h-img"><div><b>${m.title}</b><div class="h-meta">${m.cat}</div></div></div><button class="btn-delete" onclick="removeItem(${m.id}, '${type}')"><i class="fa-solid fa-trash"></i></button></div>`;
             });
-            container.innerHTML = html;
         }
 
-        window.removeFromList = (id, type) => {
-            if(type === 'list') { const idx = myList.findIndex(m=>m.id===id); if(idx>-1) myList.splice(idx,1); }
-            else { const idx = myHistory.findIndex(m=>m.id===id); if(idx>-1) myHistory.splice(idx,1); }
-            showToast("Eliminado", "error");
-            showHistory(type);
+        window.removeItem = (id, type) => {
+            if(type === 'list') myList = myList.filter(x => x.id !== id);
+            else myHistory = myHistory.filter(x => x.id !== id);
+            saveData(); showHistory(type);
         }
 
-        window.openEditProfile = () => {
-            document.getElementById('edit-name-input').value = document.getElementById('profile-name').innerText;
-            openModal('edit-modal');
+        window.logoutApp = () => {
+            if(confirm("¿Cerrar sesión?")) {
+                showToast("Cerrando...", "error");
+                localStorage.clear();
+                setTimeout(() => location.reload(), 1500);
+            }
         }
-        window.selectAvatar = (img) => {
-            document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
-            img.classList.add('selected');
-            tempAvatar = img.src;
-        }
+
         window.saveProfile = () => {
-            const newName = document.getElementById('edit-name-input').value;
-            if(newName) document.getElementById('profile-name').innerText = newName;
-            if(tempAvatar) document.getElementById('current-avatar').src = tempAvatar;
+            const name = document.getElementById('edit-name-input').value;
+            if(name) { document.getElementById('profile-name').innerText = name; localStorage.setItem('userName', name); }
+            if(tempAvatar) { document.getElementById('current-avatar').src = tempAvatar; localStorage.setItem('userAvatar', tempAvatar); }
             closeModal('edit-modal');
-            showToast("Perfil actualizado");
         }
-
-        /* --- 6. UTILIDADES --- */
+        
+        /* --- 8. HELPERS --- */
         window.switchTab = (id, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('tab-'+id).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            
-            // Pausar shorts si sales de la pestaña
             if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
         }
-
         window.openModal = (id) => document.getElementById(id).classList.add('open');
         window.closeModal = (id) => document.getElementById(id).classList.remove('open');
         window.closeModalIfOutside = (e, id) => { if(e.target.id === id) closeModal(id); }
         window.showToast = (msg, type='info') => {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
+            const t = document.getElementById('toast'); t.innerText = msg; t.style.display='block';
             t.style.borderLeftColor = type==='error'?'red':'var(--primary)';
-            setTimeout(() => t.style.display = 'none', 3000);
+            setTimeout(()=>t.style.display='none', 3000);
         }
+        window.selectAvatar = (img) => {
+            document.querySelectorAll('.avatar-option').forEach(a=>a.classList.remove('selected'));
+            img.classList.add('selected'); tempAvatar = img.src;
+        }
+        window.openEditProfile = () => { document.getElementById('edit-name-input').value = document.getElementById('profile-name').innerText; openModal('edit-modal'); }
 
-        // START APP
         init();
     </script>
 </body>
