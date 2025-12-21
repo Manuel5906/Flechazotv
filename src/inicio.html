@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0f0f1a">
 
-    <title>Flechazo TV - Pro Edition</title>
+    <title>Flechazo TV - Home Pro</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
@@ -19,7 +19,6 @@
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Temas */
         .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
         .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
 
@@ -29,27 +28,26 @@
             margin: 0; font-family: -apple-system, system-ui, sans-serif; 
             background: var(--bg); color: var(--text); 
             padding-bottom: calc(90px + var(--safe-bottom));
-            transition: 0.4s; overflow-x: hidden;
+            transition: background 0.4s; overflow-x: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER (Solo Inicio) --- */
         .header { 
             padding: calc(15px + var(--safe-top)) 25px 15px; 
-            background: rgba(15,15,26,0.9); position: sticky; top: 0; 
+            background: rgba(15,15,26,0.95); position: sticky; top: 0; 
             z-index: 1000; display: flex; justify-content: space-between; 
             align-items: center; backdrop-filter: blur(15px);
         }
         .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* --- CONTENIDO --- */
-        .container { max-width: 1200px; margin: 0 auto; } /* Centrado para PC */
         .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
         .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; gap: 15px; scrollbar-width: none; }
         .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
-        .poster:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .poster:active { transform: scale(0.95); }
 
         /* --- EXPLORAR (SEARCH) --- */
-        .search-container { padding: 15px 25px; }
+        .search-area { padding: calc(20px + var(--safe-top)) 25px 15px; position: sticky; top: 0; background: var(--bg); z-index: 100; }
         .search-bar { 
             background: var(--card); padding: 15px; border-radius: 15px; 
             display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1);
@@ -57,248 +55,188 @@
         .search-bar input { background: transparent; border: none; color: white; width: 100%; font-size: 16px; }
 
         /* --- PERFIL ELITE --- */
-        .profile-header { padding: 40px 25px; text-align: center; background: linear-gradient(to bottom, rgba(162, 75, 250, 0.1), transparent); }
-        .avatar-main { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); padding: 5px; position: relative; margin: 0 auto; }
+        .profile-hero { padding: calc(40px + var(--safe-top)) 25px 30px; text-align: center; }
+        .avatar-main { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--primary); padding: 5px; position: relative; margin: 0 auto; }
         .avatar-main img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .edit-icon { position: absolute; bottom: 5px; right: 5px; background: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--bg); }
         
-        .xp-bar { width: 250px; height: 8px; background: #333; margin: 15px auto; border-radius: 10px; overflow: hidden; }
-        .xp-fill { height: 100%; width: 65%; background: var(--gradient); transition: 1s; }
+        .xp-bar { width: 220px; height: 6px; background: #333; margin: 15px auto; border-radius: 10px; overflow: hidden; }
+        .xp-fill { height: 100%; width: 75%; background: var(--gradient); transition: 1.5s; }
 
-        .vip-card { 
-            margin: 20px 25px; padding: 20px; border-radius: 20px; 
+        .vip-banner { 
+            margin: 0 25px 20px; padding: 18px; border-radius: 20px; 
             background: linear-gradient(135deg, #1e1e2d, #000); 
             border: 1px solid rgba(255,215,0,0.3); display: flex; justify-content: space-between; align-items: center;
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 25px; }
-        .stat-box { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-box i { color: var(--primary); margin-bottom: 8px; font-size: 20px; }
-
-        /* --- AMIGOS REALES --- */
-        .friend-list { display: flex; gap: 15px; overflow-x: auto; padding: 10px 25px; scrollbar-width: none; }
-        .friend-card { min-width: 70px; text-align: center; position: relative; }
-        .friend-card img { width: 60px; height: 60px; border-radius: 18px; border: 2px solid #00ff88; padding: 2px; }
-        .status-online { position: absolute; top: 5px; right: 8px; width: 12px; height: 12px; background: #00ff88; border-radius: 50%; border: 2px solid var(--bg); }
-
-        /* --- BOTONES Y MENÚ --- */
-        .menu-list { padding: 20px 25px; }
-        .menu-item { 
-            background: var(--card); padding: 18px; border-radius: 18px; margin-bottom: 12px; 
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-        }
-        .menu-item i { width: 20px; text-align: center; color: var(--primary); margin-right: 15px; }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 25px; }
+        .stat-item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-item i { color: var(--primary); margin-bottom: 8px; font-size: 18px; }
 
         /* --- NAV INFERIOR --- */
         .nav { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.95); 
-            display: flex; justify-content: space-around; padding: 10px 0 calc(15px + var(--safe-bottom)); 
-            z-index: 2000; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(15px);
+            position: fixed; bottom: 0; width: 100%; background: rgba(15,15,26,0.98); 
+            display: flex; justify-content: space-around; padding: 10px 0 calc(12px + var(--safe-bottom)); 
+            z-index: 2000; border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px);
         }
-        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; text-decoration: none; cursor: pointer; transition: 0.3s; }
-        .nav-btn.active { color: var(--primary); transform: translateY(-3px); }
-        .nav-btn i { font-size: 22px; display: block; margin-bottom: 5px; }
+        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; transition: 0.3s; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
 
-        /* --- MODAL AVATARES --- */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            z-index: 3000; display: none; align-items: flex-end; 
-        }
-        .modal.active { display: flex; }
-        .modal-sheet { 
-            width: 100%; background: var(--card); border-radius: 30px 30px 0 0; 
-            padding: 30px 25px 50px; animation: slideUp 0.4s ease; 
-        }
-        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .avatar-opt { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; cursor: pointer; }
-        .avatar-opt.active { border-color: var(--primary); }
+        /* REPRODUCTOR */
+        #player-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; align-items: center; }
 
         .hidden { display: none !important; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="player" style="display:none; position:fixed; inset:0; background:#000; z-index:9999; display:none; align-items:center;">
-        <i class="fa-solid fa-arrow-left" onclick="stopVideo()" style="position:absolute; top:40px; left:25px; font-size:24px; z-index:10001;"></i>
+    <div id="player-overlay">
+        <i class="fa-solid fa-xmark" onclick="stopVideo()" style="position:absolute; top:40px; right:25px; font-size:30px; z-index:10001; color:white;"></i>
         <video id="main-video" controls style="width:100%;"></video>
     </div>
 
-    <div id="app">
+    <div id="screen-home" class="screen">
         <header class="header">
             <h2 class="logo">Flechazo TV</h2>
             <div style="position:relative;">
                 <i class="fa-regular fa-bell" style="font-size:24px;"></i>
-                <span style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%;"></span>
+                <span style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; border:2px solid var(--bg);"></span>
             </div>
         </header>
 
-        <div id="screen-home" class="screen container">
-            <div class="section-title">🔥 Tendencias</div>
-            <div class="horizontal-scroll" id="trends-list"></div>
-            
-            <div class="section-title">✨ Recomendados</div>
-            <div class="horizontal-scroll" id="rec-list"></div>
-        </div>
-
-        <div id="screen-explore" class="screen hidden container">
-            <div class="search-container">
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
-                    <input type="text" id="search-inp" placeholder="¿Qué quieres ver hoy?">
-                </div>
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; padding:0 25px;" id="explore-grid"></div>
-        </div>
-
-        <div id="screen-profile" class="screen hidden container">
-            <div class="profile-header">
-                <div class="avatar-main" onclick="toggleModal('modal-avatars', true)">
-                    <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
-                    <div class="edit-icon"><i class="fa-solid fa-camera" style="font-size:14px;"></i></div>
-                </div>
-                <h2 id="user-name" style="margin:15px 0 5px;">Gamer Elite</h2>
-                <div class="xp-bar"><div class="xp-fill"></div></div>
-                <p style="color:var(--text-sec); font-size:12px;">Nivel 15 • Gamer Pro</p>
-            </div>
-
-            <div class="vip-card">
-                <div>
-                    <b style="color:var(--gold); font-size:17px;"><i class="fa-solid fa-crown"></i> MIEMBRO VIP</b>
-                    <p style="margin:5px 0 0; font-size:11px; color:#aaa;">Expira: 20 Dic, 2025</p>
-                </div>
-                <i class="fa-solid fa-chevron-right" style="opacity:0.3;"></i>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-box"><i class="fa-solid fa-clock"></i><b>128h</b><span>Visto</span></div>
-                <div class="stat-box"><i class="fa-solid fa-fire"></i><b>12</b><span>Racha</span></div>
-                <div class="stat-box"><i class="fa-solid fa-trophy"></i><b>45</b><span>Logros</span></div>
-            </div>
-
-            <div class="section-title"><i class="fa-solid fa-users" style="margin-right:10px;"></i>Amigos Online</div>
-            <div class="friend-list">
-                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=1"><span>Sky_K</span><div class="status-online"></div></div>
-                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=2"><span>Drama</span><div class="status-online"></div></div>
-                <div class="friend-card"><img src="https://i.pravatar.cc/100?u=4"><span>FF_Pro</span><div class="status-online"></div></div>
-            </div>
-
-            <div class="menu-list">
-                <div class="menu-item"><div><i class="fa-solid fa-shield-halved"></i><b>Seguridad</b></div><i class="fa-solid fa-chevron-right"></i></div>
-                <div class="menu-item"><div><i class="fa-solid fa-palette"></i><b>Temas</b></div>
-                    <div style="display:flex; gap:8px;">
-                        <div onclick="setTheme('default')" style="width:20px; height:20px; background:#0f0f1a; border-radius:50%; border:1px solid #fff;"></div>
-                        <div onclick="setTheme('fire')" style="width:20px; height:20px; background:#ff3300; border-radius:50%; border:1px solid #fff;"></div>
-                    </div>
-                </div>
-                <div class="menu-item" onclick="location.reload()" style="background:rgba(255,75,75,0.05); border:1px solid rgba(255,75,75,0.2);">
-                    <div><i class="fa-solid fa-power-off" style="color:var(--primary);"></i><b style="color:var(--primary);">Cerrar Sesión</b></div>
-                </div>
-            </div>
-        </div>
-
-        <nav class="nav">
-            <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-            <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-            <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-solid fa-bolt"></i>Shorts</div>
-            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
-        </nav>
+        <div class="section-title">🔥 Tendencias Semanales</div>
+        <div class="horizontal-scroll" id="trends-list"></div>
+        
+        <div class="section-title">✨ Recomendados para ti</div>
+        <div class="horizontal-scroll" id="rec-list"></div>
     </div>
 
-    <div id="modal-avatars" class="modal" onclick="if(event.target.id==='modal-avatars') toggleModal('modal-avatars', false)">
-        <div class="modal-sheet">
-            <h3 style="margin-top:0; text-align:center;">Elige tu Personaje</h3>
-            <div class="avatar-grid">
-                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-opt active" onclick="changeAvatar(this)">
-                <img src="https://wallpapers.com/images/hd/free-fire-criminal-bundle-4k-778-x-1024-h7d7i2d2y2d2.jpg" class="avatar-opt" onclick="changeAvatar(this)">
-                <img src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png" class="avatar-opt" onclick="changeAvatar(this)">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-m7_2oW0h529z5SAnI_U6m5B7u_iO6zL_A&usqp=CAU" class="avatar-opt" onclick="changeAvatar(this)">
+    <div id="screen-explore" class="screen hidden">
+        <div class="search-area">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
+                <input type="text" id="search-inp" placeholder="Buscar películas o dramas...">
             </div>
-            <button onclick="toggleModal('modal-avatars', false)" style="width:100%; padding:15px; margin-top:25px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:bold;">CONFIRMAR</button>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
+    </div>
+
+    <div id="screen-profile" class="screen hidden">
+        <div class="profile-hero">
+            <div class="avatar-main">
+                <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
+                <div style="position:absolute; bottom:0; right:0; background:var(--primary); width:30px; height:30px; border-radius:50%; border:3px solid var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px;">
+                    <i class="fa-solid fa-pencil"></i>
+                </div>
+            </div>
+            <h2 style="margin:15px 0 5px;">Usuario Flechazo</h2>
+            <div class="xp-bar"><div class="xp-fill"></div></div>
+            <p style="color:var(--text-sec); font-size:12px;">Nivel 15 • 850 / 1000 XP</p>
+        </div>
+
+        <div class="vip-banner">
+            <div>
+                <b style="color:var(--gold); font-size:16px;"><i class="fa-solid fa-crown"></i> SUSCRIPCIÓN VIP</b>
+                <p style="margin:4px 0 0; font-size:11px; color:#aaa;">Tu plan vence en 30 días</p>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="opacity:0.3;"></i>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item"><i class="fa-solid fa-video"></i><br><b>42</b><br><span>Vistos</span></div>
+            <div class="stat-item"><i class="fa-solid fa-fire"></i><br><b>7</b><br><span>Racha</span></div>
+            <div class="stat-item"><i class="fa-solid fa-star"></i><br><b>120</b><br><span>Puntos</span></div>
+        </div>
+
+        <div style="padding: 25px;">
+            <div onclick="setTheme('default')" style="background:var(--card); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                <span>Tema Oscuro Original</span><i class="fa-solid fa-moon"></i>
+            </div>
+            <div onclick="setTheme('fire')" style="background:var(--card); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                <span>Tema Fuego Carmesí</span><i class="fa-solid fa-fire" style="color:#ff3300;"></i>
+            </div>
+            <div onclick="location.reload()" style="background:rgba(255,75,75,0.1); padding:15px; border-radius:15px; color:var(--primary); text-align:center; font-weight:bold; margin-top:20px;">
+                CERRAR SESIÓN
+            </div>
         </div>
     </div>
+
+    <nav class="nav">
+        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+    </nav>
 
     <script>
         let moviesData = [];
 
-        // 1. CARGA DE APIS
+        // 1. CARGA DESDE TU API
         async function loadContent() {
             try {
-                // Simulación de fetch a tu API local
+                // Simulación de fetch a tu servidor
                 // const res = await fetch('/api/movies');
                 // moviesData = await res.json();
 
+                // Datos locales por si la API falla
                 moviesData = [
                     { id: 1, title: "Amor Prohibido", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
                     { id: 2, title: "Booyah Master", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-                    { id: 3, title: "Venganza Coreana", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
+                    { id: 3, title: "Venganza Coreana", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+                    { id: 4, title: "El Hacker", img: "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }
                 ];
                 
-                renderUI();
-            } catch (e) { console.error("Error cargando API"); }
+                renderLists(moviesData);
+            } catch (e) { console.log("Error API"); }
         }
 
         // 2. RENDERIZADO
-        function renderUI() {
+        function renderLists(data) {
             const trends = document.getElementById('trends-list');
             const grid = document.getElementById('explore-grid');
             
-            const html = moviesData.map(m => `<img class="poster" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
+            const html = data.map(m => `<img class="poster" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
             trends.innerHTML = html;
             grid.innerHTML = html;
             document.getElementById('rec-list').innerHTML = [...html].reverse().join('');
         }
 
-        // 3. NAVEGACIÓN
+        // 3. NAVEGACIÓN (HEADER SOLO EN HOME)
         window.switchTab = (tab, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('screen-'+tab).classList.remove('hidden');
+            
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
         }
 
-        // 4. PLAYER
+        // 4. REPRODUCTOR
         window.playVideo = (url) => {
-            const p = document.getElementById('player');
+            const p = document.getElementById('player-overlay');
             const v = document.getElementById('main-video');
             v.src = url;
             p.style.display = 'flex';
             v.play();
         }
         window.stopVideo = () => {
-            const p = document.getElementById('player');
+            const p = document.getElementById('player-overlay');
             const v = document.getElementById('main-video');
             v.pause();
             p.style.display = 'none';
         }
 
-        // 5. PERFIL
-        window.toggleModal = (id, show) => {
-            document.getElementById(id).classList.toggle('active', show);
-        }
-        window.changeAvatar = (el) => {
-            document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('user-img').src = el.src;
-            localStorage.setItem('userAvatar', el.src);
-        }
+        // 5. TEMAS Y BÚSQUEDA
         window.setTheme = (t) => {
             document.body.className = t === 'default' ? '' : 'theme-' + t;
         }
 
-        // INIT
-        window.onload = () => {
-            loadContent();
-            if(localStorage.getItem('userAvatar')) document.getElementById('user-img').src = localStorage.getItem('userAvatar');
-        }
-
-        // Búsqueda real
         document.getElementById('search-inp').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             const filtered = moviesData.filter(m => m.title.toLowerCase().includes(val));
             const grid = document.getElementById('explore-grid');
             grid.innerHTML = filtered.map(m => `<img class="poster" style="width:100%;" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
         });
+
+        window.onload = loadContent;
     </script>
 </body>
 </html>
