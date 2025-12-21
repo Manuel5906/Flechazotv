@@ -1,18 +1,8 @@
 [
-  { 
-    "id": 1, 
-    "title": "Amor Prohibido", 
-    "desc": "El amor entre dos mundos opuestos.", 
-    "img": "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", 
-    "cat": "Romance",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-  },
-  { 
-    "id": 2, 
-    "title": "Free Fire: La Película", 
-    "desc": "Booyah! La batalla real comienza.", 
-    "img": "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", 
-    "cat": "Acción",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  }
+  { "id": 1, "title": "Amor Prohibido", "desc": "El amor entre dos mundos opuestos que desafía todas las reglas de la sociedad.", "img": "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", "cat": "Romance", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+  { "id": 2, "title": "Free Fire: Booyah", "desc": "La batalla real comienza ahora. 50 sobrevivientes, un solo ganador.", "img": "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", "cat": "Acción", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+  { "id": 3, "title": "Venganza Mortal", "desc": "Nadie escapa de su pasado cuando la traición toca a la puerta.", "img": "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", "cat": "Acción", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+  { "id": 4, "title": "El Hacker", "desc": "Código rojo en la red. Un virus amenaza la seguridad global.", "img": "https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg", "cat": "Suspenso", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+  { "id": 5, "title": "Romance Real", "desc": "Un príncipe busca el amor verdadero fuera de los muros del palacio.", "img": "https://image.tmdb.org/t/p/w300/q719jXXEzOoYaps6babgKnONONX.jpg", "cat": "Romance", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
+  { "id": 6, "title": "Heroico", "desc": "El camino al gran maestro está lleno de obstáculos y enemigos.", "img": "https://image.tmdb.org/t/p/w300/iuFNMS8U5cb6xfzi513hSCzxdn5.jpg", "cat": "Free Fire", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" }
 ]
