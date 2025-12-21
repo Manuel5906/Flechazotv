@@ -4,250 +4,253 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" id="status-bar-color" content="#0f0f1a">
-    <title>Flechazo TV - Home Premium</title>
+    <title>Flechazo TV - Ultimate Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- 1. TEMAS Y VARIABLES --- */
+        /* --- 1. CONFIGURACIÓN Y TEMAS --- */
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
             --accent: #a24bfa; --text: #fff; --text-sec: #aaa;
             --gradient: linear-gradient(45deg, #ff4b4b, #a24bfa);
         }
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(45deg, #ff3300, #ff9900); }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(45deg, #00ff88, #00ccff); }
-        .theme-purple { --bg: #10051a; --card: #1e0d2d; --primary: #bf00ff; --gradient: linear-gradient(45deg, #bf00ff, #ff0077); }
+        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
+        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; transition: background 0.4s; overflow-x: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; transition: 0.4s; overflow-x: hidden; }
+
+        /* --- 2. SKELETON LOADING (Efecto de carga) --- */
+        .skeleton { background: #252535; position: relative; overflow: hidden; border-radius: 8px; }
+        .skeleton::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* --- 3. UI COMPONENTS --- */
+        .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        .logo { font-size: 22px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* --- 2. COMPONENTES UI --- */
-        .header { padding: 15px 20px; background: rgba(15,15,26,0.95); position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
-        .logo { font-size: 22px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-title { padding: 20px 20px 10px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; }
+        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; gap: 12px; scrollbar-width: none; }
         
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
-        .notif-panel { position: fixed; top: 70px; right: 20px; width: 300px; max-height: 400px; background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-y: auto; }
-        .notif-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* Películas */
+        .poster { min-width: 115px; height: 170px; border-radius: 10px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
+        .poster:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-        .search-box { background:#252535; padding:12px; border-radius:12px; display:flex; align-items:center; margin: 10px 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .explore-item { aspect-ratio: 2/3; background: #222; border-radius: 8px; overflow: hidden; animation: fadeIn 0.4s; }
-        .explore-item img { width: 100%; height: 100%; object-fit: cover; }
+        /* --- 4. REPRODUCTOR TIPO NETFLIX --- */
+        #player-fs { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; flex-direction: column; justify-content: center; }
+        #player-fs video { width: 100%; max-height: 80vh; }
+        .controls-fs { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 30px; font-size: 25px; color: #fff; }
 
-        .poster-card { min-width: 110px; width: 110px; height: 160px; border-radius: 8px; overflow: hidden; background: #222; margin-right: 12px; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
-        .section-title { padding: 20px 20px 10px; font-weight: 700; font-size: 17px; }
+        /* --- 5. EXPLORAR --- */
+        .search-bar { background: var(--card); margin: 15px 20px; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .search-bar input { background: transparent; border: none; color: #fff; width: 100%; }
+        .filter-tags { display: flex; gap: 10px; padding: 0 20px 15px; overflow-x: auto; scrollbar-width: none; }
+        .tag { padding: 6px 15px; background: var(--card); border-radius: 20px; font-size: 12px; white-space: nowrap; border: 1px solid transparent; }
+        .tag.active { background: var(--primary); border-color: var(--primary); }
 
-        /* --- 3. MODAL DETALLE PREMIUM --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
-        .modal-overlay.open { display: flex; }
-        .modal-sheet { background: var(--card); width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; animation: slideUp 0.3s ease; overflow: hidden; }
-        .detail-hero { width: 100%; height: 240px; position: relative; }
-        .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-play-hero { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; box-shadow: 0 0 20px rgba(255,75,75,0.5); cursor: pointer; }
+        /* --- 6. SHORTS --- */
+        .short-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; background: #000; position: fixed; inset: 0; z-index: 200; padding-bottom: 70px; }
+        .short-v { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; }
+        .short-v video { width: 100%; height: 100%; object-fit: cover; }
+        .short-info { position: absolute; bottom: 100px; left: 15px; text-shadow: 0 2px 5px #000; }
 
-        /* --- 4. REPRODUCTOR --- */
-        .player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; display: flex; justify-content: center; align-items: center; }
-        .close-player { position: absolute; top: 25px; right: 25px; color: white; font-size: 30px; z-index: 5001; }
-
-        /* --- 5. PERFIL --- */
-        .avatar-box { position: relative; width: 100px; height: 100px; margin: 20px auto; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
-        .theme-dot { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
-
-        /* --- 6. NAV --- */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 12px 0 25px 0; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
-        .nav-item { text-align: center; color: #666; font-size: 10px; flex: 1; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        /* --- 7. NAV --- */
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 12px 0 25px; z-index: 300; border-top: 1px solid rgba(255,255,255,0.05); }
+        .nav-btn { color: #666; font-size: 10px; text-align: center; flex: 1; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
 
         .hidden { display: none !important; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="notif-panel" class="notif-panel">
-        <div style="padding: 15px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">Centro de Avisos</div>
-        <div id="notif-content"><p style="padding: 20px; text-align: center; color: #666;">No hay mensajes nuevos</p></div>
+    <div id="notif-box" style="position:fixed; top:70px; right:20px; width:280px; background:var(--card); border-radius:15px; z-index:1000; display:none; border:1px solid var(--primary); box-shadow: 0 10px 30px #000;">
+        <div style="padding:15px; font-weight:bold; border-bottom:1px solid #333;">Avisos Recientes</div>
+        <div id="notif-list" style="max-height:300px; overflow-y:auto;"></div>
     </div>
 
-    <div id="video-player-overlay" class="player-overlay hidden">
-        <i class="fa-solid fa-xmark close-player" onclick="closePlayer()"></i>
-        <video id="main-video-player" controls playsinline style="width: 100%;"></video>
+    <div id="player-fs">
+        <i class="fa-solid fa-arrow-left" onclick="stopPlayer()" style="position:absolute; top:30px; left:25px; font-size:24px;"></i>
+        <video id="vid-main" controls playsinline></video>
+        <div class="controls-fs">
+            <i class="fa-solid fa-backward-step" onclick="skip(-10)"></i>
+            <i class="fa-solid fa-forward-step" onclick="skip(10)"></i>
+        </div>
     </div>
 
-    <div id="app-content">
-        <div id="tab-home" class="screen">
-            <div class="header">
-                <h2 class="logo">Flechazo TV</h2>
-                <div style="position: relative;" onclick="toggleNotifs()">
-                    <i class="fa-regular fa-bell" style="font-size: 22px;"></i>
-                    <div id="bell-dot" class="notif-badge hidden">!</div>
-                </div>
+    <div id="main-content">
+        <div class="header">
+            <h2 class="logo">Flechazo TV</h2>
+            <div style="position:relative;" onclick="toggleNotifs()">
+                <i class="fa-regular fa-bell" style="font-size:22px;"></i>
+                <span id="notif-dot" style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; display:none;"></span>
             </div>
+        </div>
+
+        <div id="screen-home">
             <div class="section-title">🔥 Tendencias</div>
-            <div class="horizontal-scroll" id="home-list"></div>
-            <div class="section-title">⚔️ Acción y Free Fire</div>
-            <div class="horizontal-scroll" id="action-list"></div>
-        </div>
-
-        <div id="tab-explore" class="screen hidden">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#666; margin-right:10px;"></i>
-                <input type="text" id="search-input" placeholder="Buscar en Flechazo TV..." style="background:transparent; border:none; color:white; width:100%;">
+            <div class="horizontal-scroll" id="list-trends">
+                <div class="skeleton poster"></div><div class="skeleton poster"></div><div class="skeleton poster"></div>
             </div>
-            <div class="explore-grid" id="explore-grid"></div>
+            <div class="section-title">✨ Recomendados</div>
+            <div class="horizontal-scroll" id="list-rec"></div>
         </div>
 
-        <div id="tab-shorts" class="screen hidden" style="background: black;">
-            <div id="shorts-feed" style="height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory;"></div>
+        <div id="screen-explore" class="hidden">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inp-search" placeholder="Películas, dramas o clips...">
+            </div>
+            <div class="filter-tags">
+                <div class="tag active" onclick="filterCat('Todo', this)">Todo</div>
+                <div class="tag" onclick="filterCat('Acción', this)">Acción</div>
+                <div class="tag" onclick="filterCat('Romance', this)">Romance</div>
+                <div class="tag" onclick="filterCat('Free Fire', this)">Free Fire</div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
         </div>
 
-        <div id="tab-profile" class="screen hidden">
-            <div style="text-align: center; padding: 40px 20px;">
-                <div class="avatar-box">
-                    <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="avatar-img">
+        <div id="screen-shorts" class="hidden">
+            <div class="short-container" id="shorts-wrapper"></div>
+        </div>
+
+        <div id="screen-profile" class="hidden">
+            <div style="text-align:center; padding:40px 20px;">
+                <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--primary);">
+                <h3>Gamer Pro</h3>
+                <div style="margin:20px 0; display:flex; justify-content:center; gap:15px;">
+                    <div style="text-align:center;"><b id="count-list">0</b><br><small>Mi Lista</small></div>
+                    <div style="text-align:center;"><b>15</b><br><small>Nivel</small></div>
                 </div>
-                <h2 id="profile-name">Cargando...</h2>
-                <div style="display:flex; justify-content:center; gap:15px; margin: 20px 0;">
-                    <div class="theme-dot" style="background:#0f0f1a" onclick="changeTheme('default')"></div>
-                    <div class="theme-dot" style="background:#ff3300" onclick="changeTheme('fire')"></div>
-                    <div class="theme-dot" style="background:#00ff88" onclick="changeTheme('emerald')"></div>
-                    <div class="theme-dot" style="background:#bf00ff" onclick="changeTheme('purple')"></div>
+                <div class="section-title">Temas</div>
+                <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
+                    <div onclick="setTheme('default')" style="width:30px; height:30px; background:#0f0f1a; border-radius:50%; border:2px solid #fff;"></div>
+                    <div onclick="setTheme('fire')" style="width:30px; height:30px; background:#ff3300; border-radius:50%; border:2px solid #fff;"></div>
+                    <div onclick="setTheme('emerald')" style="width:30px; height:30px; background:#00ff88; border-radius:50%; border:2px solid #fff;"></div>
                 </div>
-                <button onclick="location.reload()" style="padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid #444; color:white; border-radius:20px;">Cerrar Sesión</button>
+                <button onclick="location.reload()" style="width:100%; padding:15px; background:var(--card); border:none; color:#ff4b4b; border-radius:12px;">Cerrar Sesión</button>
             </div>
         </div>
-
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-            <div class="nav-item" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-            <div class="nav-item" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
-            <div class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
-        </nav>
     </div>
 
-    <div class="modal-overlay" id="detail-modal" onclick="if(event.target.id==='detail-modal') closeModal()">
-        <div class="modal-sheet" id="modal-injector"></div>
+    <div class="modal-overlay" id="modal-info" onclick="if(event.target.id==='modal-info') this.classList.remove('open')">
+        <div class="modal-sheet" id="modal-data"></div>
     </div>
+
+    <nav class="nav">
+        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+        <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+        <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-brands fa-tiktok"></i>Shorts</div>
+        <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
+    </nav>
 
     <script>
-        let movies = [];
-        let searchTimeout;
+        let dbMovies = [];
+        let myList = JSON.parse(localStorage.getItem('flechazo_lista')) || [];
 
-        // --- 1. APIS Y DATOS ---
-        async function loadData() {
+        // 1. CARGA DE DATOS (Simulando API)
+        async function loadApp() {
             try {
-                const [moviesRes, shortsRes, notifsRes] = await Promise.all([
-                    fetch('http://localhost:3000/api/movies'),
-                    fetch('http://localhost:3000/api/shorts'),
-                    fetch('http://localhost:3000/api/notifications')
-                ]);
-                movies = await moviesRes.json();
-                renderMovies(movies);
-                renderShorts(await shortsRes.json());
-                renderNotifs(await notifsRes.json());
-            } catch (e) {
-                console.warn("API Offline, usando datos locales");
-                movies = [{ id: 1, title: "Amor Prohibido", desc: "Drama romántico.", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", cat: "Acción", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }];
-                renderMovies(movies);
-            }
+                // Aquí llamarías a: fetch('http://localhost:3000/api/movies')
+                dbMovies = [
+                    { id: 1, title: "Amor Prohibido", cat: "Romance", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+                    { id: 2, title: "Booyah Master", cat: "Free Fire", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+                    { id: 3, title: "Venganza Mortal", cat: "Acción", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
+                ];
+                renderHome();
+                renderExplore(dbMovies);
+                loadShorts();
+                checkNotifs();
+                updateProfile();
+            } catch (e) { console.error("Error API"); }
         }
 
-        // --- 2. RENDERIZADO ---
-        function renderMovies(data) {
-            const hList = document.getElementById('home-list');
-            const aList = document.getElementById('action-list');
-            const eGrid = document.getElementById('explore-grid');
-            hList.innerHTML = ''; aList.innerHTML = ''; eGrid.innerHTML = '';
-
-            data.forEach(m => {
-                const html = `<div class="poster-card" onclick="openDetail(${m.id})"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-                hList.innerHTML += html;
-                eGrid.innerHTML += `<div class="explore-item" onclick="openDetail(${m.id})"><img src="${m.img}"></div>`;
-                if(m.cat === 'Acción') aList.innerHTML += html;
-            });
+        // 2. REPRODUCTOR NETFLIX
+        window.startPlayer = (url) => {
+            const player = document.getElementById('player-fs');
+            const video = document.getElementById('vid-main');
+            video.src = url;
+            player.style.display = 'flex';
+            video.play();
         }
-
-        function renderNotifs(data) {
-            if(data.length > 0) {
-                document.getElementById('bell-dot').classList.remove('hidden');
-                document.getElementById('notif-content').innerHTML = data.map(n => `
-                    <div class="notif-item"><b>${n.title}</b><p style="font-size:12px;margin:5px 0;">${n.msg}</p></div>
-                `).join('');
-            }
+        window.stopPlayer = () => {
+            const player = document.getElementById('player-fs');
+            const video = document.getElementById('vid-main');
+            video.pause();
+            player.style.display = 'none';
         }
+        window.skip = (sec) => document.getElementById('vid-main').currentTime += sec;
 
-        // --- 3. FUNCIONALIDADES ---
-        window.openDetail = (id) => {
-            const m = movies.find(x => x.id === id);
-            document.getElementById('modal-injector').innerHTML = `
-                <div class="detail-hero" onclick="playMovie('${m.video}')">
-                    <img src="${m.img}">
-                    <div class="btn-play-hero"><i class="fa-solid fa-play"></i></div>
+        // 3. DETALLES MEJORADOS
+        window.openDetails = (id) => {
+            const m = dbMovies.find(x => x.id === id);
+            const inList = myList.some(x => x.id === id);
+            document.getElementById('modal-data').innerHTML = `
+                <div style="position:relative;">
+                    <img src="${m.img}" style="width:100%; height:250px; object-fit:cover;">
+                    <div onclick="startPlayer('${m.video}')" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:40px; color:#fff; background:var(--primary); width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px var(--primary);"><i class="fa-solid fa-play"></i></div>
                 </div>
                 <div style="padding:25px;">
-                    <h2>${m.title}</h2><p style="color:#aaa;">${m.desc}</p>
-                    <button onclick="playMovie('${m.video}')" style="width:100%; padding:15px; background:white; color:black; border:none; border-radius:10px; font-weight:bold;">VER AHORA</button>
-                </div>`;
-            document.getElementById('detail-modal').classList.add('open');
-        };
+                    <h2 style="margin:0 0 10px;">${m.title}</h2>
+                    <p style="color:#aaa; font-size:14px;">98% Coincidencia • 2024 • ${m.cat}</p>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button onclick="startPlayer('${m.video}')" style="flex:1; padding:15px; background:#fff; color:#000; border:none; border-radius:8px; font-weight:bold;">VER AHORA</button>
+                        <button onclick="toggleList(${m.id})" style="flex:1; padding:15px; background:var(--card); color:#fff; border:none; border-radius:8px;">${inList ? '✓ EN LISTA' : '+ MI LISTA'}</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-info').classList.add('open');
+        }
 
-        window.playMovie = (url) => {
-            const v = document.getElementById('main-video-player');
-            v.src = url;
-            document.getElementById('video-player-overlay').classList.remove('hidden');
-            v.play();
-            closeModal();
-        };
+        // 4. LÓGICA DE LISTA Y TEMAS
+        window.toggleList = (id) => {
+            const movie = dbMovies.find(x => x.id === id);
+            const index = myList.findIndex(x => x.id === id);
+            if(index > -1) myList.splice(index, 1);
+            else myList.push(movie);
+            localStorage.setItem('flechazo_lista', JSON.stringify(myList));
+            updateProfile();
+            openDetails(id);
+        }
 
-        window.closePlayer = () => {
-            const v = document.getElementById('main-video-player');
-            v.pause(); v.src = "";
-            document.getElementById('video-player-overlay').classList.add('hidden');
-        };
+        window.setTheme = (t) => {
+            document.body.className = t === 'default' ? '' : 'theme-' + t;
+            localStorage.setItem('flechazo_theme', t);
+        }
 
-        window.closeModal = () => document.getElementById('detail-modal').classList.remove('open');
+        // 5. NAVEGACIÓN Y CARGA INICIAL
+        function renderHome() {
+            const container = document.getElementById('list-trends');
+            container.innerHTML = dbMovies.map(m => `<img class="poster" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
+            document.getElementById('list-rec').innerHTML = [...dbMovies].reverse().map(m => `<img class="poster" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
+        }
 
-        window.toggleNotifs = () => {
-            const p = document.getElementById('notif-panel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
-            document.getElementById('bell-dot').classList.add('hidden');
-        };
+        function renderExplore(data) {
+            const grid = document.getElementById('explore-grid');
+            grid.innerHTML = data.map(m => `<img class="poster" style="min-width:auto; width:100%; height:140px;" src="${m.img}" onclick="openDetails(${m.id})">`).join('');
+        }
 
-        window.changeTheme = (theme) => {
-            document.body.className = theme === 'default' ? '' : 'theme-' + theme;
-            localStorage.setItem('user-theme', theme);
-        };
-
-        // BÚSQUEDA
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const txt = e.target.value.toLowerCase();
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                try {
-                    const res = await fetch(`http://localhost:3000/api/search?q=${txt}`);
-                    renderMovies(await res.json());
-                } catch {
-                    renderMovies(movies.filter(m => m.title.toLowerCase().includes(txt)));
-                }
-            }, 500);
-        });
-
-        window.switchTab = (id, el) => {
+        window.switchTab = (tab, el) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById('tab-'+id).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('screen-'+tab).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            if(id !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
-        };
+            if(tab !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
+        }
 
-        // INIT
-        if(localStorage.getItem('user-theme')) changeTheme(localStorage.getItem('user-theme'));
-        loadData();
+        function updateProfile() {
+            document.getElementById('count-list').innerText = myList.length;
+        }
+
+        // CARGA
+        const savedTheme = localStorage.getItem('flechazo_theme');
+        if(savedTheme) setTheme(savedTheme);
+        loadApp();
     </script>
 </body>
 </html>
