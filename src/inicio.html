@@ -4,35 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f0f1a">
 
-    <title>Flechazo TV - Ultimate Pro</title>
+    <title>Flechazo TV - Ultimate Custom</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
+        /* --- 1. SISTEMA DE TEMAS DINÁMICOS --- */
         :root { 
             --bg: #0f0f1a; --card: #1e1e2d; --primary: #ff4b4b; 
-            --gold: #FFD700; --text: #fff; --text-sec: #aaa;
             --gradient: linear-gradient(135deg, #ff4b4b, #a24bfa);
+            --text: #fff; --text-sec: #aaa;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; }
-        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; }
+        .theme-fire { --bg: #0a0000; --card: #1a0505; --primary: #ff3300; --gradient: linear-gradient(135deg, #ff3300, #ff9900); }
+        .theme-emerald { --bg: #05100a; --card: #0d1e15; --primary: #00ff88; --gradient: linear-gradient(135deg, #00ff88, #00ccff); }
+        .theme-ocean { --bg: #050a1a; --card: #0d152d; --primary: #0088ff; --gradient: linear-gradient(135deg, #0088ff, #00ffff); }
+        .theme-gold { --bg: #1a1505; --card: #2d250d; --primary: #ffcc00; --gradient: linear-gradient(135deg, #ffcc00, #ff6600); }
+        .theme-sakura { --bg: #1a0510; --card: #2d0d1e; --primary: #ff69b4; --gradient: linear-gradient(135deg, #ff69b4, #ffb6c1); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body { 
             margin: 0; font-family: -apple-system, system-ui, sans-serif; 
             background: var(--bg); color: var(--text); 
-            padding-bottom: calc(90px + var(--safe-bottom));
-            transition: background 0.4s; overflow-x: hidden;
+            padding-bottom: calc(100px + var(--safe-bottom));
+            transition: background 0.4s, color 0.4s; overflow-x: hidden;
         }
 
-        /* --- HEADER (Solo en Inicio) --- */
+        /* --- UI COMPONENTS --- */
         .header { 
             padding: calc(15px + var(--safe-top)) 25px 15px; 
             background: rgba(15,15,26,0.95); position: sticky; top: 0; 
@@ -41,32 +44,34 @@
         }
         .logo { font-size: 24px; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* --- CONTENIDO --- */
-        .section-title { padding: 20px 25px 10px; font-size: 18px; font-weight: bold; }
-        .horizontal-scroll { display: flex; overflow-x: auto; padding: 0 25px 20px; gap: 15px; scrollbar-width: none; }
-        .poster { min-width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: var(--card); transition: 0.3s; cursor: pointer; }
-        .poster:active { transform: scale(0.95); }
+        /* --- PERFIL ELITE --- */
+        .profile-container { padding: calc(20px + var(--safe-top)) 20px 20px; }
+        
+        .user-info { text-align: center; margin-bottom: 30px; }
+        .avatar-wrapper { width: 110px; height: 110px; margin: 0 auto 15px; position: relative; }
+        .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); padding: 3px; object-fit: cover; }
+        
+        .xp-container { width: 220px; height: 8px; background: #333; margin: 10px auto; border-radius: 10px; overflow: hidden; }
+        .xp-fill { height: 100%; width: 65%; background: var(--gradient); transition: 1.5s; }
 
-        /* --- EXPLORAR (SEARCH) --- */
-        .search-area { padding: calc(20px + var(--safe-top)) 25px 15px; position: sticky; top: 0; background: var(--bg); z-index: 100; }
-        .search-bar { 
-            background: var(--card); padding: 15px; border-radius: 15px; 
-            display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1);
+        /* Agrupadores de Opciones (Cards) */
+        .settings-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .setting-item { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: 0.2s;
         }
-        .search-bar input { background: transparent; border: none; color: white; width: 100%; font-size: 16px; }
-
-        /* --- SHORTS (TIKTOK STYLE) --- */
-        .shorts-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; background: #000; position: fixed; inset: 0; z-index: 500; padding-bottom: calc(70px + var(--safe-bottom)); }
-        .short-v { height: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; background: #000; }
-        .short-v video { width: 100%; height: 100%; object-fit: cover; }
-        .short-ui { position: absolute; bottom: 100px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: flex-end; text-shadow: 0 2px 4px #000; z-index: 10; }
-
-        /* --- PERFIL --- */
-        .profile-hero { padding: calc(40px + var(--safe-top)) 25px 30px; text-align: center; }
-        .avatar-main { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--primary); padding: 5px; position: relative; margin: 0 auto; }
-        .avatar-main img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .xp-bar { width: 220px; height: 6px; background: #333; margin: 15px auto; border-radius: 10px; overflow: hidden; }
-        .xp-fill { height: 100%; width: 75%; background: var(--gradient); transition: 1.5s; }
+        .setting-item:last-child { border: none; }
+        .setting-item:active { background: rgba(255,255,255,0.05); }
+        .setting-left { display: flex; align-items: center; gap: 15px; }
+        .setting-left i { width: 20px; text-align: center; color: var(--primary); font-size: 18px; }
+        
+        /* Selectores de Lista */
+        select { 
+            background: transparent; border: none; color: var(--primary); 
+            font-weight: bold; font-size: 14px; appearance: none; text-align: right;
+            cursor: pointer;
+        }
 
         /* --- NAV INFERIOR --- */
         .nav { 
@@ -78,194 +83,166 @@
         .nav-btn.active { color: var(--primary); }
         .nav-btn i { font-size: 22px; display: block; margin-bottom: 4px; }
 
-        /* REPRODUCTOR */
-        #player-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
-        #main-video { width: 100%; max-height: 100vh; }
-
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="player-overlay">
-        <i class="fa-solid fa-xmark" onclick="stopVideo()" style="position:absolute; top:40px; right:25px; font-size:30px; z-index:10001; color:white; cursor:pointer;"></i>
-        <video id="main-video" controls playsinline webkit-playsinline></video>
+    <div id="player-overlay" style="position:fixed; inset:0; background:#000; z-index:9999; display:none; align-items:center;">
+        <i class="fa-solid fa-xmark" onclick="stopVideo()" style="position:absolute; top:40px; right:25px; font-size:30px; color:white; z-index:10001;"></i>
+        <video id="main-video" controls style="width:100%;"></video>
     </div>
 
-    <div id="screen-home" class="screen">
-        <header class="header">
+    <div id="app">
+        <header id="main-header" class="header">
             <h2 class="logo">Flechazo TV</h2>
             <div style="position:relative;">
-                <i class="fa-regular fa-bell" style="font-size:24px;"></i>
+                <i class="fa-solid fa-bell" style="font-size:24px;"></i>
                 <span id="notif-dot" style="position:absolute; top:0; right:0; width:10px; height:10px; background:red; border-radius:50%; border:2px solid var(--bg); display:none;"></span>
             </div>
         </header>
 
-        <div class="section-title">🔥 Tendencias Semanales</div>
-        <div class="horizontal-scroll" id="trends-list">
-            <img class="poster" src="https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-            <img class="poster" src="https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-            <img class="poster" src="https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')">
-            <img class="poster" src="https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-        </div>
-        
-        <div class="section-title">✨ Recomendados para ti</div>
-        <div class="horizontal-scroll" id="rec-list"></div>
-    </div>
-
-    <div id="screen-explore" class="screen hidden">
-        <div class="search-area">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass" style="color:var(--primary);"></i>
-                <input type="text" id="search-inp" placeholder="Buscar películas o dramas...">
+        <div id="screen-home" class="screen">
+            <div class="section-title">🔥 Tendencias</div>
+            <div class="horizontal-scroll" id="trends-list">
+                <img class="poster" src="https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                <img class="poster" src="https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
             </div>
         </div>
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:0 20px;" id="explore-grid"></div>
-    </div>
 
-    <div id="screen-shorts" class="screen hidden">
-        <div class="shorts-container" id="shorts-wrapper">
-            </div>
-    </div>
-
-    <div id="screen-profile" class="screen hidden">
-        <div class="profile-hero">
-            <div class="avatar-main">
-                <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
-            </div>
-            <h2 style="margin:15px 0 5px;">Usuario Flechazo</h2>
-            <div class="xp-bar"><div class="xp-fill"></div></div>
-            <p style="color:var(--text-sec); font-size:12px;">Nivel 15 • Gamer Elite</p>
-        </div>
-
-        <div style="padding: 25px;">
-            <div class="section-title" style="padding:0 0 10px 0;">Ajustes de Interfaz</div>
-            <div onclick="setTheme('default')" style="background:var(--card); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; cursor:pointer;">
-                <span>Tema Oscuro Original</span><i class="fa-solid fa-moon"></i>
-            </div>
-            <div onclick="setTheme('fire')" style="background:var(--card); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; cursor:pointer;">
-                <span>Tema Fuego Carmesí</span><i class="fa-solid fa-fire" style="color:#ff3300;"></i>
-            </div>
-            <div onclick="location.reload()" style="background:rgba(255,75,75,0.1); padding:15px; border-radius:15px; color:var(--primary); text-align:center; font-weight:bold; margin-top:20px; cursor:pointer;">
-                CERRAR SESIÓN
+        <div id="screen-explore" class="screen hidden">
+            <div style="padding: 20px;">
+                <div style="background:var(--card); padding:15px; border-radius:15px; display:flex; gap:10px;">
+                    <i class="fa-solid fa-search" style="color:var(--primary);"></i>
+                    <input type="text" placeholder="Buscar..." style="background:transparent; border:none; color:white; width:100%;">
+                </div>
             </div>
         </div>
-    </div>
 
-    <nav class="nav">
-        <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
-        <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
-        <div class="nav-btn" onclick="switchTab('shorts', this)"><i class="fa-solid fa-bolt"></i>Shorts</div>
-        <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Perfil</div>
-    </nav>
+        <div id="screen-profile" class="screen hidden">
+            <div class="profile-container">
+                <div class="user-info">
+                    <div class="avatar-wrapper">
+                        <img id="user-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg">
+                    </div>
+                    <h2 id="txt-user">Gamer Flechazo</h2>
+                    <div class="xp-container"><div class="xp-fill"></div></div>
+                    <p style="color:var(--text-sec); font-size:12px;" id="txt-level">Nivel 15 • 850/1000 XP</p>
+                </div>
 
-    <script>
-        let moviesData = [];
-        const API_URL = 'http://localhost:3000/api';
+                <div class="section-title">🎨 Personalización</div>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <i class="fa-solid fa-palette"></i>
+                            <span id="txt-theme-label">Tema de la App</span>
+                        </div>
+                        <select id="theme-selector" onchange="setTheme(this.value)">
+                            <option value="default">Noche Azul</option>
+                            <option value="fire">Fuego Carmesí</option>
+                            <option value="emerald">Esmeralda</option>
+                            <option value="ocean">Océano Profundo</option>
+                            <option value="gold">Oro Real</option>
+                            <option value="sakura">Sakura Pink</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <i class="fa-solid fa-language"></i>
+                            <span id="txt-lang-label">Idioma</span>
+                        </div>
+                        <select id="lang-selector" onchange="setLanguage(this.value)">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                            <option value="pt">Português</option>
+                            <option value="ko">한국어 (Coreano)</option>
+                        </select>
+                    </div>
+                </div>
 
-        // 1. CARGA DESDE API
-        async function loadContent() {
-            try {
-                const res = await fetch(`${API_URL}/movies`);
-                if(res.ok) moviesData = await res.json();
-                else throw new Error();
-            } catch (e) {
-                // Datos locales si la API no responde
-                moviesData = [
-                    { id: 1, title: "Amor Prohibido", img: "https://image.tmdb.org/t/p/w300/6tfT03sGp9k4c0J3dypjrI8TSAI.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-                    { id: 2, title: "Booyah Master", img: "https://image.tmdb.org/t/p/w300/rweIrveL43TaxUN0akQEaAXL6x0.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
-                    { id: 3, title: "Venganza Mortal", img: "https://image.tmdb.org/t/p/w300/fiVW06jE7z9YnO4trhaMEdclSiC.jpg", video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
-                ];
-            }
-            renderUI();
-            loadShorts();
-        }
-
-        function renderUI() {
-            const trends = document.getElementById('trends-list');
-            const grid = document.getElementById('explore-grid');
-            const recs = document.getElementById('rec-list');
-            
-            const html = moviesData.map(m => `<img class="poster" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
-            trends.innerHTML = html;
-            grid.innerHTML = html;
-            recs.innerHTML = [...moviesData].reverse().map(m => `<img class="poster" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
-        }
-
-        // 2. LÓGICA DE SHORTS
-        async function loadShorts() {
-            const wrapper = document.getElementById('shorts-wrapper');
-            let shortsData = [];
-            try {
-                const res = await fetch(`${API_URL}/shorts`);
-                shortsData = await res.json();
-            } catch(e) {
-                shortsData = [{user: 'FlechazoUser', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', desc: 'Clip de prueba 🔥'}];
-            }
-
-            wrapper.innerHTML = shortsData.map(s => `
-                <div class="short-v">
-                    <video src="${s.videoUrl}" loop playsinline webkit-playsinline onclick="toggleVideo(this)"></video>
-                    <div class="short-ui">
-                        <div><b>@${s.user}</b><br><small>${s.desc || ''}</small></div>
-                        <div style="display:flex; flex-direction:column; gap:20px;">
-                            <i class="fa-solid fa-heart" onclick="this.style.color='red'"></i>
-                            <i class="fa-solid fa-share"></i>
+                <div class="section-title">🛡️ Cuenta</div>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <i class="fa-solid fa-crown"></i>
+                            <span>Mi Suscripción</span>
+                        </div>
+                        <span style="color:var(--gold); font-weight:bold; font-size:12px;">PREMIUM</span>
+                    </div>
+                    <div class="setting-item" onclick="location.reload()">
+                        <div class="setting-left">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span style="color:var(--primary);">Cerrar Sesión</span>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            </div>
+        </div>
 
-            // Intersection Observer para Autoplay
-            const obs = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    const v = entry.target.querySelector('video');
-                    if(entry.isIntersecting) v.play().catch(()=>{}); else v.pause();
-                });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.short-v').forEach(sv => obs.observe(sv));
+        <nav class="nav">
+            <div class="nav-btn active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>Inicio</div>
+            <div class="nav-btn" onclick="switchTab('explore', this)"><i class="fa-solid fa-compass"></i>Explorar</div>
+            <div class="nav-btn" onclick="switchTab('profile', this)"><i class="fa-solid fa-user-gear"></i>Perfil</div>
+        </nav>
+    </div>
+
+    <script>
+        // --- LOGICA DE IDIOMAS ---
+        const translations = {
+            es: { user: "Gamer Flechazo", theme: "Tema de la App", lang: "Idioma", level: "Nivel 15 • 850/1000 XP" },
+            en: { user: "Flechazo Gamer", theme: "App Theme", lang: "Language", level: "Level 15 • 850/1000 XP" },
+            pt: { user: "Flechazo Jogador", theme: "Tema do App", lang: "Idioma", level: "Nível 15 • 850/1000 XP" },
+            ko: { user: "플레차조 게이머", theme: "앱 테마", lang: "언어", level: "레벨 15 • 850/1000 XP" }
+        };
+
+        function setLanguage(lang) {
+            const t = translations[lang];
+            document.getElementById('txt-user').innerText = t.user;
+            document.getElementById('txt-theme-label').innerText = t.theme;
+            document.getElementById('txt-lang-label').innerText = t.lang;
+            document.getElementById('txt-level').innerText = t.level;
+            localStorage.setItem('f_lang', lang);
         }
 
-        // 3. NAVEGACIÓN
-        window.switchTab = (tab, el) => {
+        // --- LÓGICA DE TEMAS ---
+        function setTheme(t) {
+            document.body.className = (t === 'default') ? '' : 'theme-' + t;
+            localStorage.setItem('f_theme', t);
+            document.getElementById('theme-selector').value = t;
+        }
+
+        // --- NAVEGACIÓN ---
+        function switchTab(tab, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             document.getElementById('screen-'+tab).classList.remove('hidden');
+            
+            // Header solo en inicio
+            document.getElementById('main-header').style.display = (tab === 'home') ? 'flex' : 'none';
+
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            if(tab !== 'shorts') document.querySelectorAll('video').forEach(v => v.pause());
         }
 
-        // 4. REPRODUCTOR
-        window.playVideo = (url) => {
+        // --- VIDEO ---
+        function playVideo(url) {
             const p = document.getElementById('player-overlay');
             const v = document.getElementById('main-video');
             v.src = url;
             p.style.display = 'flex';
             v.play();
         }
-        window.stopVideo = () => {
-            const p = document.getElementById('player-overlay');
-            const v = document.getElementById('main-video');
-            v.pause();
-            p.style.display = 'none';
-        }
-        window.toggleVideo = (v) => v.paused ? v.play() : v.pause();
-
-        // 5. BUSCADOR & TEMAS
-        document.getElementById('search-inp').addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            const filtered = moviesData.filter(m => m.title.toLowerCase().includes(val));
-            document.getElementById('explore-grid').innerHTML = filtered.map(m => `<img class="poster" style="width:100%;" src="${m.img}" onclick="playVideo('${m.video}')">`).join('');
-        });
-
-        window.setTheme = (t) => {
-            document.body.className = t === 'default' ? '' : 'theme-' + t;
-            localStorage.setItem('f_theme', t);
+        function stopVideo() {
+            document.getElementById('main-video').pause();
+            document.getElementById('player-overlay').style.display = 'none';
         }
 
+        // --- INIT ---
         window.onload = () => {
-            loadContent();
-            if(localStorage.getItem('f_theme')) setTheme(localStorage.getItem('f_theme'));
+            const savedTheme = localStorage.getItem('f_theme') || 'default';
+            const savedLang = localStorage.getItem('f_lang') || 'es';
+            setTheme(savedTheme);
+            setLanguage(savedLang);
+            document.getElementById('lang-selector').value = savedLang;
         };
     </script>
 </body>
