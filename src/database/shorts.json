@@ -1,16 +1,5 @@
 [
-  {
-    "id": 101,
-    "user": "ElTioSpoiler",
-    "desc": "¡Jugada maestra en Free Fire!",
-    "likes": "10.2k",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
-  },
-  {
-    "id": 102,
-    "user": "FlechazoClips",
-    "desc": "Drama coreano triste",
-    "likes": "5k",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  }
+  { "id": 101, "user": "ElTioSpoiler", "desc": "¡Jugada maestra! 😱🔥", "likes": "10k", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" },
+  { "id": 102, "user": "FlechazoClips", "desc": "Final inesperado... 💔", "likes": "5k", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+  { "id": 103, "user": "ProGamer", "desc": "Bug encontrado 👀", "likes": "340", "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" }
 ]
