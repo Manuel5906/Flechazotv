@@ -3,164 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reproductor - Flechazo TV</title>
+    <title>Reproductor Universal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #ff3366; 
-            --grad: linear-gradient(135deg, #ff3366, #a033ff); 
-        }
+        :root { --primary: #ff3366; --grad: linear-gradient(135deg, #ff3366, #a033ff); }
         
-        /* 1. CONFIGURACIÓN PANTALLA COMPLETA */
-        body { 
-            margin: 0; 
-            background: black; 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            height: 100vh; /* Altura completa */
-            width: 100vw;  /* Anchura completa */
-            overflow: hidden; /* Sin scroll */
-            display: flex; 
-            flex-direction: column;
-        }
+        body { margin: 0; background: black; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* 2. CONTENEDOR VIDEO (Ocupa todo) */
-        .video-wrapper { 
-            position: relative; 
-            width: 100%; 
-            height: 100%; 
-            flex: 1;
-            background: #000;
-        }
+        /* --- 1. CONTENEDOR HÍBRIDO --- */
+        .video-wrapper { position: relative; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; }
 
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; /* Muestra el video completo centrado */
-        }
+        /* Reproductor Nativo (MP4) */
+        video { width: 100%; height: 100%; object-fit: contain; display: none; } /* Oculto por defecto */
 
-        /* 3. CAPA DE CONTROLES (Overlay Vertical) */
+        /* Reproductor Embed (Iframe) */
+        iframe { width: 100%; height: 100%; border: none; display: none; } /* Oculto por defecto */
+        
+        /* Clase para activar uno u otro */
+        .active-player { display: block !important; }
+
+        /* --- 2. CAPA DE CONTROLES (UI) --- */
         .controls { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.3); /* Fondo un poco más transparente */
+            background: rgba(0,0,0,0.3); pointer-events: none; /* Dejar pasar clics al iframe */
             display: flex; flex-direction: column; justify-content: space-between; 
-            padding: 20px; 
-            transition: opacity 0.3s; 
-            z-index: 5;
+            padding: 20px; z-index: 10;
         }
-        .hidden { opacity: 0; pointer-events: none; }
 
-        /* BARRA SUPERIOR (Título y Volver) */
-        .top-bar { 
-            display: flex; align-items: center; gap: 15px; 
-            padding-top: 10px; /* Espacio para la barra de estado del cel */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-        .back-btn { font-size: 1.5rem; cursor: pointer; color: white; text-decoration: none; }
+        /* Elementos clickeables (reactivan el puntero) */
+        .interactive { pointer-events: auto; }
+
+        /* Top Bar */
+        .top-bar { display: flex; align-items: center; gap: 15px; padding-top: 10px; text-shadow: 0 2px 4px black; }
+        .back-btn { font-size: 1.5rem; color: white; text-decoration: none; }
         #title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* PLAY EN EL CENTRO */
+        /* Botón Play Gigante (Solo MP4) */
         .center-play { 
-            position: absolute; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-size: 4rem; cursor: pointer; 
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); 
-            opacity: 0.8;
+            align-self: center; font-size: 4rem; filter: drop-shadow(0 0 20px black); opacity: 0.8; 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: none; /* Se activa con JS */
         }
 
-        /* BARRA INFERIOR (Controles) */
-        .bottom-bar { 
-            display: flex; flex-direction: column; gap: 15px; 
-            position: relative; 
-            padding-bottom: 20px; /* Espacio abajo para dedos */
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            margin: -20px -20px 0 -20px; /* Extender al borde */
-            padding: 40px 20px 30px 20px;
-        }
+        /* Bottom Bar */
+        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
         
-        /* Botón Siguiente (Flotante encima de la barra) */
+        /* Botón Siguiente (Flotante) */
         #btnNext { 
-            display: none; /* JS lo activa */
-            align-self: flex-end; /* A la derecha */
-            background: rgba(255, 255, 255, 0.2); 
-            backdrop-filter: blur(5px);
-            padding: 8px 16px; border-radius: 20px; 
-            font-size: 0.9rem; cursor: pointer; 
+            display: none; align-self: flex-end; 
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; 
             border: 1px solid rgba(255,255,255,0.2);
-            margin-bottom: 5px;
         }
 
-        /* Línea de Tiempo */
-        .progress { 
-            width: 100%; height: 4px; 
-            background: rgba(255,255,255,0.3); 
-            border-radius: 5px; cursor: pointer; position: relative; 
-        }
-        .fill { 
-            height: 100%; width: 0%; 
-            background: var(--grad); 
-            border-radius: 5px; position: relative; 
-        }
-        /* Bolita del timeline */
-        .fill::after { 
-            content:''; position: absolute; right: -6px; top: -4px; 
-            width: 12px; height: 12px; 
-            background: white; border-radius: 50%; 
-            box-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
-        }
+        /* Línea de Tiempo (Solo MP4) */
+        .progress-area { display: none; flex-direction: column; gap: 5px; }
+        .progress { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 5px; position: relative; }
+        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 5px; position: relative; }
+        .fill::after { content:''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
 
-        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 5px; color: #ddd; }
-        
-        #btnEpList { display: none; cursor: pointer; align-items: center; gap: 8px; }
+        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #ddd; align-items: center; }
+        #btnEpList { display: none; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; }
 
-        /* 4. PANEL LATERAL (DRAWER VERTICAL) */
+        /* --- 3. PANEL LATERAL (DRAWER) --- */
         .drawer {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 70vh; /* Más alto */
-            background: #181818; 
-            border-radius: 25px 25px 0 0; 
-            z-index: 20;
-            transform: translateY(110%); 
-            transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            padding: 25px;
-            display: flex; flex-direction: column;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70vh; 
+            background: #181818; border-radius: 25px 25px 0 0; z-index: 20;
+            transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1); 
+            padding: 25px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
         }
         .drawer.open { transform: translateY(0); }
-        
-        .ep-item { 
-            padding: 15px; 
-            border-bottom: 1px solid #333; 
-            cursor: pointer; display: flex; gap: 15px; align-items: center;
-        }
-        .ep-item:hover { background: #222; }
+        .ep-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; gap: 15px; align-items: center; }
         .ep-num { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div class="video-wrapper" onclick="toggleControls()">
-        <video id="vid" playsinline></video>
+    <div class="video-wrapper">
+        <video id="vid" playsinline onclick="togglePlay()"></video>
+
+        <iframe id="embedFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 
         <div id="ui" class="controls">
-            <div class="top-bar">
+            <div class="top-bar interactive">
                 <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
                 <span id="title">Cargando...</span>
             </div>
 
-            <i id="playIcon" class="fa-solid fa-play center-play" onclick="togglePlay()"></i>
+            <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
 
-            <div class="bottom-bar" onclick="event.stopPropagation()">
-                <div id="btnNext" onclick="nextEp()">
-                    Siguiente Ep <i class="fa-solid fa-forward"></i>
+            <div class="bottom-bar">
+                <div id="btnNext" class="interactive" onclick="nextEp()">
+                    Siguiente <i class="fa-solid fa-forward"></i>
                 </div>
 
-                <div class="progress" onclick="seek(event)">
-                    <div id="fill" class="fill"></div>
+                <div id="progressArea" class="progress-area interactive">
+                    <div class="progress" onclick="seek(event)"><div id="fill" class="fill"></div></div>
                 </div>
                 
-                <div class="info-row">
-                    <span id="time">00:00</span>
-                    <div id="btnEpList" onclick="toggleDrawer()">
+                <div class="info-row interactive">
+                    <span id="time" style="display:none;">00:00</span> <div id="btnEpList" onclick="toggleDrawer()">
                         Episodios <i class="fa-solid fa-layer-group"></i>
                     </div>
                 </div>
@@ -177,62 +119,93 @@
     </div>
 
     <script>
-        // 1. Obtener ID de la URL
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         
         let itemData = null;
         let currentEp = 0;
-        let hideTimeout;
         
+        // Elementos DOM
         const vid = document.getElementById('vid');
-        const ui = document.getElementById('ui');
+        const iframe = document.getElementById('embedFrame');
+        const playIcon = document.getElementById('playIcon');
+        const progressArea = document.getElementById('progressArea');
+        const timeLabel = document.getElementById('time');
 
-        // 2. Cargar Datos
+        // INICIO
         window.onload = async () => {
             try {
                 const res = await fetch(`/api/movies/${id}`);
                 if(!res.ok) return alert("Error cargando video");
                 itemData = await res.json();
-                
-                iniciarReproductor();
+                iniciarSistema();
             } catch(e) { console.error(e); }
         };
 
-        function iniciarReproductor() {
-            // DETECCIÓN INTELIGENTE
-            if (itemData.tipo === 'pelicula') {
-                // MODO PELÍCULA
-                document.getElementById('title').innerText = itemData.title;
-                vid.src = itemData.url;
-                
-                document.getElementById('btnNext').style.display = 'none';
-                document.getElementById('btnEpList').style.display = 'none';
-            
-            } else {
-                // MODO SERIE
-                document.getElementById('btnNext').style.display = 'flex';
+        function iniciarSistema() {
+            // 1. Configurar botones de Serie/Pelicula
+            if (itemData.tipo === 'serie') {
+                document.getElementById('btnNext').style.display = 'block';
                 document.getElementById('btnEpList').style.display = 'flex';
-                
                 cargarEpisodio(0);
                 generarLista();
+            } else {
+                // Película
+                document.getElementById('title').innerText = itemData.title;
+                detectarFuente(itemData.url);
             }
-            
-            vid.play();
-            resetTimer(); // Ocultar controles automáticamente
         }
 
-        // --- Funciones Lógicas ---
+        // --- SISTEMA INTELIGENTE DE FUENTES ---
         function cargarEpisodio(index) {
             if(!itemData.episodios || !itemData.episodios[index]) return;
             currentEp = index;
             const ep = itemData.episodios[index];
             
-            document.getElementById('title').innerText = `${itemData.title} - Ep ${ep.numero}`;
-            vid.src = ep.url;
-            vid.play();
+            document.getElementById('title').innerText = `Ep ${ep.numero}: ${ep.titulo || ''}`;
+            detectarFuente(ep.url);
         }
 
+        function detectarFuente(url) {
+            // Si termina en .mp4 o .webm -> Usar Video Nativo
+            if (url.includes('.mp4') || url.includes('.webm')) {
+                activarModoMP4(url);
+            } else {
+                // Cualquier otra cosa -> Usar Iframe (Embed)
+                activarModoEmbed(url);
+            }
+        }
+
+        function activarModoMP4(url) {
+            // Mostrar Video, Ocultar Iframe
+            iframe.classList.remove('active-player');
+            iframe.src = ""; // Limpiar iframe anterior
+            
+            vid.classList.add('active-player');
+            vid.src = url;
+            vid.play();
+
+            // Activar UI Personalizada
+            playIcon.style.display = 'block';
+            progressArea.style.display = 'flex';
+            timeLabel.style.display = 'block';
+        }
+
+        function activarModoEmbed(url) {
+            // Mostrar Iframe, Ocultar Video
+            vid.classList.remove('active-player');
+            vid.pause();
+            
+            iframe.classList.add('active-player');
+            iframe.src = url;
+
+            // Ocultar UI que no sirve en Embeds
+            playIcon.style.display = 'none';     // El iframe tiene su propio play
+            progressArea.style.display = 'none'; // El iframe tiene su propia barra
+            timeLabel.style.display = 'none';
+        }
+
+        // --- FUNCIONES COMUNES ---
         function nextEp() {
             if (itemData.episodios && currentEp + 1 < itemData.episodios.length) {
                 cargarEpisodio(currentEp + 1);
@@ -253,62 +226,34 @@
             });
         }
 
-        // --- UI Interactions ---
-        function togglePlay() {
-            if(vid.paused) { 
-                vid.play(); 
-                document.getElementById('playIcon').className = "fa-solid fa-pause center-play"; 
-            } else { 
-                vid.pause(); 
-                document.getElementById('playIcon').className = "fa-solid fa-play center-play"; 
-            }
-            resetTimer();
-        }
-
-        function toggleControls() {
-            if(ui.classList.contains('hidden')){
-                ui.classList.remove('hidden');
-                resetTimer();
-            } else {
-                ui.classList.add('hidden');
-            }
-        }
-
-        function resetTimer() {
-            clearTimeout(hideTimeout);
-            // Solo ocultar automático si está reproduciendo
-            if(!vid.paused) {
-                hideTimeout = setTimeout(() => {
-                    ui.classList.add('hidden');
-                }, 3000);
-            }
-        }
-
         function toggleDrawer() {
             document.getElementById('drawer').classList.toggle('open');
+        }
+
+        // --- SOLO PARA MP4 ---
+        function togglePlay() {
+            if(!vid.classList.contains('active-player')) return; // No hacer nada en embed
+            if(vid.paused) { 
+                vid.play(); 
+                playIcon.className = "fa-solid fa-pause center-play interactive"; 
+            } else { 
+                vid.pause(); 
+                playIcon.className = "fa-solid fa-play center-play interactive"; 
+            }
         }
 
         function seek(e) {
             const pos = (e.offsetX / e.target.offsetWidth);
             vid.currentTime = pos * vid.duration;
-            e.stopPropagation();
         }
 
         vid.ontimeupdate = () => {
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
-            
             let m = Math.floor(vid.currentTime / 60);
             let s = Math.floor(vid.currentTime % 60);
             document.getElementById('time').innerText = `${m}:${s<10?'0'+s:s}`;
         };
-        
-        // Al terminar video, mostrar controles
-        vid.onended = () => {
-            ui.classList.remove('hidden');
-            document.getElementById('playIcon').className = "fa-solid fa-rotate-right center-play";
-        };
-
     </script>
 </body>
 </html>
