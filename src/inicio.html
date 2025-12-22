@@ -5,314 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flechazo TV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* --- 1. CONFIGURACIÓN VISUAL (Variables) --- */
+        /* --- 1. VARIABLES Y ESTILO BASE --- */
         :root {
-            --primary: #E50914; /* Rojo Marca */
-            --bg: #141414;      /* Fondo Negro Profundo */
-            --card-bg: #222;    /* Fondo Cartas */
+            --bg-dark: #0f1014;       /* Fondo casi negro */
+            --bg-card: #1d1e26;       /* Fondo de tarjetas */
+            --primary-grad: linear-gradient(135deg, #ff3366 0%, #ba265d 100%); /* Rosa botón */
+            --circle-grad: linear-gradient(180deg, #2b2d3a 0%, #1a1b21 100%); /* Fondo círculos */
+            --border-glow: #ff4d80;   /* Borde neón rosado */
             --text: #ffffff;
-            --overlay: rgba(0, 0, 0, 0.85);
+            --text-gray: #8b8d96;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
-
-        /* --- 2. SPLASH SCREEN (Carga) --- */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 9999; display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
-        }
-        .logo-anim { font-size: 2.5rem; color: var(--primary); font-weight: 900; letter-spacing: 2px; animation: pulse 2s infinite; }
-
-        /* --- 3. NAVBAR (Dinámica) --- */
-        .navbar {
-            position: fixed; top: 0; width: 100%; height: 60px; padding: 0 4%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
-            z-index: 1000; display: flex; justify-content: space-between; align-items: center;
-            transition: background-color 0.3s ease;
-        }
-        .navbar.scrolled { background-color: #000; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .brand { color: var(--primary); font-weight: 900; font-size: 1.5rem; letter-spacing: 1px; text-transform: uppercase; }
-        .user-icon { font-size: 1.2rem; cursor: pointer; }
-
-        /* --- 4. HERO BANNER (Gigante) --- */
-        #hero {
-            height: 75vh; position: relative;
-            background-size: cover; background-position: center top;
-            display: flex; flex-direction: column; justify-content: flex-end;
-            padding: 0 4% 40px 4%; /* Márgenes laterales alineados */
-        }
-        /* Degradado inferior para leer texto */
-        #hero::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to top, var(--bg) 10%, transparent 100%);
-        }
-        .hero-content { position: relative; z-index: 10; max-width: 600px; }
-        .hero-title { font-size: 3rem; margin-bottom: 15px; font-weight: 800; line-height: 1; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
-        .hero-desc { font-size: 1rem; color: #ddd; margin-bottom: 20px; text-shadow: 1px 1px 2px black; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
-        .btn-hero {
-            padding: 0.8rem 1.5rem; border: none; border-radius: 4px; font-weight: bold; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: transform 0.2s;
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text); 
+            padding-bottom: 90px; /* Espacio para el menú flotante */
+            overflow-x: hidden;
         }
-        .btn-hero:hover { transform: scale(1.05); }
-        .btn-play { background: white; color: black; }
-        .btn-list { background: rgba(109, 109, 110, 0.7); color: white; margin-left: 10px; }
 
-        /* --- 5. CATEGORÍAS Y TARJETAS (Mejorado) --- */
-        #categories { margin-top: -40px; position: relative; z-index: 20; } /* Sube sobre el hero */
-        .category-row { margin-bottom: 30px; padding-left: 4%; }
-        .cat-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; color: #e5e5e5; }
-        
-        .slider {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; padding-right: 4%;
-            scrollbar-width: none; /* Firefox */
+        /* --- 2. HEADER (Logo Corazón + Lupa) --- */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 20px 10px 20px;
         }
-        .slider::-webkit-scrollbar { display: none; } /* Chrome/Safari */
         
-        /* TARJETA MEJORADA (Vertical y Adaptable) */
-        .card {
-            flex: 0 0 auto;
-            min-width: 130px; 
-            height: 200px; /* Altura fija póster */
-            border-radius: 4px;
-            background-color: var(--card-bg);
+        /* Logo simulado con icono */
+        .logo-container {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto; /* Centrado absoluto */
+            position: absolute; left: 0; right: 0;
+        }
+        .logo-heart {
+            font-size: 1.8rem;
+            background: linear-gradient(to bottom, #ff5e9a, #a033ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(255, 94, 154, 0.5));
+        }
+
+        .search-btn { font-size: 1.4rem; color: white; margin-left: auto; cursor: pointer; }
+
+        /* --- 3. HERO CARD (Tarjeta Principal) --- */
+        .hero-container {
+            padding: 20px;
+            width: 100%;
+        }
+
+        .hero-card {
+            width: 100%;
+            height: 250px;
+            border-radius: 25px; /* Bordes muy redondeados */
             overflow: hidden;
             position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero-img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        /* Degradado oscuro sobre la imagen */
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, transparent 60%);
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+            padding: 20px;
+        }
+
+        .hero-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+
+        .btn-ver {
+            background: var(--primary-grad);
+            color: white; border: none;
+            padding: 8px 20px; border-radius: 20px;
+            font-weight: 600; font-size: 0.9rem;
             cursor: pointer;
-            transition: transform 0.3s ease, border 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
         }
-        .card img { 
-            width: 100%; height: 100%; 
-            object-fit: cover; /* ESTO ES LA MAGIA: Recorta la imagen para llenar el cuadro */
-            object-position: center top; /* Enfoca las caras */
-        }
-        .card:hover { transform: scale(1.1); z-index: 50; border: 2px solid white; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
 
-        /* --- 6. MENÚ INFERIOR --- */
+        /* Puntos de paginación simulados */
+        .pagination {
+            display: flex; justify-content: center; gap: 6px; margin-top: 10px;
+        }
+        .dot { width: 6px; height: 6px; background: #444; border-radius: 50%; }
+        .dot.active { background: #ff3366; width: 20px; border-radius: 10px; }
+
+        /* --- 4. CATEGORÍAS CIRCULARES (Shorts, Romance...) --- */
+        .circles-row {
+            display: flex; justify-content: space-around; padding: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .circle-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            cursor: pointer;
+        }
+
+        .circle {
+            width: 65px; height: 65px;
+            border-radius: 50%;
+            background: var(--circle-grad);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; color: #ff5e9a;
+            border: 2px solid transparent; /* Truco para borde gradiente */
+            background-clip: padding-box;
+            position: relative;
+        }
+        
+        /* Efecto de borde rosado neón */
+        .circle::after {
+            content: ''; position: absolute; top: -2px; bottom: -2px; left: -2px; right: -2px;
+            background: linear-gradient(to bottom, #ff5e9a, #3b2c55);
+            z-index: -1; border-radius: 50%;
+        }
+
+        .circle-label { font-size: 0.85rem; color: var(--text-gray); }
+
+        /* --- 5. LISTAS DE PELÍCULAS --- */
+        .section-title {
+            padding-left: 20px; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; margin-top: 10px;
+        }
+
+        .slider {
+            display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 20px 20px;
+            scrollbar-width: none;
+        }
+        .slider::-webkit-scrollbar { display: none; }
+
+        .poster {
+            min-width: 110px; height: 160px;
+            border-radius: 15px; /* Bordes redondeados */
+            overflow: hidden;
+            position: relative;
+        }
+        .poster img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Título sobre el poster (Opcional, estilo Netflix) */
+        .poster-overlay {
+            position: absolute; bottom: 0; width: 100%; padding: 10px;
+            background: linear-gradient(to top, black, transparent);
+        }
+        .poster-title { font-size: 0.8rem; text-align: center; display: none; } /* Oculto para que se vea limpio como la foto */
+
+        /* --- 6. BARRA INFERIOR (Bottom Nav) --- */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 60px;
-            background: #121212; border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center; z-index: 2000;
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            height: 70px;
+            background: #181920;
+            border-radius: 25px;
+            display: flex; justify-content: space-around; align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 1000;
         }
-        .nav-item { color: #666; font-size: 0.7rem; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; }
-        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
-        .nav-item.active { color: white; }
 
-        /* --- 7. MODAL REPRODUCTOR (Cine) --- */
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #666; text-decoration: none; font-size: 0.75rem; gap: 5px;
+        }
+        .nav-item i { font-size: 1.4rem; }
+        
+        /* Estado Activo (Brillo Rosa) */
+        .nav-item.active { color: #ff3366; }
+        .nav-item.active i { 
+            filter: drop-shadow(0 0 8px rgba(255, 51, 102, 0.6));
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f1014; z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s;
+        }
+        .logo-splash { font-size: 3rem; color: #ff3366; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* --- MODAL REPRODUCTOR --- */
         #playerModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 5000; display: none; flex-direction: column;
+            background: black; z-index: 5000; display: none; flex-direction: column;
         }
-        .player-header { padding: 20px; display: flex; justify-content: flex-end; position: absolute; width: 100%; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
-        .close-btn { color: white; font-size: 2rem; cursor: pointer; background: none; border: none; opacity: 0.8; }
-        
-        .video-container { flex: 1; display: flex; align-items: center; justify-content: center; background: black; }
-        video { width: 100%; max-height: 100vh; }
-        
-        .player-info { padding: 20px; background: #181818; min-height: 30%; overflow-y: auto; }
-        
-        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 10px; margin-top: 15px; }
-        .ep-btn {
-            background: #333; color: #ccc; border: 1px solid #444; padding: 12px 0; border-radius: 4px; cursor: pointer; font-weight: bold;
+        .close-btn { 
+            position: absolute; top: 20px; right: 20px; color: white; 
+            font-size: 2rem; background: none; border: none; cursor: pointer; z-index: 10; 
         }
-        .ep-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        video { width: 100%; margin-top: auto; margin-bottom: auto; }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="logo-anim">FLECHAZO</div>
+    <div id="splash"><i class="fa-solid fa-heart logo-splash"></i></div>
+
+    <header class="header">
+        <div style="width: 20px;"></div>
+        
+        <div class="logo-container">
+            <i class="fa-solid fa-heart logo-heart"></i>
+        </div>
+
+        <i class="fa-solid fa-magnifying-glass search-btn"></i>
+    </header>
+
+    <div class="hero-container" id="heroContainer">
+        </div>
+    
+    <div class="pagination">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
 
-    <div class="navbar" id="navbar">
-        <div class="brand">FLECHAZO</div>
-        <div class="user-icon"><i class="fa-solid fa-user"></i></div>
+    <div class="circles-row">
+        <div class="circle-item">
+            <div class="circle"><i class="fa-brands fa-tiktok"></i></div>
+            <span class="circle-label">Shorts</span>
+        </div>
+        <div class="circle-item">
+            <div class="circle"><i class="fa-solid fa-heart"></i></div>
+            <span class="circle-label">Romance</span>
+        </div>
+        <div class="circle-item">
+            <div class="circle"><i class="fa-solid fa-person-rifle"></i></div>
+            <span class="circle-label">Acción</span>
+        </div>
+        <div class="circle-item">
+            <div class="circle"><i class="fa-solid fa-ghost"></i></div>
+            <span class="circle-label">Terror</span>
+        </div>
     </div>
 
-    <div id="app">
-        <header id="hero">
-            </header>
-
-        <div id="categories">
-            </div>
-    </div>
+    <h3 class="section-title">Populares</h3>
+    <div class="slider" id="popularesSlider">
+        </div>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
-        <a href="#" class="nav-item"><i class="fa-brands fa-tiktok"></i>Shorts</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Buscar</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-download"></i>Mi Lista</a>
+        <a href="#" class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fa-regular fa-compass"></i>
+            <span>Explorar</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fa-regular fa-bookmark"></i>
+            <span>Mi Lista</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Perfil</span>
+        </a>
     </nav>
 
     <div id="playerModal">
-        <div class="player-header">
-            <button class="close-btn" onclick="cerrarPlayer()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        
-        <div class="video-container">
-            <video id="videoScreen" controls playsinline></video>
-        </div>
-        
-        <div class="player-info">
-            <h2 id="infoTitle" style="margin-bottom: 5px;">Título</h2>
-            <p id="infoDesc" style="color: #999; font-size: 0.9rem; line-height: 1.4;"></p>
-            
-            <div id="seriesZone" style="display:none; margin-top: 25px;">
-                <h4 style="color: #ddd; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;">Episodios</h4>
-                <div id="episodesList" class="ep-grid"></div>
-            </div>
-        </div>
+        <button class="close-btn" onclick="cerrarPlayer()">&times;</button>
+        <video id="videoScreen" controls playsinline></video>
     </div>
 
     <script>
-        // --- 1. CONFIGURACIÓN ---
         const API_URL = '/api/movies';
         let contenido = [];
 
-        // DOM
-        const splash = document.getElementById('splash');
-        const hero = document.getElementById('hero');
-        const categoriesContainer = document.getElementById('categories');
-        const navbar = document.getElementById('navbar');
-
-        // --- 2. INICIO ---
-        window.addEventListener('load', async () => {
-            setTimeout(() => {
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
-            }, 1000);
-
+        window.onload = async () => {
+            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 1000);
             await cargarDatos();
-        });
+        };
 
-        // Efecto Navbar al bajar
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) navbar.classList.add('scrolled');
-            else navbar.classList.remove('scrolled');
-        });
-
-        // --- 3. LÓGICA DE DATOS ---
         async function cargarDatos() {
             try {
                 const res = await fetch(API_URL);
                 contenido = await res.json();
-                
-                if (contenido.length > 0) {
-                    construirHero(contenido);
-                    construirCategorias(contenido);
+                if(contenido.length > 0) {
+                    renderHero(contenido);
+                    renderPopulares(contenido);
                 }
-            } catch (error) {
-                console.error("Error API:", error);
-                hero.innerHTML = "<h2 style='color:white; padding:20px'>Error cargando contenido</h2>";
-            }
+            } catch (e) { console.error(e); }
         }
 
-        function construirHero(datos) {
-            const randomItem = datos[Math.floor(Math.random() * datos.length)];
+        // Renderizar Tarjeta Principal (Hero)
+        function renderHero(datos) {
+            const item = datos[Math.floor(Math.random() * datos.length)];
+            const container = document.getElementById('heroContainer');
             
-            hero.style.backgroundImage = `url('${randomItem.img}')`;
-            hero.innerHTML = `
-                <div class="hero-content">
-                    <h1 class="hero-title">${randomItem.title}</h1>
-                    <p class="hero-desc">${randomItem.desc}</p>
-                    <div class="hero-buttons">
-                        <button class="btn-hero btn-play" onclick="abrirPlayer(${randomItem.id})">
-                            <i class="fa-solid fa-play"></i> Reproducir
-                        </button>
-                        <button class="btn-hero btn-list">
-                            <i class="fa-solid fa-plus"></i> Mi Lista
-                        </button>
+            // Usamos item.imagenes.banner si existe, si no item.img
+            const imgUrl = item.imagenes ? item.imagenes.banner : item.img;
+
+            container.innerHTML = `
+                <div class="hero-card" onclick="abrirPlayer(${item.id})">
+                    <img src="${imgUrl}" class="hero-img">
+                    <div class="hero-overlay">
+                        <h2 class="hero-title">${item.title}</h2>
+                        <button class="btn-ver">Ver Ahora</button>
                     </div>
                 </div>
             `;
         }
 
-        function construirCategorias(datos) {
-            const categorias = {};
+        // Renderizar Lista Populares (Posters Verticales)
+        function renderPopulares(datos) {
+            const slider = document.getElementById('popularesSlider');
+            slider.innerHTML = '';
+
             datos.forEach(item => {
-                if (!categorias[item.cat]) categorias[item.cat] = [];
-                categorias[item.cat].push(item);
-            });
-
-            categoriesContainer.innerHTML = ''; // Limpiar
-
-            for (const [catNombre, items] of Object.entries(categorias)) {
-                const fila = document.createElement('div');
-                fila.className = 'category-row';
+                const imgUrl = item.imagenes ? item.imagenes.poster : item.img;
                 
-                let cartasHTML = items.map(item => `
-                    <div class="card" onclick="abrirPlayer(${item.id})">
-                        <img src="${item.img}" alt="${item.title}" loading="lazy">
-                    </div>
-                `).join('');
-
-                fila.innerHTML = `
-                    <h3 class="cat-title">${catNombre}</h3>
-                    <div class="slider">
-                        ${cartasHTML}
-                    </div>
-                `;
-                categoriesContainer.appendChild(fila);
-            }
+                const div = document.createElement('div');
+                div.className = 'poster';
+                div.onclick = () => abrirPlayer(item.id);
+                div.innerHTML = `<img src="${imgUrl}" loading="lazy">`;
+                
+                slider.appendChild(div);
+            });
         }
 
-        // --- 4. REPRODUCTOR INTELIGENTE ---
-        const playerModal = document.getElementById('playerModal');
-        const videoScreen = document.getElementById('videoScreen');
-        const infoTitle = document.getElementById('infoTitle');
-        const infoDesc = document.getElementById('infoDesc');
-        const seriesZone = document.getElementById('seriesZone');
-        const episodesList = document.getElementById('episodesList');
-
+        // Reproductor Simple
         function abrirPlayer(id) {
             const item = contenido.find(c => c.id === id);
-            if (!item) return;
-
-            // Datos visuales
-            infoTitle.innerText = item.title;
-            infoDesc.innerText = item.desc;
-            episodesList.innerHTML = '';
+            if(!item) return;
             
-            // Lógica Tipo
-            if (item.tipo === 'pelicula') {
-                seriesZone.style.display = 'none';
-                videoScreen.src = item.url || ''; 
-                videoScreen.play();
+            const video = document.getElementById('videoScreen');
+            const modal = document.getElementById('playerModal');
+            
+            // Lógica Serie vs Película
+            let urlVideo = "";
+            if(item.tipo === 'serie' && item.episodios) {
+                urlVideo = item.episodios[0].url; // Reproduce el 1ro por defecto
             } else {
-                seriesZone.style.display = 'block';
-                
-                if (item.episodios && item.episodios.length > 0) {
-                    item.episodios.forEach((ep, index) => {
-                        const btn = document.createElement('button');
-                        btn.className = 'ep-btn';
-                        btn.innerText = ep.numero;
-                        
-                        if (index === 0) btn.classList.add('active'); 
-
-                        btn.onclick = () => {
-                            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            videoScreen.src = ep.url;
-                            videoScreen.play();
-                        };
-                        episodesList.appendChild(btn);
-                    });
-                    
-                    videoScreen.src = item.episodios[0].url;
-                    videoScreen.play();
-                }
+                urlVideo = item.url;
             }
-            playerModal.style.display = 'flex';
+
+            video.src = urlVideo;
+            modal.style.display = 'flex';
+            video.play();
         }
 
         function cerrarPlayer() {
-            videoScreen.pause();
-            videoScreen.src = "";
-            playerModal.style.display = 'none';
+            const video = document.getElementById('videoScreen');
+            video.pause();
+            video.src = "";
+            document.getElementById('playerModal').style.display = 'none';
         }
     </script>
 </body>
