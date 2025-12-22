@@ -2,8 +2,6 @@ import { Router } from 'express'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-
-// Importaciones para YouTube (Scraping)
 import ytpl from 'ytpl'
 import yts from 'yt-search'
 
@@ -127,34 +125,34 @@ router.get('/youtube/search', async (req, res) => {
     }
 });
 
-// C) INFO DE UN SOLO VIDEO (Nuevo)
-// Info detallada: URL, Título, Descripción, Imagen HD
+// C) INFO DE UN SOLO VIDEO (Formato Personalizado)
+// Uso: /youtube/video?url=https://youtu.be/n7AQzU-NE4w
 router.get('/youtube/video', async (req, res) => {
     const inputUrl = req.query.url;
     if (!inputUrl) return res.status(400).json({ error: 'Falta URL' });
 
     try {
-        // Extraer ID con Regex (soporta youtu.be y youtube.com)
+        // 1. Extraer ID con Regex
         const videoIdMatch = inputUrl.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w\-]{10,12})\b/);
         const videoId = videoIdMatch ? videoIdMatch[1] : inputUrl;
 
+        // 2. Buscar datos en YouTube
         const video = await yts({ videoId: videoId });
 
+        // 3. Construir el JSON con TU estructura exacta
         res.json({
+            id: 0, // Ponemos 0 o null, porque el ID numérico (1, 2, 3...) lo genera tu base de datos al guardar
+            tipo: "pelicula", // Valor por defecto
             title: video.title,
-            description: video.description,
-            url: video.url,
-            videoId: video.videoId,
-            duration: video.timestamp,
-            views: video.views,
-            date: video.ago,
-            // image_max es la portada de alta calidad
-            thumbnail: video.image, 
-            author: {
-                name: video.author.name,
-                url: video.author.url
-            }
+            desc: video.description, // La descripción completa del video
+            cat: "Drama", // Valor por defecto (puedes cambiarlo manual al recibirlo)
+            imagenes: {
+                poster: "",
+                banner: `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg` 
+            },
+            url: video.url
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Video no encontrado o enlace inválido' });
