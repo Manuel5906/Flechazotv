@@ -37,7 +37,7 @@
   {
     "id": 2,
     "tipo": "pelicula",
-    "title": "Regreso del Gran Maestro | Película Completa",
+    "title": "Regreso del Gran Maestro",
     "desc": "El drama chino 'El regreso del gran maestro' ha causado sensación en redes sociales gracias a su inspiradora trama centrada en la superación, la justicia y la resiliencia. Con capítulos que duran menos de dos minutos, la serie ha logrado enganchar a miles de usuarios que siguen con entusiasmo la historia de su protagonista. Su éxito viral ha despertado un creciente interés por saber dónde ver la serie completa en español y qué alternativas existen para acceder a todos los episodios.",
     "cat": "Drama",
     "imagenes": {
@@ -49,8 +49,8 @@
   {
     "id": 3,
     "tipo": "pelicula",
-    "title": "Amor con Chico Más Joven | Película Completa",
-    "desc": "",
+    "title": "Amor con Chico Más Joven",
+    "desc": "Para arruinar cita a ciegas, elige a azar mesero para casar, sin saber es CEO multimillonario oculto",
     "cat": "Drama",
     "imagenes": {
       "poster": "",
