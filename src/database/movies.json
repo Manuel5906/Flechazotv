@@ -3,609 +3,71 @@
     "id": 1,
     "tipo": "serie",
     "title": "El Regreso del CEO",
-    "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa para recuperar su imperio.",
+    "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa...",
     "cat": "Romance",
     "imagenes": {
-      "poster": "https://i.pinimg.com/564x/23/a1/b5/23a1b5d6e7f8a9b0c1d2e3f4a5b6c7d.jpg",
-      "banner": "https://i.ytimg.com/vi/YkduVUMZwbQ/maxresdefault.jpg"
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQot3hEt1Bbg-mJyD0nIUcLFSsgZXXVbtWgqzUqsfaz-w&s",
+      "banner": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg"
     },
     "episodios": [
-      { "numero": 1, "titulo": "El encuentro", "url": "https://www.youtube.com/watch?v=YkduVUMZwbQ" },
-      { "numero": 2, "titulo": "La revelación", "url": "https://www.youtube.com/watch?v=YkduVUMZwbQ" }
+      {
+        "numero": 1,
+        "titulo": "El encuentro",
+        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+      },
+      {
+        "numero": 2,
+        "titulo": "La revelación",
+        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+      }
     ]
+  },
+  {
+    "id": 1,
+    "tipo": "pelicula",
+    "title": "Navidad Eterna | Película Completa",
+    "desc": "Una historia de amor de 2 horas sin interrupciones.",
+    "cat": "Drama",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/fd/50/25/fd50254b8d745423854580665a6c4293.jpg",
+      "banner": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg"
+    },
+    "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
   },
   {
     "id": 2,
     "tipo": "pelicula",
-    "title": "Navidad Eterna",
-    "desc": "Una historia de amor conmovedora que desafía el tiempo. Película completa sin cortes.",
+    "title": "Regreso del Gran Maestro",
+    "desc": "El drama chino 'El regreso del gran maestro' ha causado sensación en redes sociales gracias a su inspiradora trama centrada en la superación, la justicia y la resiliencia. Con capítulos que duran menos de dos minutos, la serie ha logrado enganchar a miles de usuarios que siguen con entusiasmo la historia de su protagonista. Su éxito viral ha despertado un creciente interés por saber dónde ver la serie completa en español y qué alternativas existen para acceder a todos los episodios.",
     "cat": "Drama",
     "imagenes": {
-      "poster": "https://i.pinimg.com/564x/fd/50/25/fd50254b8d745423854580665a6c4293.jpg",
-      "banner": "https://i.ytimg.com/vi/aWzlQ2N6qqg/maxresdefault.jpg"
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2DtDrKPhtZdSfX5uTtVfUAaTe1SY8lSggQqbj9p5Pbg&s=10",
+      "banner": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGWu5yUy58nEwBL3610hSQ8JJrXtfqm-_Qgyqipia5IA&s=10"
     },
-    "url": "https://www.youtube.com/watch?v=aWzlQ2N6qqg"
+    "url": "https://www.youtube.com/embed/eEh6mqsXZyk"
   },
   {
     "id": 3,
     "tipo": "pelicula",
-    "title": "Furia en la Carretera",
-    "desc": "Un conductor debe sobrevivir a una persecución mortal en el desierto.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/12/34/56/1234567890abcdef1234567890abcdef.jpg",
-      "banner": "https://i.ytimg.com/vi/y8x4c1z5w6g/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=y8x4c1z5w6g"
-  },
-  {
-    "id": 4,
-    "tipo": "pelicula",
-    "title": "El Bosque Siniestro",
-    "desc": "Un grupo de amigos se pierde en un bosque donde no están solos.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/98/76/54/9876543210fedcba09876543210fedcba.jpg",
-      "banner": "https://i.ytimg.com/vi/7TavVZMewpY/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 5,
-    "tipo": "serie",
-    "title": "Amor por Contrato",
-    "desc": "Fingieron casarse por dinero, pero terminaron enamorándose de verdad.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/1a/2b/3c/1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.jpg",
-      "banner": "https://i.ytimg.com/vi/NngWHhsMLrs/maxresdefault.jpg"
-    },
-    "episodios": [
-      { "numero": 1, "titulo": "La Boda", "url": "https://www.youtube.com/watch?v=NngWHhsMLrs" }
-    ]
-  },
-  {
-    "id": 6,
-    "tipo": "pelicula",
-    "title": "Código Rojo",
-    "desc": "Un agente secreto tiene 24 horas para detener un ataque global.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/55/66/77/556677889900aabbccddeeff112233.jpg",
-      "banner": "https://i.ytimg.com/vi/tm_Tjk3qTK4/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 7,
-    "tipo": "serie",
-    "title": "La Doble Vida",
-    "desc": "Ama de casa de día, asesina a sueldo de noche.",
-    "cat": "Venganza",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/aa/bb/cc/aabbccddeeff1122334455667788.jpg",
-      "banner": "https://i.ytimg.com/vi/1_z3b4c5d6e/maxresdefault.jpg"
-    },
-    "episodios": [
-      { "numero": 1, "titulo": "El Inicio", "url": "https://www.youtube.com/watch?v=eEh6mqsXZyk" }
-    ]
-  },
-  {
-    "id": 8,
-    "tipo": "pelicula",
-    "title": "Risas y Llantos",
-    "desc": "Una comedia familiar que te hará llorar de risa.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/dd/ee/ff/ddeeff11223344556677889900aa.jpg",
-      "banner": "https://i.ytimg.com/vi/Bey4XXJAqS8/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 9,
-    "tipo": "pelicula",
-    "title": "El Hacker",
-    "desc": "En el mundo digital, nadie está a salvo.",
-    "cat": "Suspenso",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/11/22/11/1122113344556677889900aabbcc.jpg",
-      "banner": "https://i.ytimg.com/vi/h2tY39tY9pY/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=h2tY39tY9pY"
-  },
-  {
-    "id": 10,
-    "tipo": "serie",
-    "title": "Renacida",
-    "desc": "Volvió del pasado para vengarse de quienes la traicionaron.",
-    "cat": "Fantasía",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/88/99/00/889900aabbccddeeff112233445566.jpg",
-      "banner": "https://i.ytimg.com/vi/Renacida123/maxresdefault.jpg"
-    },
-    "episodios": [
-      { "numero": 1, "titulo": "Despertar", "url": "https://www.youtube.com/watch?v=dx3bzbKf88U" }
-    ]
-  },
-  {
-    "id": 11,
-    "tipo": "pelicula",
-    "title": "La Sombra del Pasado",
-    "desc": "Un detective retirado debe volver para un último caso.",
-    "cat": "Crimen",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/a1/a2/a3/a1a2a3b4b5b6c7c8d9d0e1e2f3f4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_11/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=dx3bzbKf88U"
-  },
-  {
-    "id": 12,
-    "tipo": "pelicula",
-    "title": "Amor en París",
-    "desc": "Dos extraños se encuentran en la ciudad del amor.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/b1/b2/b3/b1b2b3c4c5c6d7d8e9e0f1f2a3a4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_12/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
-  },
-  {
-    "id": 13,
-    "tipo": "pelicula",
-    "title": "El Exorcismo",
-    "desc": "Un sacerdote lucha contra una fuerza antigua.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/c1/c2/c3/c1c2c3d4d5d6e7e8f9f0a1a2b3b4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_13/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 14,
-    "tipo": "pelicula",
-    "title": "Carrera Mortal",
-    "desc": "Ganar la carrera es la única forma de salir con vida.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/d1/d2/d3/d1d2d3e4e5e6f7f8a9a0b1b2c3c4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_14/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=y8x4c1z5w6g"
-  },
-  {
-    "id": 15,
-    "tipo": "pelicula",
-    "title": "La Boda de mi Mejor Amigo",
-    "desc": "Se enamoró de la persona equivocada en el momento equivocado.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/e1/e2/e3/e1e2e3f4f5f6a7a8b9b0c1c2d3d4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_15/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 16,
-    "tipo": "pelicula",
-    "title": "El Último Sobreviviente",
-    "desc": "Solo en una isla desierta, debe aprender a vivir.",
-    "cat": "Aventura",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/f1/f2/f3/f1f2f3a4a5a6b7b8c9c0d1d2e3e4.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_16/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=h2tY39tY9pY"
-  },
-  {
-    "id": 17,
-    "tipo": "pelicula",
-    "title": "Ciberataque",
-    "desc": "El futuro de la humanidad depende de un código.",
-    "cat": "Ciencia Ficción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/01/02/03/01020304050607080900aabbccdd.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_17/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 18,
-    "tipo": "pelicula",
-    "title": "El Fantasma del Lago",
-    "desc": "Dicen que quien mira el agua de noche, no regresa.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/11/33/55/1133557799bbddff1133557799bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_18/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 19,
-    "tipo": "pelicula",
-    "title": "Golpe Maestro",
-    "desc": "El robo perfecto, ejecutado por el equipo perfecto.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/22/44/66/2244668800aaccee2244668800aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_19/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=eEh6mqsXZyk"
-  },
-  {
-    "id": 20,
-    "tipo": "pelicula",
-    "title": "Un Amor Imposible",
-    "desc": "Sus familias se odian, pero ellos se aman.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/33/55/77/3355779911bbddff3355779911bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_20/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
-  },
-  {
-    "id": 21,
-    "tipo": "pelicula",
-    "title": "Zona de Guerra",
-    "desc": "Atrapados tras las líneas enemigas.",
-    "cat": "Bélica",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/44/66/88/4466880022aaccee4466880022aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_21/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=y8x4c1z5w6g"
-  },
-  {
-    "id": 22,
-    "tipo": "pelicula",
-    "title": "El Payaso Asesino",
-    "desc": "El circo llegó a la ciudad, pero algo anda mal.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/55/77/99/5577991133bbddff5577991133bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_22/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 23,
-    "tipo": "pelicula",
-    "title": "Operación Dragón",
-    "desc": "Artes marciales y espionaje en una isla remota.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/66/88/00/6688002244aaccee6688002244aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_23/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=eEh6mqsXZyk"
-  },
-  {
-    "id": 24,
-    "tipo": "pelicula",
-    "title": "La Vecina de al Lado",
-    "desc": "Parecía una chica normal, pero ocultaba un secreto.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/77/99/11/7799113355bbddff7799113355bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_24/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 25,
-    "tipo": "pelicula",
-    "title": "El Secreto de la Montaña",
-    "desc": "Nadie sabe qué pasó en aquella expedición.",
-    "cat": "Suspenso",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/88/00/22/8800224466aaccee8800224466aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_25/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=h2tY39tY9pY"
-  },
-  {
-    "id": 26,
-    "tipo": "pelicula",
-    "title": "Vuelo 777",
-    "desc": "Un avión secuestrado y un solo hombre para salvarlos.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/99/11/33/9911335577bbddff9911335577bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_26/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 27,
-    "tipo": "pelicula",
-    "title": "Cita a Ciegas",
-    "desc": "Todo salió mal desde el primer momento.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/00/22/44/0022446688aaccee0022446688aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_27/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 28,
-    "tipo": "pelicula",
-    "title": "La Mansión Embrujada",
-    "desc": "Heredaron una casa, pero no estaban solos.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/11/33/55/1133557799bbddff1133557799bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_28/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 29,
-    "tipo": "pelicula",
-    "title": "El Guardaespaldas",
-    "desc": "Protegiendo a la testigo clave del juicio del siglo.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/22/44/66/2244668800aaccee2244668800aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_29/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=y8x4c1z5w6g"
-  },
-  {
-    "id": 30,
-    "tipo": "pelicula",
-    "title": "Corazón Roto",
-    "desc": "Después de la tormenta, siempre sale el sol.",
+    "title": "Amor con Chico Más Joven",
+    "desc": "Para arruinar cita a ciegas, elige a azar mesero para casar, sin saber es CEO multimillonario oculto",
     "cat": "Drama",
     "imagenes": {
-      "poster": "https://i.pinimg.com/564x/33/55/77/3355779911bbddff3355779911bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_30/maxresdefault.jpg"
+      "poster": "",
+      "banner": "https://img.youtube.com/vi/NngWHhsMLrs/maxresdefault.jpg"
     },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
+    "url": "https://youtu.be/NngWHhsMLrs?si=A21xKpoNSNeHc-uo"
   },
   {
-    "id": 31,
+    "id":  4,
     "tipo": "pelicula",
-    "title": "El Francotirador",
-    "desc": "Un solo disparo puede cambiar la historia.",
-    "cat": "Acción",
+    "title": "Destino de una Noche Equivocada",
+    "desc": "Tras noche con CEO, huérfana quedó embarazada. 2 meses después, él se casó y la mimó como a princesa",
+    "cat": "Drama",
     "imagenes": {
-      "poster": "https://i.pinimg.com/564x/44/66/88/4466880022aaccee4466880022aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_31/maxresdefault.jpg"
+      "poster": "",
+      "banner": "https://i.ytimg.com/vi/dx3bzbKf88U/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBwH_Jy-7qEW9FmQmqN9cjzw_WaqA"
     },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 32,
-    "tipo": "pelicula",
-    "title": "Vacaciones de Terror",
-    "desc": "Iban a ser las mejores vacaciones de sus vidas.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/55/77/99/5577991133bbddff5577991133bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_32/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 33,
-    "tipo": "pelicula",
-    "title": "El Contrato",
-    "desc": "Firmó sin leer la letra pequeña.",
-    "cat": "Suspenso",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/66/88/00/6688002244aaccee6688002244aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_33/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=h2tY39tY9pY"
-  },
-  {
-    "id": 34,
-    "tipo": "pelicula",
-    "title": "A Toda Velocidad",
-    "desc": "Carreras ilegales y adrenalina pura.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/77/99/11/7799113355bbddff7799113355bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_34/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=y8x4c1z5w6g"
-  },
-  {
-    "id": 35,
-    "tipo": "pelicula",
-    "title": "El Chef",
-    "desc": "La cocina nunca había sido tan divertida.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/88/00/22/8800224466aaccee8800224466aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_35/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 36,
-    "tipo": "pelicula",
-    "title": "Luna de Miel",
-    "desc": "Un viaje romántico que cambió sus vidas.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/99/11/33/9911335577bbddff9911335577bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_36/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
-  },
-  {
-    "id": 37,
-    "tipo": "pelicula",
-    "title": "El Laberinto",
-    "desc": "Entrar es fácil, salir es imposible.",
-    "cat": "Ciencia Ficción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/00/22/44/0022446688aaccee0022446688aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_37/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 38,
-    "tipo": "pelicula",
-    "title": "El Muñeco Diabólico",
-    "desc": "Nunca debieron comprar ese juguete.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/11/33/55/1133557799bbddff1133557799bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_38/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 39,
-    "tipo": "pelicula",
-    "title": "Rescate en la Jungla",
-    "desc": "La misión era simple: entrar y salir.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/22/44/66/2244668800aaccee2244668800aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_39/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=eEh6mqsXZyk"
-  },
-  {
-    "id": 40,
-    "tipo": "pelicula",
-    "title": "Mi Primera Vez",
-    "desc": "Una historia de amor adolescente.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/33/55/77/3355779911bbddff3355779911bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_40/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
-  },
-  {
-    "id": 41,
-    "tipo": "pelicula",
-    "title": "El Detective",
-    "desc": "Siempre encuentra la verdad, cueste lo que cueste.",
-    "cat": "Crimen",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/44/66/88/4466880022aaccee4466880022aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_41/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=dx3bzbKf88U"
-  },
-  {
-    "id": 42,
-    "tipo": "pelicula",
-    "title": "Invasión Alienígena",
-    "desc": "Llegaron del cielo y no vienen en son de paz.",
-    "cat": "Ciencia Ficción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/55/77/99/5577991133bbddff5577991133bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_42/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
-  },
-  {
-    "id": 43,
-    "tipo": "pelicula",
-    "title": "El Manicomio",
-    "desc": "Los pacientes tomaron el control.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/66/88/00/6688002244aaccee6688002244aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_43/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 44,
-    "tipo": "pelicula",
-    "title": "Venganza Mortal",
-    "desc": "No parará hasta que todos paguen.",
-    "cat": "Acción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/77/99/11/7799113355bbddff7799113355bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_44/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=eEh6mqsXZyk"
-  },
-  {
-    "id": 45,
-    "tipo": "pelicula",
-    "title": "El Profesor Chiflado",
-    "desc": "Sus experimentos siempre terminan mal.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/88/00/22/8800224466aaccee8800224466aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_45/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 46,
-    "tipo": "pelicula",
-    "title": "Amor a Primera Vista",
-    "desc": "Solo bastó una mirada.",
-    "cat": "Romance",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/99/11/33/9911335577bbddff9911335577bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_46/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=NngWHhsMLrs"
-  },
-  {
-    "id": 47,
-    "tipo": "pelicula",
-    "title": "La Isla Perdida",
-    "desc": "Fueron a buscar un tesoro y encontraron la muerte.",
-    "cat": "Aventura",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/00/22/44/0022446688aaccee0022446688aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_47/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=h2tY39tY9pY"
-  },
-  {
-    "id": 48,
-    "tipo": "pelicula",
-    "title": "El Asesino de la Máscara",
-    "desc": "Nadie sabe quién se esconde detrás.",
-    "cat": "Terror",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/11/33/55/1133557799bbddff1133557799bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_48/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=7TavVZMewpY"
-  },
-  {
-    "id": 49,
-    "tipo": "pelicula",
-    "title": "Misión Imposible: Copia",
-    "desc": "Una parodia que te hará reír sin parar.",
-    "cat": "Comedia",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/22/44/66/2244668800aaccee2244668800aa.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_49/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=Bey4XXJAqS8"
-  },
-  {
-    "id": 50,
-    "tipo": "pelicula",
-    "title": "El Final de los Tiempos",
-    "desc": "El apocalipsis ha comenzado.",
-    "cat": "Ciencia Ficción",
-    "imagenes": {
-      "poster": "https://i.pinimg.com/564x/33/55/77/3355779911bbddff3355779911bb.jpg",
-      "banner": "https://i.ytimg.com/vi/sample_50/maxresdefault.jpg"
-    },
-    "url": "https://www.youtube.com/watch?v=tm_Tjk3qTK4"
+    "url": "https://m.youtube.com/watch?v=dx3bzbKf88U"
   }
 ]
