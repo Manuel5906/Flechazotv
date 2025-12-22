@@ -2,89 +2,149 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
     <title>Reproductor Universal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #ff3366; --grad: linear-gradient(135deg, #ff3366, #a033ff); }
+        :root { 
+            --primary: #ff3366; 
+            --grad: linear-gradient(135deg, #ff3366, #a033ff); 
+            --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.6) 100%);
+        }
         
-        body { margin: 0; background: black; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+        /* RESET Y BASE */
+        body { 
+            margin: 0; background: black; color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            height: 100dvh; /* Altura dinámica real para móviles */
+            width: 100vw; overflow: hidden; 
+            display: flex; flex-direction: column;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
 
-        /* --- 1. CONTENEDOR HÍBRIDO --- */
-        .video-wrapper { position: relative; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; }
+        /* --- 1. CONTENEDOR DE VIDEO --- */
+        .video-wrapper { 
+            position: relative; width: 100%; height: 100%; 
+            background: #000; display: flex; align-items: center; justify-content: center; 
+        }
 
-        /* Reproductor Nativo (MP4) */
-        video { width: 100%; height: 100%; object-fit: contain; display: none; } /* Oculto por defecto */
-
-        /* Reproductor Embed (Iframe) */
-        iframe { width: 100%; height: 100%; border: none; display: none; } /* Oculto por defecto */
+        /* Reproductores */
+        video, iframe { 
+            width: 100%; height: 100%; border: none; 
+            display: none; /* Ocultos por defecto */
+        }
         
-        /* Clase para activar uno u otro */
+        /* Modo PC: Max width para que no se vea estirado en monitores ultra-wide (Opcional) */
+        @media (min-width: 1024px) {
+            video { max-width: 100%; object-fit: contain; }
+        }
+        
+        /* Clase Activa */
         .active-player { display: block !important; }
 
-        /* --- 2. CAPA DE CONTROLES (UI) --- */
-        .controls { 
+        /* --- 2. CAPA DE INTERFAZ (UI) --- */
+        .controls-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.3); pointer-events: none; /* Dejar pasar clics al iframe */
-            display: flex; flex-direction: column; justify-content: space-between; 
-            padding: 20px; z-index: 10;
+            background: var(--overlay-bg);
+            display: flex; flex-direction: column; justify-content: space-between;
+            
+            /* ÁREAS SEGURAS (Para iPhone X/11/12/13/14/15) */
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            
+            z-index: 10; transition: opacity 0.3s ease;
+            pointer-events: none; /* Dejar pasar clics al video/iframe por defecto */
         }
 
-        /* Elementos clickeables (reactivan el puntero) */
-        .interactive { pointer-events: auto; }
+        /* Elementos interactivos dentro de la capa */
+        .interactive { pointer-events: auto; cursor: pointer; }
+        .hidden { opacity: 0; }
 
-        /* Top Bar */
-        .top-bar { display: flex; align-items: center; gap: 15px; padding-top: 10px; text-shadow: 0 2px 4px black; }
-        .back-btn { font-size: 1.5rem; color: white; text-decoration: none; }
-        #title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Botón Play Gigante (Solo MP4) */
-        .center-play { 
-            align-self: center; font-size: 4rem; filter: drop-shadow(0 0 20px black); opacity: 0.8; 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            display: none; /* Se activa con JS */
-        }
-
-        /* Bottom Bar */
-        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        /* --- 3. ELEMENTOS DE LA UI --- */
         
-        /* Botón Siguiente (Flotante) */
+        /* Barra Superior */
+        .top-bar { display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 1.5rem; color: white; text-decoration: none; filter: drop-shadow(0 2px 4px black); }
+        #title { 
+            font-size: 1rem; font-weight: 600; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            text-shadow: 0 2px 4px black; opacity: 0.9;
+        }
+
+        /* Play Centro (Solo MP4) */
+        .center-play { 
+            align-self: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); opacity: 0.9;
+            transition: transform 0.2s; display: none; /* Se activa con JS */
+        }
+        .center-play:active { transform: translate(-50%, -50%) scale(0.9); }
+
+        /* Barra Inferior */
+        .bottom-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+
+        /* Botón Siguiente Flotante */
         #btnNext { 
             display: none; align-self: flex-end; 
-            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; 
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2); margin-bottom: 5px;
+            transition: background 0.2s;
+        }
+        #btnNext:hover { background: rgba(255,255,255,0.3); }
+
+        /* Barra de Progreso (Solo MP4) */
+        .progress-area { 
+            display: none; width: 100%; height: 20px; /* Área táctil grande */
+            align-items: center; cursor: pointer;
+        }
+        .track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; position: relative; overflow: hidden; }
+        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 4px; }
+        
+        /* Información y Botones Extra */
+        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #ddd; }
+        
+        #btnEpList { 
+            display: none; align-items: center; gap: 8px; 
+            background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 12px; 
         }
 
-        /* Línea de Tiempo (Solo MP4) */
-        .progress-area { display: none; flex-direction: column; gap: 5px; }
-        .progress { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 5px; position: relative; }
-        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 5px; position: relative; }
-        .fill::after { content:''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
+        /* --- 4. PANEL LATERAL (DRAWER) --- */
+        .drawer-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 15; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 
-        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #ddd; align-items: center; }
-        #btnEpList { display: none; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; }
-
-        /* --- 3. PANEL LATERAL (DRAWER) --- */
         .drawer {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 70vh; 
-            background: #181818; border-radius: 25px 25px 0 0; z-index: 20;
+            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 70vh; 
+            background: #181818; border-radius: 20px 20px 0 0; z-index: 20;
             transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            padding: 25px; display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
+            padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column; box-shadow: 0 -5px 30px black;
         }
         .drawer.open { transform: translateY(0); }
-        .ep-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; gap: 15px; align-items: center; }
-        .ep-num { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+        
+        .drawer-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .ep-list { overflow-y: auto; flex: 1; }
+        .ep-item { padding: 14px; border-radius: 8px; cursor: pointer; display: flex; gap: 15px; align-items: center; transition: background 0.2s; }
+        .ep-item:hover { background: #2a2a2a; }
+        .ep-item.active { background: #333; border: 1px solid #ff3366; }
+        .ep-num { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
+        .ep-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
     </style>
 </head>
 <body>
 
     <div class="video-wrapper">
         <video id="vid" playsinline onclick="togglePlay()"></video>
-
         <iframe id="embedFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 
-        <div id="ui" class="controls">
+        <div id="ui" class="controls-layer">
+            
             <div class="top-bar interactive">
                 <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
                 <span id="title">Cargando...</span>
@@ -93,16 +153,18 @@
             <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
 
             <div class="bottom-bar">
+                
                 <div id="btnNext" class="interactive" onclick="nextEp()">
                     Siguiente <i class="fa-solid fa-forward"></i>
                 </div>
 
-                <div id="progressArea" class="progress-area interactive">
-                    <div class="progress" onclick="seek(event)"><div id="fill" class="fill"></div></div>
+                <div id="progressArea" class="progress-area interactive" onclick="seek(event)">
+                    <div class="track"><div id="fill" class="fill"></div></div>
                 </div>
                 
                 <div class="info-row interactive">
-                    <span id="time" style="display:none;">00:00</span> <div id="btnEpList" onclick="toggleDrawer()">
+                    <span id="time" style="display:none; font-variant-numeric: tabular-nums;">00:00 / 00:00</span>
+                    <div id="btnEpList" onclick="toggleDrawer()">
                         Episodios <i class="fa-solid fa-layer-group"></i>
                     </div>
                 </div>
@@ -110,53 +172,63 @@
         </div>
     </div>
 
+    <div id="drawerBackdrop" class="drawer-backdrop" onclick="toggleDrawer()"></div>
     <div id="drawer" class="drawer">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+        <div class="drawer-header">
             <h3 style="margin:0;">Episodios</h3>
-            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
+            <i class="fa-solid fa-xmark interactive" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
         </div>
-        <div id="list" style="overflow-y:auto; flex:1;"></div>
+        <div id="list" class="ep-list"></div>
     </div>
 
     <script>
+        // --- 1. DETECCIÓN Y VARIABLES ---
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
-        
         let itemData = null;
         let currentEp = 0;
+        let hideTimer;
         
-        // Elementos DOM
+        // DOM Elements
         const vid = document.getElementById('vid');
         const iframe = document.getElementById('embedFrame');
+        const ui = document.getElementById('ui');
         const playIcon = document.getElementById('playIcon');
         const progressArea = document.getElementById('progressArea');
         const timeLabel = document.getElementById('time');
+        const drawer = document.getElementById('drawer');
+        const backdrop = document.getElementById('drawerBackdrop');
 
-        // INICIO
+        // --- 2. INICIO ---
         window.onload = async () => {
             try {
                 const res = await fetch(`/api/movies/${id}`);
-                if(!res.ok) return alert("Error cargando video");
+                if(!res.ok) throw new Error("Error API");
                 itemData = await res.json();
                 iniciarSistema();
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                document.getElementById('title').innerText = "Error cargando contenido";
+            }
         };
 
         function iniciarSistema() {
-            // 1. Configurar botones de Serie/Pelicula
+            // Configurar UI para Serie o Película
             if (itemData.tipo === 'serie') {
                 document.getElementById('btnNext').style.display = 'block';
                 document.getElementById('btnEpList').style.display = 'flex';
                 cargarEpisodio(0);
                 generarLista();
             } else {
-                // Película
+                // Es Película
                 document.getElementById('title').innerText = itemData.title;
                 detectarFuente(itemData.url);
             }
+            
+            // Auto-Ocultar controles al inicio
+            resetInteraction();
         }
 
-        // --- SISTEMA INTELIGENTE DE FUENTES ---
+        // --- 3. LÓGICA DE FUENTES (MP4 vs EMBED) ---
         function cargarEpisodio(index) {
             if(!itemData.episodios || !itemData.episodios[index]) return;
             currentEp = index;
@@ -164,48 +236,89 @@
             
             document.getElementById('title').innerText = `Ep ${ep.numero}: ${ep.titulo || ''}`;
             detectarFuente(ep.url);
+            generarLista(); // Actualizar el 'active' en la lista
         }
 
         function detectarFuente(url) {
-            // Si termina en .mp4 o .webm -> Usar Video Nativo
-            if (url.includes('.mp4') || url.includes('.webm')) {
+            // ¿Es archivo directo? (MP4, MKV, WEBM)
+            if (url.match(/\.(mp4|webm|mkv)$/i)) {
                 activarModoMP4(url);
             } else {
-                // Cualquier otra cosa -> Usar Iframe (Embed)
                 activarModoEmbed(url);
             }
         }
 
         function activarModoMP4(url) {
-            // Mostrar Video, Ocultar Iframe
             iframe.classList.remove('active-player');
-            iframe.src = ""; // Limpiar iframe anterior
+            iframe.src = "";
             
             vid.classList.add('active-player');
             vid.src = url;
-            vid.play();
+            vid.play().catch(e => console.log("Autoplay bloqueado, usuario debe tocar play"));
 
-            // Activar UI Personalizada
+            // Activar UI completa
             playIcon.style.display = 'block';
             progressArea.style.display = 'flex';
             timeLabel.style.display = 'block';
+            
+            // Habilitar interacción de capa para Play/Pause
+            ui.onclick = (e) => {
+                // Si toca el fondo (no botones), toggle UI y Play
+                if(e.target === ui) {
+                    toggleUI();
+                }
+            };
         }
 
         function activarModoEmbed(url) {
-            // Mostrar Iframe, Ocultar Video
             vid.classList.remove('active-player');
             vid.pause();
             
             iframe.classList.add('active-player');
             iframe.src = url;
 
-            // Ocultar UI que no sirve en Embeds
-            playIcon.style.display = 'none';     // El iframe tiene su propio play
-            progressArea.style.display = 'none'; // El iframe tiene su propia barra
+            // UI Reducida (Sin Play, Sin Barra)
+            playIcon.style.display = 'none';
+            progressArea.style.display = 'none';
             timeLabel.style.display = 'none';
+            
+            // En embed, la capa UI debe dejar pasar los clics al iframe
+            // excepto en los botones flotantes
+            ui.onclick = null; 
         }
 
-        // --- FUNCIONES COMUNES ---
+        // --- 4. FUNCIONES DE INTERACCIÓN ---
+        function togglePlay() {
+            if(!vid.classList.contains('active-player')) return;
+            
+            if(vid.paused) {
+                vid.play();
+                playIcon.className = "fa-solid fa-pause center-play interactive";
+                resetInteraction(); // Ocultar controles al reproducir
+            } else {
+                vid.pause();
+                playIcon.className = "fa-solid fa-play center-play interactive";
+                ui.classList.remove('hidden'); // Mostrar controles al pausar
+            }
+        }
+
+        function toggleUI() {
+            if(ui.classList.contains('hidden')) {
+                ui.classList.remove('hidden');
+                resetInteraction();
+            } else {
+                ui.classList.add('hidden');
+            }
+        }
+
+        function resetInteraction() {
+            clearTimeout(hideTimer);
+            if(!vid.paused && vid.classList.contains('active-player')) {
+                hideTimer = setTimeout(() => ui.classList.add('hidden'), 3500);
+            }
+        }
+
+        // --- 5. LÓGICA DE SERIES ---
         function nextEp() {
             if (itemData.episodios && currentEp + 1 < itemData.episodios.length) {
                 cargarEpisodio(currentEp + 1);
@@ -214,46 +327,53 @@
             }
         }
 
+        function toggleDrawer() {
+            drawer.classList.toggle('open');
+            backdrop.classList.toggle('open');
+        }
+
         function generarLista() {
             const list = document.getElementById('list');
             list.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
                 const div = document.createElement('div');
-                div.className = 'ep-item';
-                div.innerHTML = `<span class="ep-num">${ep.numero}</span> <span>${ep.titulo || 'Episodio ' + ep.numero}</span>`;
+                div.className = `ep-item ${i === currentEp ? 'active' : ''}`;
+                div.innerHTML = `<span class="ep-num">${ep.numero}</span> <span class="ep-title">${ep.titulo || 'Episodio ' + ep.numero}</span>`;
                 div.onclick = () => { cargarEpisodio(i); toggleDrawer(); };
                 list.appendChild(div);
             });
         }
 
-        function toggleDrawer() {
-            document.getElementById('drawer').classList.toggle('open');
-        }
-
-        // --- SOLO PARA MP4 ---
-        function togglePlay() {
-            if(!vid.classList.contains('active-player')) return; // No hacer nada en embed
-            if(vid.paused) { 
-                vid.play(); 
-                playIcon.className = "fa-solid fa-pause center-play interactive"; 
-            } else { 
-                vid.pause(); 
-                playIcon.className = "fa-solid fa-play center-play interactive"; 
-            }
-        }
-
+        // --- 6. BARRA DE PROGRESO (Solo MP4) ---
         function seek(e) {
-            const pos = (e.offsetX / e.target.offsetWidth);
+            const rect = progressArea.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
             vid.currentTime = pos * vid.duration;
+            e.stopPropagation();
         }
 
         vid.ontimeupdate = () => {
+            if(isNaN(vid.duration)) return;
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
-            let m = Math.floor(vid.currentTime / 60);
-            let s = Math.floor(vid.currentTime % 60);
-            document.getElementById('time').innerText = `${m}:${s<10?'0'+s:s}`;
+            
+            const cur = formatTime(vid.currentTime);
+            const dur = formatTime(vid.duration);
+            timeLabel.innerText = `${cur} / ${dur}`;
         };
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            let sec = Math.floor(s % 60);
+            return `${m}:${sec<10?'0'+sec:sec}`;
+        }
+        
+        // PC Mouse Interaction
+        ui.onmousemove = () => {
+            ui.classList.remove('hidden');
+            resetInteraction();
+        };
+
     </script>
 </body>
 </html>
