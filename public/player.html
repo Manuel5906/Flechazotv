@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Reproductor Seguro</title>
+    <title>Reproductor Flechazo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. CONFIGURACIÓN BASE (CANDADO ANTI-REBOTE) --- */
+        /* --- CONFIGURACIÓN BASE --- */
         html, body {
             margin: 0; padding: 0; background: #000; color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100dvh; width: 100vw; overflow: hidden;
             position: fixed; top: 0; left: 0;
-            user-select: none; -webkit-user-select: none; /* Anti-Selección de texto */
-            -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 2. CONTENEDOR VIDEO --- */
+        /* --- CONTENEDOR VIDEO --- */
         .video-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
@@ -26,12 +25,12 @@
         }
         video, iframe { 
             width: 100%; height: 100%; object-fit: contain; border: none; 
-            pointer-events: none; /* Bloquea clic derecho nativo del video */
+            pointer-events: none; 
         }
         .active-player { display: block !important; pointer-events: auto; }
         .hidden { display: none !important; }
 
-        /* --- 3. MARCA DE AGUA (SEGURIDAD VISUAL) --- */
+        /* --- MARCA DE AGUA --- */
         .watermark {
             position: absolute; top: 20px; right: 20px; z-index: 5;
             opacity: 0.5; pointer-events: none;
@@ -39,14 +38,16 @@
             filter: drop-shadow(0 2px 4px black);
         }
         .wm-logo { font-size: 1.2rem; color: #ff3366; }
-        .wm-text { font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+        .wm-text { font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; color: rgba(255,255,255,0.7); }
 
-        /* --- 4. CAPA TÁCTIL (PLAY/PAUSE) --- */
+        /* --- ÁREA TÁCTIL (PLAY/PAUSE + DOBLE TAP) --- */
         .center-touch-area {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 6; pointer-events: auto; /* Captura clics antes que el video */
+            z-index: 6; pointer-events: auto;
             display: flex; align-items: center; justify-content: center;
         }
+        
+        /* Icono Play/Pause Animado */
         .play-icon-anim {
             font-size: 5rem; color: rgba(255,255,255,0.8);
             filter: drop-shadow(0 0 10px black);
@@ -54,27 +55,52 @@
         }
         .paused .play-icon-anim { opacity: 1; transform: scale(1); }
 
-        /* --- 5. INTERFAZ FLOTANTE (UI) --- */
+        /* SPINNER DE CARGA */
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: #ff3366;
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+            position: absolute; z-index: 4; display: none; /* JS lo activa */
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ANIMACIÓN DOBLE TAP (10s) */
+        .seek-anim {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.6); padding: 15px; border-radius: 50%;
+            color: white; font-size: 1.5rem; font-weight: bold;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; flex-direction: column; align-items: center; z-index: 20;
+        }
+        .seek-anim i { font-size: 1.2rem; margin-bottom: 5px; }
+        .seek-left { left: 20%; } .seek-right { right: 20%; }
+        .show-seek { opacity: 1; }
+
+        /* --- UI FLOTANTE --- */
         .ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Deja pasar clicks al video */
+            pointer-events: none;
             display: flex; flex-direction: column; justify-content: space-between;
             z-index: 10;
         }
 
-        /* TOP BAR */
+        /* HEADER */
         .top-bar {
             padding: max(15px, env(safe-area-inset-top)) 20px;
             display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
             pointer-events: auto;
         }
-        .back-icon { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); cursor: pointer; }
+        .back-icon { 
+            font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); 
+            cursor: pointer; padding: 10px; /* Área táctil más grande */
+        }
         .video-info { flex: 1; overflow: hidden; }
         .video-title { font-size: 1rem; font-weight: 700; text-shadow: 0 1px 3px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-subtitle { font-size: 0.8rem; color: #ddd; text-shadow: 0 1px 3px black; }
 
-        /* SIDEBAR (BOTONES LATERALES) */
+        /* SIDEBAR */
         .sidebar {
             position: absolute; right: 15px; bottom: max(90px, env(safe-area-inset-bottom));
             display: flex; flex-direction: column; gap: 20px; align-items: center;
@@ -88,19 +114,17 @@
             color: white; cursor: pointer; transition: transform 0.2s;
         }
         .side-btn:active { transform: scale(0.9); background: rgba(255, 51, 102, 0.8); }
-        .side-btn i { font-size: 1.4rem; }
         .btn-label { font-size: 0.65rem; font-weight: 600; margin-top: 5px; text-shadow: 0 1px 2px black; }
 
-        /* BOTÓN SIGUIENTE (ANIMADO) */
         #btnNext { 
             transform: translateX(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         #btnNext .side-btn { background: rgba(255, 51, 102, 0.9); border: none; }
         #btnNext.show { transform: translateX(0); opacity: 1; }
 
-        /* BARRA PROGRESO (FINA ABAJO) */
+        /* BARRA PROGRESO */
         .progress-container {
-            width: 100%; height: 30px; /* Área táctil invisible grande */
+            width: 100%; height: 30px; 
             position: absolute; bottom: 0; left: 0;
             display: flex; align-items: flex-end;
             pointer-events: auto; cursor: pointer;
@@ -116,7 +140,7 @@
         .progress-container:active .progress-track { height: 8px; }
         .progress-container:active .progress-fill::after { transform: scale(1.5); }
 
-        /* --- DRAWER (MENÚ) --- */
+        /* DRAWER */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 
@@ -140,32 +164,45 @@
         .ep-num { font-size: 1.1rem; font-weight: bold; color: #666; }
         .ep-item.active .ep-num { color: #ff3366; }
 
-        /* ALERTAS SEGURIDAD */
+        /* SEGURIDAD & ERRORES */
         #securityMsg {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 30px; border-radius: 10px;
             z-index: 9999; display: none; font-weight: bold; box-shadow: 0 5px 20px black;
         }
+        #errorMsg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; color: #ccc; display: none; z-index: 2;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="securityMsg"><i class="fa-solid fa-lock"></i> Acción Bloqueada</div>
+<body oncontextmenu="return false;">
+
+    <div id="securityMsg"><i class="fa-solid fa-lock"></i> Bloqueado</div>
+    <div id="errorMsg"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Video no disponible</div>
 
     <div class="video-container">
         <video id="vid" playsinline loop></video>
         <iframe id="embedFrame" allowfullscreen allow="autoplay"></iframe>
+
+        <div id="spinner" class="loading-spinner"></div>
+
+        <div id="seekLeft" class="seek-anim seek-left"><i class="fa-solid fa-backward"></i> -10s</div>
+        <div id="seekRight" class="seek-anim seek-right"><i class="fa-solid fa-forward"></i> +10s</div>
 
         <div class="watermark">
             <i class="fa-solid fa-heart wm-logo"></i>
             <span class="wm-text">FLECHAZO TV</span>
         </div>
 
-        <div id="touchArea" class="center-touch-area" onclick="togglePlay()">
+        <div id="touchArea" class="center-touch-area" onclick="handleTouch(event)">
             <i class="fa-solid fa-play play-icon-anim"></i>
         </div>
 
         <div class="ui-layer">
             <div class="top-bar">
-                <i class="fa-solid fa-arrow-left back-icon" onclick="history.back()"></i>
+                <i class="fa-solid fa-arrow-left back-icon" onclick="goHome()"></i>
+                
                 <div class="video-info">
                     <div id="title" class="video-title">Cargando...</div>
                     <div id="subtitle" class="video-subtitle"></div>
@@ -200,28 +237,55 @@
     </div>
 
     <script>
-        // --- SEGURIDAD ---
-        // 1. Bloqueo de Teclas Developer
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
-                showSecurityMsg(); return false;
-            }
-            // Atajos PC (Espacio, Flechas)
-            if(document.body.classList.contains('pc-mode') && !document.getElementById('vid').classList.contains('hidden')) {
-                if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
-                if(e.code === 'ArrowRight') { vid.currentTime += 10; }
-                if(e.code === 'ArrowLeft') { vid.currentTime -= 10; }
-            }
-        };
-        // 2. Anti-Drag
-        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
-        function showSecurityMsg() {
-            const m = document.getElementById('securityMsg'); m.style.display='block'; setTimeout(()=>m.style.display='none', 1500);
+        // --- 1. FUNCIÓN REGRESAR MEJORADA ---
+        function goHome() {
+            // Intenta ir al inicio definido o a la raíz
+            window.location.href = 'index.html'; 
         }
-        // 3. Detectar PC
-        if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) document.body.classList.add('pc-mode');
 
-        // --- LÓGICA APP ---
+        // --- 2. DOBLE TAP (LÓGICA) ---
+        let lastClick = 0;
+        
+        function handleTouch(e) {
+            const now = new Date().getTime();
+            const width = window.innerWidth;
+            const x = e.clientX;
+
+            // Detectar Doble Tap (< 300ms)
+            if (now - lastClick < 300) {
+                if (x < width / 3) {
+                    skip(-10); // Izquierda
+                    showSeekAnim('seekLeft');
+                } else if (x > (width / 3) * 2) {
+                    skip(10); // Derecha
+                    showSeekAnim('seekRight');
+                } else {
+                    togglePlay(); // Centro (Play/Pause forzado)
+                }
+            } else {
+                // Toque Simple (Esperar un poco para confirmar que no es doble)
+                setTimeout(() => {
+                    if (new Date().getTime() - lastClick > 300) {
+                        // Es un toque simple, Toggle Play
+                        // (Opcional: Si quieres que el simple tap oculte UI, pon lógica aquí)
+                        togglePlay(); 
+                    }
+                }, 350);
+            }
+            lastClick = now;
+        }
+
+        function skip(sec) {
+            if(!vid.classList.contains('hidden')) vid.currentTime += sec;
+        }
+
+        function showSeekAnim(id) {
+            const el = document.getElementById(id);
+            el.classList.add('show-seek');
+            setTimeout(() => el.classList.remove('show-seek'), 600);
+        }
+
+        // --- 3. LÓGICA PRINCIPAL ---
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         let itemData = null, currentEp = 0, isSerie = false;
@@ -233,6 +297,7 @@
         const btnNext = document.getElementById('btnNext');
         const drawer = document.getElementById('drawer');
         const overlay = document.getElementById('overlay');
+        const spinner = document.getElementById('spinner');
 
         window.onload = async () => {
             try {
@@ -246,7 +311,10 @@
                     document.getElementById('title').innerText = itemData.title;
                     loadSource(itemData.url);
                 }
-            } catch(e) {}
+            } catch(e) { 
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('title').innerText = "Error";
+            }
         };
 
         function loadEp(i) {
@@ -259,21 +327,32 @@
         }
 
         function loadSource(url) {
+            spinner.style.display = 'block'; // Mostrar carga
+            
             if(url.match(/\.(mp4|webm|mkv)$/i)) {
                 // MP4
                 iframe.classList.add('hidden'); iframe.src = "";
-                vid.classList.remove('hidden'); vid.src = url; vid.play().catch(()=>{});
+                vid.classList.remove('hidden'); vid.src = url; 
+                vid.play().then(() => spinner.style.display = 'none').catch(() => spinner.style.display = 'none');
+                
                 document.getElementById('progressContainer').style.display = 'flex';
                 touchArea.style.pointerEvents = 'auto'; 
             } else {
                 // Embed
                 vid.classList.add('hidden'); vid.pause();
                 iframe.classList.remove('hidden'); iframe.src = url;
+                iframe.onload = () => spinner.style.display = 'none'; // Ocultar al cargar iframe
+                
                 document.getElementById('progressContainer').style.display = 'none';
-                touchArea.style.pointerEvents = 'none'; // Clic directo al iframe
+                touchArea.style.pointerEvents = 'none';
                 if(isSerie && hasNext()) setTimeout(() => btnNext.classList.add('show'), 5000);
             }
         }
+
+        /* --- EVENTOS VIDEO (BUFFERING) --- */
+        vid.onwaiting = () => spinner.style.display = 'block';
+        vid.onplaying = () => spinner.style.display = 'none';
+        vid.onerror = () => { spinner.style.display = 'none'; document.getElementById('errorMsg').style.display = 'block'; };
 
         function togglePlay() {
             if(vid.classList.contains('hidden')) return;
@@ -311,6 +390,10 @@
             });
             l.scrollTop = sp;
         }
+        
+        // Anti-Robo
+        document.onkeydown = function(e) { if(e.keyCode == 123) return false; }
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
     </script>
 </body>
 </html>
