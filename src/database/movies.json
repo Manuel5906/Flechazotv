@@ -1,24 +1,36 @@
-const contenido = [
+[
   {
     "id": 1,
-    "tipo": "serie",  // <--- INDICA QUE TIENE EPISODIOS
+    "tipo": "serie",
     "title": "El Regreso del CEO",
     "desc": "Un CEO envenenado es salvado por una humilde vendedora...",
     "img": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg",
     "cat": "Romance",
     "episodios": [
-      { "numero": 1, "titulo": "El encuentro", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" },
-      { "numero": 2, "titulo": "La revelación", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" }, 
-      { "numero": 3, "titulo": "El final", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" }
+      {
+        "numero": 1,
+        "titulo": "El encuentro",
+        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+      },
+      {
+        "numero": 2,
+        "titulo": "La revelación",
+        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+      },
+      {
+        "numero": 3,
+        "titulo": "El final",
+        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+      }
     ]
   },
   {
     "id": 2,
-    "tipo": "pelicula", // <--- INDICA QUE ES UN SOLO VIDEO
+    "tipo": "pelicula",
     "title": "Navidad Eterna",
     "desc": "Una historia de amor de 2 horas sin interrupciones.",
     "img": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg",
     "cat": "Drama",
-    "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" // Solo un link
+    "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
   }
-];
+]
