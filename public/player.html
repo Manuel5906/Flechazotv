@@ -424,111 +424,90 @@
             startPlaybackSequence();
         };
 
-        // --- FUNCIONES PREMIUM ---
-        async function togglePiP() {
-            if (playerType === 'html5' && html5Player) {
-                try { if (document.pictureInPictureElement) await document.exitPictureInPicture(); else await html5Player.requestPictureInPicture(); } 
-                catch (err) { showFeedback('fa-circle-exclamation', 'No Soportado'); }
-            } else { showFeedback('fa-youtube', 'Usar App YT'); }
-        }
-
-        function toggleFit() {
-            isZoomed = !isZoomed;
-            const container = document.getElementById('mainContainer');
-            const icon = document.getElementById('fitBtn');
-            if(isZoomed) { container.classList.add('video-zoomed'); icon.className = "fa-solid fa-compress icon-btn"; showFeedback('fa-crop-simple', 'Llenar'); } 
-            else { container.classList.remove('video-zoomed'); icon.className = "fa-solid fa-crop-simple icon-btn"; showFeedback('fa-image', 'Normal'); }
-        }
-
-        // --- AJUSTES Y CALIDAD ---
-        function openSettings() { if(isLocked) return; toggleDrawer('settings'); showMainMenu(); }
-        function showMainMenu() {
-            document.getElementById('mainMenu').style.display = 'block';
-            document.querySelectorAll('.submenu').forEach(el => el.classList.remove('active'));
-        }
-        function showSubmenu(id) {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('submenu-'+id).classList.add('active');
-        }
-
-        function setQuality(level) {
-            // Actualizar UI
-            document.querySelectorAll('.grid-quality .option-btn').forEach(btn => btn.classList.remove('active'));
-            // Seleccionar el botón clickeado o el correspondiente (truco simple)
-            const btnId = 'qual-' + (level === 'default' ? 'auto' : level);
-            const btn = document.getElementById(btnId);
-            if(btn) btn.classList.add('active');
-
-            // Actualizar Texto Menu
-            const label = btn ? btn.innerText : 'Auto';
-            document.getElementById('qualityValueLabel').innerText = label;
-
-            // Aplicar lógica real
-            if(playerType === 'youtube' && ytPlayer && ytPlayer.setPlaybackQuality) {
-                ytPlayer.setPlaybackQuality(level);
-                showFeedback('fa-sliders', 'Calidad: ' + label);
-            } else {
-                showFeedback('fa-circle-info', 'Auto (HTML5)');
-            }
-            showMainMenu();
-        }
-
-        function setSpeed(rate) {
-            currentSpeed = rate;
-            if(html5Player) html5Player.playbackRate = rate;
-            if(ytPlayer) ytPlayer.setPlaybackRate(rate);
-            document.querySelectorAll('.grid-options .option-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('speedValueLabel').innerText = rate + 'x';
-            showMainMenu();
-        }
-
-        // --- GESTOS Y PLAYER LOGIC --- (Igual que antes)
+        // --- GESTOS Y SONIDO (CORREGIDO) ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
+            
             layer.addEventListener('click', (e) => {
+                // TRUCO: Unmute al primer toque si está en silencio
+                if(currentVol > 0 && (html5Player.muted || (ytPlayer && ytPlayer.isMuted && ytPlayer.isMuted()))) {
+                    html5Player.muted = false;
+                    if(ytPlayer && ytPlayer.unMute) ytPlayer.unMute();
+                }
+
                 if(isLocked) { animateLockBtn(); return; }
                 const w = window.innerWidth; const x = e.clientX;
                 if(x < w * 0.30) performSmartSeek(-10, 'left');
                 else if(x > w * 0.70) performSmartSeek(10, 'right');
                 else { const ui = document.getElementById('uiLayer'); ui.classList.contains('hidden-ui') ? resetUiTimer() : togglePlay(); }
             });
+
             layer.addEventListener('touchstart', (e) => {
                 if(isLocked) return; resetUiTimer();
                 touchStartY = e.touches[0].clientY;
                 const x = e.touches[0].clientX; const w = window.innerWidth;
                 if(x < w/2) activeGesture = 'bright'; else activeGesture = 'vol';
             });
+
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
                 if (e.cancelable) e.preventDefault(); resetUiTimer();
-                const y = e.touches[0].clientY; const delta = touchStartY - y;
-                if(Math.abs(delta) > 5) {
-                    const step = (delta / window.innerHeight) * 2;
-                    if(activeGesture === 'vol') setVolume(currentVol + step);
-                    if(activeGesture === 'bright') setBrightness(currentBright + step);
-                    touchStartY = y;
+                const y = e.touches[0].clientY; 
+                const delta = touchStartY - y;
+
+                // Sensibilidad ajustada
+                if(Math.abs(delta) > 10) { 
+                    const step = (delta / window.innerHeight) * 1.5; 
+                    if(activeGesture === 'vol') {
+                        setVolume(currentVol + step);
+                    }
+                    if(activeGesture === 'bright') {
+                        setBrightness(currentBright + step);
+                    }
+                    touchStartY = y; // IMPORTANTE: Resetear para movimiento suave
                 }
             });
+
             layer.addEventListener('touchend', () => {
                 activeGesture = null;
                 setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 500);
             });
         }
 
-        function performSmartSeek(seconds, side) {
-            if (lastTapSide !== side) { seekAccumulator = 0; lastTapSide = side; document.getElementById('seekLeft').classList.remove('visible'); document.getElementById('seekRight').classList.remove('visible'); }
-            clearTimeout(seekOverlayTimer); seekAccumulator += seconds;
-            if(playerType === 'html5') html5Player.currentTime += seconds;
-            else if(playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + seconds, true);
-            const overlayId = side === 'left' ? 'seekLeft' : 'seekRight';
-            const textId = side === 'left' ? 'seekLeftText' : 'seekRightText';
-            document.getElementById(textId).innerText = Math.abs(seekAccumulator) + "s";
-            document.getElementById(overlayId).classList.add('visible');
-            seekOverlayTimer = setTimeout(() => { document.getElementById(overlayId).classList.remove('visible'); seekAccumulator = 0; lastTapSide = null; }, 800);
-            resetUiTimer();
+        // --- FUNCION VOLUMEN (CORREGIDA PARA YOUTUBE) ---
+        function setVolume(val) {
+            currentVol = Math.max(0, Math.min(1, val));
+            
+            // 1. HTML5
+            if(html5Player) { 
+                html5Player.volume = currentVol; 
+                if(currentVol > 0) html5Player.muted = false; 
+            }
+            
+            // 2. YOUTUBE (CLAVE: USAR UNMUTE)
+            if(ytPlayer && ytPlayer.setVolume) {
+                ytPlayer.setVolume(currentVol * 100);
+                if(currentVol > 0) ytPlayer.unMute(); // ESTO ARREGLA EL PROBLEMA
+                else ytPlayer.mute();
+            }
+
+            let icon = currentVol > 0.5 ? 'fa-volume-high' : (currentVol === 0 ? 'fa-volume-xmark' : 'fa-volume-low');
+            showFeedback(icon, Math.round(currentVol * 100) + '%');
         }
 
+        function setBrightness(val) {
+            currentBright = Math.max(0.2, Math.min(1, val));
+            document.getElementById('brightness-overlay').style.opacity = (1 - currentBright);
+            showFeedback('fa-sun', Math.round(currentBright * 100) + '%');
+        }
+
+        function showFeedback(iconClass, text) {
+            document.getElementById('feedIcon').className = `fa-solid ${iconClass} feedback-icon`;
+            document.getElementById('feedText').innerText = text;
+            document.getElementById('centerFeedback').classList.add('visible');
+        }
+
+        // --- PLAYBACK Y STARTUP ---
         function buildSourceQueue(data) {
             sourceQueue = [];
             if(data.url) sourceQueue.push(data.url);
@@ -538,14 +517,26 @@
         }
         function tryNextSource() { currentSourceIndex++; if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]); }
         function startPlaybackSequence() { currentSourceIndex = 0; playIntro(); }
+        
         function playIntro() {
             isPlayingIntro = true; playerType = 'intro';
             html5Player.classList.remove('hidden'); document.getElementById('yt-placeholder').classList.add('hidden');
-            html5Player.src = INTRO_URL; html5Player.muted = true; updateBottomIcon(true);
+            html5Player.src = INTRO_URL; 
+            
+            // REGLA: Autoplay requiere Muted
+            html5Player.muted = true; 
+            
+            updateBottomIcon(true);
             html5Player.play().catch(() => { document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); });
         }
+
         function handleHtml5Ended() {
-            if(isPlayingIntro) { isPlayingIntro = false; html5Player.muted = false; if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]); } 
+            if(isPlayingIntro) { 
+                isPlayingIntro = false; 
+                // Al terminar la intro, activamos sonido para el siguiente video
+                html5Player.muted = false; 
+                if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]); 
+            } 
             else if(isSerie) nextEp();
         }
 
@@ -564,8 +555,14 @@
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
                 document.getElementById('yt-placeholder').classList.add('hidden'); html5Player.classList.remove('hidden');
                 html5Player.src = url; html5Player.currentTime = parseFloat(savedTime);
-                html5Player.playbackRate = currentSpeed; html5Player.muted = false;
-                html5Player.play().catch(e=>console.log(e)); updateBottomIcon(true);
+                html5Player.playbackRate = currentSpeed; 
+                
+                // RESTAURAR SONIDO
+                html5Player.muted = false;
+                html5Player.volume = currentVol > 0 ? currentVol : 1;
+                
+                html5Player.play().catch(e=>console.log(e)); 
+                updateBottomIcon(true);
                 html5Player.onplaying = () => { document.getElementById('spinner').style.display = 'none'; resetUiTimer(); updateBottomIcon(true); };
                 html5Player.onpause = () => updateBottomIcon(false);
                 html5Player.onwaiting = () => document.getElementById('spinner').style.display = 'block';
@@ -573,23 +570,61 @@
             }
         }
 
-        function setVolume(val) {
-            currentVol = Math.max(0, Math.min(1, val));
-            if(html5Player) { html5Player.volume = currentVol; if(val>0) html5Player.muted=false; }
-            if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(currentVol * 100);
-            let icon = currentVol > 0.5 ? 'fa-volume-high' : (currentVol===0 ? 'fa-volume-xmark' : 'fa-volume-low');
-            showFeedback(icon, Math.round(currentVol * 100) + '%');
+        // --- RESTO DE FUNCIONES (AJUSTES, SEEK, ETC) ---
+        function performSmartSeek(seconds, side) {
+            if (lastTapSide !== side) { seekAccumulator = 0; lastTapSide = side; document.getElementById('seekLeft').classList.remove('visible'); document.getElementById('seekRight').classList.remove('visible'); }
+            clearTimeout(seekOverlayTimer); seekAccumulator += seconds;
+            if(playerType === 'html5') html5Player.currentTime += seconds;
+            else if(playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + seconds, true);
+            const overlayId = side === 'left' ? 'seekLeft' : 'seekRight';
+            const textId = side === 'left' ? 'seekLeftText' : 'seekRightText';
+            document.getElementById(textId).innerText = Math.abs(seekAccumulator) + "s";
+            document.getElementById(overlayId).classList.add('visible');
+            seekOverlayTimer = setTimeout(() => { document.getElementById(overlayId).classList.remove('visible'); seekAccumulator = 0; lastTapSide = null; }, 800);
+            resetUiTimer();
         }
-        function setBrightness(val) {
-            currentBright = Math.max(0.2, Math.min(1, val));
-            document.getElementById('brightness-overlay').style.opacity = (1 - currentBright);
-            showFeedback('fa-sun', Math.round(currentBright * 100) + '%');
+
+        function togglePiP() {
+            if (playerType === 'html5' && html5Player) {
+                try { if (document.pictureInPictureElement) document.exitPictureInPicture(); else html5Player.requestPictureInPicture(); } 
+                catch (err) { showFeedback('fa-circle-exclamation', 'No Soportado'); }
+            } else { showFeedback('fa-youtube', 'Usar App YT'); }
         }
-        function showFeedback(iconClass, text) {
-            document.getElementById('feedIcon').className = `fa-solid ${iconClass} feedback-icon`;
-            document.getElementById('feedText').innerText = text;
-            document.getElementById('centerFeedback').classList.add('visible');
+
+        function toggleFit() {
+            isZoomed = !isZoomed;
+            const container = document.getElementById('mainContainer');
+            const icon = document.getElementById('fitBtn');
+            if(isZoomed) { container.classList.add('video-zoomed'); icon.className = "fa-solid fa-compress icon-btn"; showFeedback('fa-crop-simple', 'Llenar'); } 
+            else { container.classList.remove('video-zoomed'); icon.className = "fa-solid fa-crop-simple icon-btn"; showFeedback('fa-image', 'Normal'); }
         }
+
+        function openSettings() { if(isLocked) return; toggleDrawer('settings'); showMainMenu(); }
+        function showMainMenu() { document.getElementById('mainMenu').style.display = 'block'; document.querySelectorAll('.submenu').forEach(el => el.classList.remove('active')); }
+        function showSubmenu(id) { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('submenu-'+id).classList.add('active'); }
+
+        function setQuality(level) {
+            document.querySelectorAll('.grid-quality .option-btn').forEach(btn => btn.classList.remove('active'));
+            const btnId = 'qual-' + (level === 'default' ? 'auto' : level);
+            const btn = document.getElementById(btnId);
+            if(btn) btn.classList.add('active');
+            const label = btn ? btn.innerText : 'Auto';
+            document.getElementById('qualityValueLabel').innerText = label;
+            if(playerType === 'youtube' && ytPlayer && ytPlayer.setPlaybackQuality) { ytPlayer.setPlaybackQuality(level); showFeedback('fa-sliders', 'Calidad: ' + label); } 
+            else { showFeedback('fa-circle-info', 'Auto (HTML5)'); }
+            showMainMenu();
+        }
+
+        function setSpeed(rate) {
+            currentSpeed = rate;
+            if(html5Player) html5Player.playbackRate = rate;
+            if(ytPlayer) ytPlayer.setPlaybackRate(rate);
+            document.querySelectorAll('.grid-options .option-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('speedValueLabel').innerText = rate + 'x';
+            showMainMenu();
+        }
+
         function toggleLock() {
             isLocked = !isLocked;
             const ui = document.getElementById('uiLayer'); const lockBtn = document.getElementById('unlockBtn'); const container = document.getElementById('mainContainer');
@@ -650,8 +685,15 @@
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%', videoId: videoId,
                 playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'start': Math.floor(start), 'playsinline': 1, 'fs': 0, 'modestbranding': 1 },
-                events: { 'onReady': (e)=>{e.target.setPlaybackRate(currentSpeed); e.target.playVideo(); setInterval(updateProgressLoop, 500);}, 
-                'onStateChange': (e)=>{ if(e.data===YT.PlayerState.PLAYING){ document.getElementById('spinner').style.display='none'; resetUiTimer(); updateBottomIcon(true); } if(e.data===YT.PlayerState.PAUSED){ document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); } if(e.data===YT.PlayerState.ENDED && isSerie) nextEp(); } }
+                events: { 
+                    'onReady': (e)=>{
+                        e.target.setPlaybackRate(currentSpeed); 
+                        e.target.playVideo(); 
+                        // INTENTO DE UNMUTE AL CARGAR
+                        if(currentVol > 0) e.target.unMute();
+                        setInterval(updateProgressLoop, 500);
+                    }, 
+                    'onStateChange': (e)=>{ if(e.data===YT.PlayerState.PLAYING){ document.getElementById('spinner').style.display='none'; resetUiTimer(); updateBottomIcon(true); } if(e.data===YT.PlayerState.PAUSED){ document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); } if(e.data===YT.PlayerState.ENDED && isSerie) nextEp(); } }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
