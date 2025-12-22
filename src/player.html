@@ -4,105 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Reproductor Universal</title>
+    <title>Reproductor Seguro - Flechazo TV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* --- 1. VARIABLES & BASE --- */
         :root { 
             --primary: #ff3366; 
             --grad: linear-gradient(135deg, #ff3366, #a033ff); 
-            /* Degradado más oscuro abajo para resaltar los botones */
-            --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%);
+            --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 30%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
         }
         
         html, body {
-            margin: 0; padding: 0;
-            background: #000; color: white; 
+            margin: 0; padding: 0; background: #000; color: white; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* CLAVE 1: 100dvh (Dynamic Height) se adapta cuando aparece la barra del navegador */
-            height: 100dvh; 
-            width: 100vw; 
-            overflow: hidden; 
-            position: fixed; 
-            top: 0; left: 0;
+            height: 100dvh; width: 100vw; overflow: hidden; 
+            position: fixed; top: 0; left: 0;
+            user-select: none; -webkit-user-select: none; /* No seleccionar texto */
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- 2. LAYOUT VIDEO --- */
         .video-wrapper { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; display: flex; align-items: center; justify-content: center; 
         }
 
         video, iframe { 
-            width: 100%; height: 100%; border: none; display: none; 
-            object-fit: contain; 
+            width: 100%; height: 100%; border: none; display: none; object-fit: contain; 
+            pointer-events: none; /* Bloquea clic derecho nativo en el video */
         }
-        .active-player { display: block !important; }
+        .active-player { display: block !important; pointer-events: auto; }
 
-        /* CAPA DE CONTROLES (UI) */
+        /* --- 3. MARCA DE AGUA (COPYRIGHT) --- */
+        .watermark {
+            position: absolute; top: 20px; right: 20px; 
+            opacity: 0.5; z-index: 5; pointer-events: none; /* No interfiere con clics */
+            display: flex; align-items: center; gap: 8px;
+            filter: drop-shadow(0 2px 4px black);
+        }
+        .wm-logo { font-size: 1.5rem; color: #ff3366; }
+        .wm-text { font-weight: 900; letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase; color: rgba(255,255,255,0.8); }
+
+        /* --- 4. INTERFAZ (UI) --- */
         .controls-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--overlay-bg);
             display: flex; flex-direction: column; justify-content: space-between;
-            
-            /* CLAVE 2: Padding Exagerado Abajo (80px) para separarse de la barra del navegador */
             padding-top: max(20px, env(safe-area-inset-top));
-            padding-bottom: max(80px, env(safe-area-inset-bottom)); /* <--- AQUÍ ESTÁ EL ARREGLO */
+            padding-bottom: max(60px, env(safe-area-inset-bottom));
             padding-left: max(20px, env(safe-area-inset-left));
             padding-right: max(20px, env(safe-area-inset-right));
-            
-            z-index: 10; transition: opacity 0.3s ease; pointer-events: none;
+            z-index: 10; transition: opacity 0.3s ease;
         }
-
-        .interactive { pointer-events: auto; cursor: pointer; }
-        .hidden { opacity: 0; }
+        
+        .hidden { opacity: 0; pointer-events: none; }
+        /* En PC, si está oculto, ocultamos el cursor para inmersión */
+        .pc-mode .controls-layer.hidden { cursor: none; }
 
         /* HEADER */
-        .top-bar { display: flex; align-items: center; gap: 15px; }
-        .back-btn { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); }
-        #title { font-size: 1.1rem; font-weight: 600; text-shadow: 0 2px 4px black; opacity: 0.9; }
+        .top-bar { display: flex; align-items: center; gap: 15px; pointer-events: auto; }
+        .back-btn { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); cursor: pointer; }
+        #title { font-size: 1rem; font-weight: 600; text-shadow: 0 2px 4px black; opacity: 0.9; }
 
         /* PLAY GIGANTE */
         .center-play { 
             align-self: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 5rem; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); opacity: 0.9;
-            display: none; transition: transform 0.1s;
+            display: none; transition: transform 0.1s; pointer-events: auto; cursor: pointer;
         }
         .center-play:active { transform: scale(0.9); }
 
         /* BARRA INFERIOR */
-        .bottom-bar { 
-            display: flex; flex-direction: column; gap: 20px; /* Más espacio entre elementos */
-            position: relative; 
-            /* Subimos un poco toda la barra por si acaso */
-            transform: translateY(-10px); 
-        }
+        .bottom-bar { display: flex; flex-direction: column; gap: 15px; position: relative; pointer-events: auto; }
 
-        /* BOTÓN SIGUIENTE */
+        /* Botón Siguiente */
         #btnNext { 
             align-self: flex-end; 
             background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
             padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; font-weight: 600;
             border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; gap: 8px;
-            transform: translateX(150%); opacity: 0; transition: transform 0.5s, opacity 0.5s;
+            transform: translateX(150%); opacity: 0; transition: transform 0.5s, opacity 0.5s; cursor: pointer;
         }
-        #btnNext.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
+        #btnNext.show { transform: translateX(0); opacity: 1; }
 
-        /* BARRA DE PROGRESO (Más gruesa para tocar fácil) */
-        .progress-area { display: none; width: 100%; height: 30px; align-items: center; cursor: pointer; }
+        /* Progreso */
+        .progress-area { width: 100%; height: 25px; display: flex; align-items: center; cursor: pointer; }
         .track { width: 100%; height: 5px; background: rgba(255,255,255,0.3); border-radius: 10px; position: relative; overflow: hidden; }
         .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 10px; }
-        /* Bolita visual */
-        .track::after { content: ''; position: absolute; right: 0; top: 0; height: 100%; width: 0; background: white; box-shadow: 0 0 10px white; }
-
-        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: #eee; font-weight: 500; }
+        
+        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #eee; }
         
         #btnEpList { 
             display: none; align-items: center; gap: 8px; 
-            background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 12px;
-            backdrop-filter: blur(5px);
+            background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 12px; cursor: pointer;
         }
 
-        /* DRAWER (Menú) */
-        .drawer-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        /* --- 5. DRAWER (MENÚ EPISODIOS) --- */
+        .drawer-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 
         .drawer {
@@ -110,8 +109,9 @@
             background: #1e1e1e; border-radius: 25px 25px 0 0; z-index: 30;
             transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1); 
             display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
-            padding-bottom: max(40px, env(safe-area-inset-bottom)); /* Espacio extra en el menú también */
+            padding-bottom: max(30px, env(safe-area-inset-bottom));
         }
+        /* Ajuste PC: Centrado */
         @media (min-width: 768px) { .drawer { width: 400px; left: 50%; margin-left: -200px; } }
         .drawer.open { transform: translateY(0); }
         
@@ -121,32 +121,43 @@
         .ep-item.active { border: 1px solid #ff3366; background: #222; }
         .ep-num { color: #888; font-weight: bold; font-size: 1.1rem; }
         .ep-item.active .ep-num { color: #ff3366; }
+
+        /* Mensaje Seguridad */
+        #securityMsg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px;
+            z-index: 9999; display: none; text-align: center; font-weight: bold;
+        }
+
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;"> <div id="securityMsg"><i class="fa-solid fa-lock"></i> Contenido Protegido</div>
 
     <div class="video-wrapper">
         <video id="vid" playsinline onclick="togglePlay()"></video>
         <iframe id="embedFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 
+        <div class="watermark">
+            <i class="fa-solid fa-heart wm-logo"></i>
+            <span class="wm-text">FLECHAZO TV</span>
+        </div>
+
         <div id="ui" class="controls-layer">
-            <div class="top-bar interactive">
-                <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="top-bar">
+                <div class="back-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></div>
                 <span id="title">Cargando...</span>
             </div>
 
-            <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
+            <i id="playIcon" class="fa-solid fa-play center-play" onclick="togglePlay()"></i>
 
             <div class="bottom-bar">
-                <div id="btnNext" class="interactive" onclick="nextEp()">
-                    Siguiente <i class="fa-solid fa-forward"></i>
-                </div>
+                <div id="btnNext" onclick="nextEp()">Siguiente <i class="fa-solid fa-forward"></i></div>
 
-                <div id="progressArea" class="progress-area interactive" onclick="seek(event)">
+                <div id="progressArea" class="progress-area" onclick="seek(event)">
                     <div class="track"><div id="fill" class="fill"></div></div>
                 </div>
                 
-                <div class="info-row interactive">
+                <div class="info-row">
                     <span id="time" style="display:none; font-variant-numeric: tabular-nums;">00:00 / 00:00</span>
                     <div id="btnEpList" onclick="toggleDrawer()">
                         Episodios <i class="fa-solid fa-list-ul"></i>
@@ -159,14 +170,57 @@
     <div id="drawerBackdrop" class="drawer-backdrop" onclick="toggleDrawer()"></div>
     <div id="drawer" class="drawer">
         <div class="drawer-header">
-            <h3 style="margin:0;">Episodios</h3>
-            <i class="fa-solid fa-xmark interactive" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
+            <h3 style="margin:0;">Lista de Episodios</h3>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
         </div>
         <div id="list" class="ep-list"></div>
     </div>
 
     <script>
-        /* --- JS IGUAL QUE ANTES --- */
+        // --- 1. SEGURIDAD & DETECCIÓN ---
+        
+        // Detectar si es Móvil o PC
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if(!isMobile) {
+            document.body.classList.add('pc-mode');
+            console.log("Modo PC Activado: Atajos de teclado habilitados.");
+        } else {
+            console.log("Modo Móvil Activado: Touch optimizado.");
+        }
+
+        // Bloquear Teclas de Desarrollador (F12, Ctrl+U, etc)
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) { // F12
+                showSecurityMsg(); return false;
+            }
+            if(e.ctrlKey && (e.shiftKey && e.keyCode == 73)) { // Ctrl+Shift+I
+                showSecurityMsg(); return false;
+            }
+            if(e.ctrlKey && (e.keyCode == 85)) { // Ctrl+U
+                showSecurityMsg(); return false;
+            }
+            
+            // Atajos de Reproductor (Solo PC)
+            if(!isMobile && document.getElementById('vid').classList.contains('active-player')) {
+                const v = document.getElementById('vid');
+                if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
+                if(e.code === 'ArrowRight') { v.currentTime += 10; updateTimeUI(); }
+                if(e.code === 'ArrowLeft') { v.currentTime -= 10; updateTimeUI(); }
+                if(e.code === 'KeyF') { toggleFullScreen(); }
+            }
+        };
+
+        function showSecurityMsg() {
+            const msg = document.getElementById('securityMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+        }
+
+        // Evitar arrastrar imágenes (Protección visual)
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+
+        // --- 2. LÓGICA REPRODUCTOR ---
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         let itemData = null;
@@ -190,7 +244,7 @@
                 if(!res.ok) throw new Error("Error");
                 itemData = await res.json();
                 iniciar();
-            } catch(e) { document.getElementById('title').innerText = "Error"; }
+            } catch(e) { document.getElementById('title').innerText = "Contenido no disponible"; }
         };
 
         function iniciar() {
@@ -219,7 +273,6 @@
             if (url.match(/\.(mp4|webm|mkv)$/i)) modoMP4(url);
             else modoEmbed(url);
         }
-        // Alias para compatibilidad
         const detectarFuente = detectingFuente; 
 
         function modoMP4(url) {
@@ -227,7 +280,11 @@
             vid.classList.add('active-player'); vid.src = url;
             vid.play().catch(()=>{});
             playIcon.style.display = 'block'; progressArea.style.display = 'flex'; timeLabel.style.display = 'block';
-            ui.onclick = (e) => { if(e.target === ui) toggleUI(); };
+            
+            // Permitir clic en el video para pausar (Solo si la UI está visible o en PC)
+            ui.onclick = (e) => { 
+                if(e.target === ui) toggleUI(); 
+            };
         }
 
         function modoEmbed(url) {
@@ -238,36 +295,68 @@
             if(isSerie && haySiguiente()) setTimeout(() => btnNext.classList.add('show'), 5000);
         }
 
-        vid.ontimeupdate = () => {
+        // --- ACTUALIZACIÓN TIEMPO ---
+        function updateTimeUI() {
             if(isNaN(vid.duration)) return;
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
             timeLabel.innerText = `${fmt(vid.currentTime)} / ${fmt(vid.duration)}`;
+
             if(isSerie && haySiguiente()) {
                 if(vid.duration - vid.currentTime <= 60) btnNext.classList.add('show');
                 else btnNext.classList.remove('show');
             }
-        };
+        }
+        vid.ontimeupdate = updateTimeUI;
 
         vid.onended = () => { ui.classList.remove('hidden'); if(isSerie && haySiguiente()) btnNext.classList.add('show'); };
         function haySiguiente() { return itemData.episodios && currentEp + 1 < itemData.episodios.length; }
         function nextEp() { if(haySiguiente()) cargarEp(currentEp + 1); }
+        
+        // --- UI TOGGLES ---
         function toggleUI() { ui.classList.toggle('hidden'); if(!ui.classList.contains('hidden')) resetInt(); }
-        function resetInt() { clearTimeout(hideTimer); if(!vid.paused && vid.classList.contains('active-player')) hideTimer = setTimeout(()=>ui.classList.add('hidden'), 3500); }
+        
+        function resetInt() { 
+            clearTimeout(hideTimer); 
+            // En móvil ocultamos a los 3.5s, en PC igual si el mouse no se mueve
+            if(!vid.paused && vid.classList.contains('active-player')) 
+                hideTimer = setTimeout(()=>ui.classList.add('hidden'), 3500); 
+        }
+        
         function toggleDrawer() { drawer.classList.toggle('open'); backdrop.classList.toggle('open'); }
-        function togglePlay() { if(!vid.classList.contains('active-player')) return; if(vid.paused){vid.play(); playIcon.className="fa-solid fa-pause center-play interactive"; resetInt();}else{vid.pause(); playIcon.className="fa-solid fa-play center-play interactive"; ui.classList.remove('hidden');} }
+        
+        function togglePlay() { 
+            if(!vid.classList.contains('active-player')) return; 
+            if(vid.paused){vid.play(); playIcon.className="fa-solid fa-pause center-play"; resetInt();}
+            else{vid.pause(); playIcon.className="fa-solid fa-play center-play"; ui.classList.remove('hidden');} 
+        }
+        
         function seek(e) { const r = progressArea.getBoundingClientRect(); vid.currentTime = ((e.clientX - r.left)/r.width)*vid.duration; e.stopPropagation(); }
         function fmt(s) { const m=Math.floor(s/60); let sc=Math.floor(s%60); return `${m}:${sc<10?'0'+sc:sc}`; }
+        
         function genList() {
-            const l = document.getElementById('list'); l.innerHTML = '';
+            const l = document.getElementById('list'); 
+            const sp = l.scrollTop; l.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
                 const d = document.createElement('div'); d.className = `ep-item ${i===currentEp?'active':''}`;
-                d.innerHTML = `<span class="ep-num">${ep.numero}</span><span>Episodio ${ep.numero}</span>`;
+                d.innerHTML = `<span class="ep-num">${ep.numero}</span><span style="flex:1; font-size:0.9rem;">Episodio ${ep.numero}</span>`;
                 d.onclick = () => { cargarEp(i); toggleDrawer(); };
                 l.appendChild(d);
             });
+            l.scrollTop = sp;
         }
+
+        // PC: Mostrar controles al mover mouse
         ui.onmousemove = () => { ui.classList.remove('hidden'); resetInt(); };
+
+        // Fullscreen
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(()=>{});
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+            }
+        }
     </script>
 </body>
 </html>
