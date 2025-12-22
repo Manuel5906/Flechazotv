@@ -125,38 +125,43 @@ router.get('/youtube/search', async (req, res) => {
     }
 });
 
-// C) INFO DE UN SOLO VIDEO (Formato Personalizado)
-// Uso: /youtube/video?url=https://youtu.be/n7AQzU-NE4w
+// C) INFO DE UN SOLO VIDEO (Con Poster y Banner)
 router.get('/youtube/video', async (req, res) => {
     const inputUrl = req.query.url;
     if (!inputUrl) return res.status(400).json({ error: 'Falta URL' });
 
     try {
-        // 1. Extraer ID con Regex
+        // 1. Extraer ID
         const videoIdMatch = inputUrl.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=))([\w\-]{10,12})\b/);
         const videoId = videoIdMatch ? videoIdMatch[1] : inputUrl;
 
-        // 2. Buscar datos en YouTube
+        // 2. Buscar datos
         const video = await yts({ videoId: videoId });
 
-        // 3. Construir el JSON con TU estructura exacta
+        // URL de Alta Calidad (Max Res)
+        const highResImage = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+        // URL de Calidad Media (HQ - siempre existe si falla la Max)
+        const midResImage = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+        // 3. Respuesta JSON ajustada
         res.json({
-            id: 0, // Ponemos 0 o null, porque el ID numérico (1, 2, 3...) lo genera tu base de datos al guardar
-            tipo: "pelicula", // Valor por defecto
+            id: 0, 
+            tipo: "pelicula",
             title: video.title,
-            desc: video.description, // La descripción completa del video
-            cat: "Drama", // Valor por defecto (puedes cambiarlo manual al recibirlo)
+            desc: video.description, 
+            cat: "Drama", 
             imagenes: {
-                poster: "",
-                banner: `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg` 
+                poster: highResImage, 
+                banner: highResImage
             },
             url: video.url
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Video no encontrado o enlace inválido' });
+        res.status(500).json({ error: 'Video no encontrado' });
     }
 });
+
 
 export default router;
