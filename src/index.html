@@ -1,1 +1,92 @@
-h
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flechazo TV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-dark: #0f1014; --text: #ffffff; --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 90px; }
+        
+        /* UI Básica */
+        .header { padding: 20px; display: flex; justify-content: center; position: relative; }
+        .logo-heart { font-size: 1.8rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .search-btn { position: absolute; right: 20px; top: 25px; font-size: 1.4rem; color: white; }
+
+        /* Hero */
+        .hero-container { padding: 20px; }
+        .hero-card { width: 100%; height: 250px; border-radius: 25px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+        .btn-ver { background: var(--primary-grad); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+        /* Categorías y Listas */
+        .circles-row { display: flex; justify-content: space-around; padding: 20px; }
+        .circle { width: 60px; height: 60px; border-radius: 50%; background: #1a1b21; display: flex; justify-content: center; align-items: center; border: 1px solid #333; color: #ff3366; font-size: 1.4rem; }
+        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
+        .poster { min-width: 110px; height: 160px; border-radius: 15px; overflow: hidden; }
+        .poster img { width: 100%; height: 100%; object-fit: cover; }
+        h3 { padding: 0 20px; margin: 20px 0 10px 0; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 70px; background: #181920; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-item { color: #666; font-size: 1.5rem; } .nav-item.active { color: #ff3366; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-heart"><i class="fa-solid fa-heart"></i></div>
+        <i class="fa-solid fa-magnifying-glass search-btn"></i>
+    </header>
+
+    <div id="heroContainer" class="hero-container"></div>
+    
+    <div class="circles-row">
+        <div class="circle"><i class="fa-brands fa-tiktok"></i></div>
+        <div class="circle"><i class="fa-solid fa-heart"></i></div>
+        <div class="circle"><i class="fa-solid fa-fire"></i></div>
+    </div>
+
+    <h3>Populares</h3>
+    <div class="slider" id="popularesSlider"></div>
+
+    <nav class="bottom-nav">
+        <i class="fa-solid fa-house nav-item active"></i>
+        <i class="fa-regular fa-compass nav-item"></i>
+        <i class="fa-regular fa-bookmark nav-item"></i>
+        <i class="fa-regular fa-user nav-item"></i>
+    </nav>
+
+    <script>
+        // REDIRECCIÓN: Aquí enviamos el ID al otro archivo HTML
+        function irAlPlayer(id) {
+            window.location.href = `player.html?id=${id}`;
+        }
+
+        window.onload = async () => {
+            const res = await fetch('/api/movies');
+            const data = await res.json();
+            
+            // Hero
+            const hero = data[Math.floor(Math.random() * data.length)];
+            document.getElementById('heroContainer').innerHTML = `
+                <div class="hero-card" onclick="irAlPlayer(${hero.id})">
+                    <img src="${hero.imagenes ? hero.imagenes.banner : hero.img}" class="hero-img">
+                    <div class="hero-overlay">
+                        <h2>${hero.title}</h2>
+                        <button class="btn-ver">Ver Ahora</button>
+                    </div>
+                </div>`;
+
+            // Lista
+            const slider = document.getElementById('popularesSlider');
+            data.forEach(item => {
+                const img = item.imagenes ? item.imagenes.poster : item.img;
+                slider.innerHTML += `<div class="poster" onclick="irAlPlayer(${item.id})"><img src="${img}"></div>`;
+            });
+        };
+    </script>
+</body>
+</html>
