@@ -125,11 +125,22 @@
         .show-seek { animation: fadePop 0.6s ease-out; }
         @keyframes fadePop { 0% { opacity: 0; transform: translateY(-50%) scale(0.8); } 50% { opacity: 1; transform: translateY(-50%) scale(1.1); } 100% { opacity: 0; transform: translateY(-50%) scale(1); } }
         
+        /* Mensajes de Estado y Error */
+        #statusMsg {
+            position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px;
+            font-size: 0.75rem; color: #ff3366; font-weight: bold;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 50;
+        }
+        #statusMsg.visible { opacity: 1; }
+
         #errorMsg { position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); display:none; color: #ccc; text-align: center; font-weight: bold; z-index: 60; }
         .error-sub { font-size: 0.8rem; font-weight: normal; color: #888; margin-top: 5px; display:block;}
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+    <div id="statusMsg"><i class="fa-solid fa-rotate"></i> Cambiando fuente...</div>
 
     <div id="errorMsg">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br>
@@ -207,12 +218,12 @@
         let itemData = null;
         let currentEp = 0;
         let isSerie = false;
-        
         let isPlayingIntro = false;
-        let isUsingBackup = false; 
-        
-        let currentVideoUrl = "";
-        let currentBackupUrl = ""; 
+
+        // --- SISTEMA DE SUSTITUCIÓN (COLA DE FUENTES) ---
+        // Almacenamos todos los links posibles (Main, Backup, Mirrors) aquí
+        let sourceQueue = [];   
+        let currentSourceIndex = 0; 
 
         const INTRO_URL = "http://googleusercontent.com/generated_video_content/16975865586054294131";
         const params = new URLSearchParams(window.location.search);
@@ -221,40 +232,35 @@
         // --- 1. INICIO ---
         window.onload = async () => {
             
-            // --- DETECCIÓN DE ERRORES MEJORADA ---
+            // --- DETECCIÓN DE ERRORES INTELIGENTE ---
             html5Player.onerror = function() {
-                console.log("Error detectado en HTML5 Player.");
-                
+                console.warn("Error en HTML5 Player detectado.");
+
+                // Si falla la intro, la saltamos y vamos al video
                 if (isPlayingIntro) {
-                    // Si falla la intro, saltamos al video
                     console.log("Intro falló, saltando...");
                     handleHtml5Ended();
                     return;
                 }
 
-                if (!isUsingBackup && currentBackupUrl) {
-                    console.log("Video falló. Activando Backup...");
-                    isUsingBackup = true; 
-                    
-                    // IMPORTANTE: Ocultar error viejo si existía, mostrar spinner
-                    document.getElementById('errorMsg').style.display = 'none';
-                    document.getElementById('spinner').style.display = 'block';
-                    
-                    loadMainVideo(currentBackupUrl); // Cargar Backup
-                } else {
-                    // Si falló el backup o no hay backup
-                    showError("Contenido no disponible", "No pudimos cargar el video.");
-                }
+                // Si falla el video, intentamos la siguiente fuente de la cola
+                tryNextSource();
             };
 
             html5Player.onended = handleHtml5Ended;
 
             if (!id) {
-                // MODO DEMO
-                document.getElementById('ui-title').innerText = "Flechazo TV: Demo";
-                document.getElementById('ui-subtitle').innerText = "Modo Prueba";
-                currentVideoUrl = "https://link-roto-ejemplo.com/video.mp4"; 
-                currentBackupUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; 
+                // MODO DEMO: Prueba de fallo
+                document.getElementById('ui-title').innerText = "Modo Demo: Sustitución";
+                document.getElementById('ui-subtitle').innerText = "Prueba de Backup";
+                
+                // Simulamos cola: 1. Roto, 2. Roto, 3. Funciona
+                sourceQueue = [
+                    "https://link-roto-1.com/video.mp4",
+                    "https://link-roto-2.com/video.mp4",
+                    "https://www.w3schools.com/html/mov_bbb.mp4" 
+                ];
+                
                 startPlaybackSequence();
                 return;
             }
@@ -271,8 +277,7 @@
                     prepareEp(0);
                 } else {
                     document.getElementById('ui-title').innerText = itemData.title;
-                    currentVideoUrl = itemData.url;
-                    currentBackupUrl = itemData.backupUrl || ""; 
+                    buildSourceQueue(itemData); // Construir cola automáticamente
                     startPlaybackSequence();
                 }
 
@@ -282,9 +287,57 @@
             }
         };
 
+        // --- CONSTRUCTOR DE COLA DE FUENTES ---
+        // Extrae todos los links posibles del objeto de datos
+        function buildSourceQueue(dataObj) {
+            sourceQueue = [];
+            
+            // 1. URL Principal
+            if (dataObj.url) sourceQueue.push(dataObj.url);
+            
+            // 2. URL de Respaldo (Backup)
+            if (dataObj.backupUrl) sourceQueue.push(dataObj.backupUrl);
+            
+            // 3. URLs Extra (si tienes una lista de espejos)
+            if (dataObj.mirrors && Array.isArray(dataObj.mirrors)) {
+                sourceQueue = sourceQueue.concat(dataObj.mirrors);
+            }
+
+            // Fallback por seguridad
+            if (sourceQueue.length === 0) sourceQueue.push("");
+        }
+
+        // --- LÓGICA DE INTENTO DE FUENTE ---
+        function tryNextSource() {
+            currentSourceIndex++; // Avanzar al siguiente link
+
+            if (currentSourceIndex < sourceQueue.length) {
+                console.log(`Intentando fuente ${currentSourceIndex + 1} de ${sourceQueue.length}`);
+                
+                // Mostrar aviso "Cambiando fuente..."
+                showStatusMsg(true);
+                
+                // Ocultar error viejo, mostrar spinner
+                document.getElementById('errorMsg').style.display = 'none';
+                document.getElementById('spinner').style.display = 'block';
+
+                loadMainVideo(sourceQueue[currentSourceIndex]);
+            } else {
+                console.error("Todas las fuentes fallaron.");
+                showStatusMsg(false);
+                showError("Video no disponible", "Todas las opciones de reproducción fallaron.");
+            }
+        }
+
+        function showStatusMsg(show) {
+            const el = document.getElementById('statusMsg');
+            show ? el.classList.add('visible') : el.classList.remove('visible');
+            if(show) setTimeout(() => el.classList.remove('visible'), 2000);
+        }
+
+        // --- 2. SECUENCIA DE REPRODUCCIÓN ---
         function startPlaybackSequence() {
-            isUsingBackup = false;
-            // Aseguramos que no haya errores visibles al empezar
+            currentSourceIndex = 0; // Resetear índice al link 1
             document.getElementById('errorMsg').style.display = 'none';
             playIntro();
         }
@@ -309,17 +362,20 @@
         function handleHtml5Ended() {
             if (isPlayingIntro) {
                 isPlayingIntro = false;
-                loadMainVideo(currentVideoUrl); 
+                // Cargar la primera fuente de la cola
+                if (sourceQueue.length > 0) {
+                    loadMainVideo(sourceQueue[0]);
+                } else {
+                    showError("Sin fuentes de video");
+                }
             } else {
                 checkNextButton(html5Player.duration, html5Player.duration);
             }
         }
 
-        // --- CARGA DEL VIDEO PRINCIPAL ---
+        // --- CARGA DEL VIDEO ---
         function loadMainVideo(url) {
-            // AL CARGAR CUALQUIER VIDEO, LIMPIAMOS ERRORES VISUALES
-            document.getElementById('errorMsg').style.display = 'none'; 
-            
+            document.getElementById('errorMsg').style.display = 'none'; // Limpieza preventiva
             const spinner = document.getElementById('spinner');
             spinner.style.display = 'block';
             document.getElementById('touchArea').classList.remove('paused');
@@ -341,18 +397,13 @@
                 html5Player.load();
                 
                 var promise = html5Player.play();
-                if (promise !== undefined) {
-                    promise.catch(error => console.log("Autoplay bloqueado"));
-                }
+                if (promise !== undefined) { promise.catch(e => console.log("Autoplay bloqueado")); }
                 
-                html5Player.oncanplay = () => {
-                    spinner.style.display = 'none';
-                    document.getElementById('errorMsg').style.display = 'none'; // Aseguramos ocultar error
-                };
+                html5Player.oncanplay = () => { spinner.style.display = 'none'; };
                 html5Player.onwaiting = () => spinner.style.display = 'block';
                 html5Player.onplaying = () => { 
                     spinner.style.display = 'none'; 
-                    document.getElementById('errorMsg').style.display = 'none'; // Aseguramos ocultar error
+                    document.getElementById('errorMsg').style.display = 'none';
                     updatePlayUI(true); 
                 };
                 html5Player.onpause = () => updatePlayUI(false);
@@ -360,6 +411,7 @@
             }
         }
 
+        // --- PREPARAR EPISODIO ---
         function prepareEp(i) {
             if (!itemData.episodios || !itemData.episodios[i]) return;
             currentEp = i;
@@ -370,8 +422,8 @@
             document.getElementById('ui-title').innerText = epTitle;
             document.getElementById('ui-subtitle').innerText = itemData.title;
             
-            currentVideoUrl = itemData.episodios[i].url;
-            currentBackupUrl = itemData.episodios[i].backupUrl || ""; 
+            // Construir la cola para este episodio
+            buildSourceQueue(itemData.episodios[i]);
             
             startPlaybackSequence();
             
@@ -399,21 +451,26 @@
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%', videoId: videoId,
                 playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1, 'fs': 0 },
-                events: { 'onReady': onYtReady, 'onStateChange': onYtStateChange }
+                events: { 'onReady': onYtReady, 'onStateChange': onYtStateChange, 'onError': onYtError }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
 
         function onYtReady(event) { 
             document.getElementById('spinner').style.display = 'none'; 
-            document.getElementById('errorMsg').style.display = 'none'; // Ocultar error si YT carga
+            document.getElementById('errorMsg').style.display = 'none'; 
             event.target.playVideo(); 
             startProgressLoop(); 
+        }
+        function onYtError(event) {
+            // Manejar error de YouTube también
+            console.log("Error YouTube, probando siguiente fuente...");
+            tryNextSource();
         }
         function onYtStateChange(event) {
             if (event.data == YT.PlayerState.PLAYING) { 
                 document.getElementById('spinner').style.display = 'none'; 
-                document.getElementById('errorMsg').style.display = 'none'; // Ocultar error al reproducir
+                document.getElementById('errorMsg').style.display = 'none'; 
                 updatePlayUI(true); 
             }
             else if (event.data == YT.PlayerState.PAUSED) updatePlayUI(false);
@@ -499,11 +556,34 @@
             document.getElementById('errorMsg').style.display = 'block'; 
             document.getElementById('spinner').style.display = 'none'; 
         }
+
+        // --- PANTALLA COMPLETA ROBUSTA ---
         function toggleFullScreen() {
-            const doc = window.document; const docEl = doc.documentElement;
-            const req = docEl.requestFullscreen || docEl.webkitRequestFullScreen; const can = doc.exitFullscreen || doc.webkitExitFullscreen;
-            if (!doc.fullscreenElement && !doc.webkitFullscreenElement) { if(req) req.call(docEl); } else { if(can) can.call(doc); }
+            const doc = window.document;
+            const docEl = document.getElementById('mainContainer'); // Apuntamos al contenedor principal
+            
+            // Detección estándar y prefixes
+            const requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullScreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+            const cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+
+            if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement && !doc.msFullscreenElement) {
+                // Entrar
+                if(requestFullScreen) {
+                    requestFullScreen.call(docEl);
+                    document.getElementById('fs-icon').className = "fa-solid fa-compress";
+                } else {
+                    // Fallback para iPhone iOS (intenta video nativo si contenedor falla)
+                    if(html5Player.webkitEnterFullscreen) html5Player.webkitEnterFullscreen();
+                }
+            } else {
+                // Salir
+                if(cancelFullScreen) {
+                    cancelFullScreen.call(doc);
+                    document.getElementById('fs-icon').className = "fa-solid fa-expand";
+                }
+            }
         }
+        
         function goHome() { window.location.href = '/'; }
     </script>
 </body>
