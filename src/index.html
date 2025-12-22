@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. ESTILOS GENERALES --- */
+        /* --- ESTILOS BASE --- */
         :root { 
             --bg-dark: #0f1014; 
             --card-bg: #1e1e24;
             --text: #ffffff; 
-            --text-gray: #a1a1a6;
             --primary: #ff3366;
             --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); 
         }
@@ -22,340 +21,336 @@
         body { 
             background-color: var(--bg-dark); 
             color: var(--text); 
-            padding-bottom: 90px; /* Espacio para menú abajo */
+            padding-bottom: 90px; /* Espacio para menú */
             overflow-x: hidden;
         }
 
-        /* Efecto Blur para cuando abre el modal */
-        #main-content { transition: filter 0.3s; }
-        body.modal-open #main-content { filter: blur(5px) brightness(0.7); pointer-events: none; }
+        /* --- SISTEMA DE PESTAÑAS (SPA) --- */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 2. HEADER & BUSCADOR --- */
+        /* --- HEADER --- */
         .header { 
             padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; 
             position: sticky; top: 0; z-index: 50; background: rgba(15,16,20,0.95); backdrop-filter: blur(10px);
         }
         .logo-heart { font-size: 1.6rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
+        /* BUSCADOR */
         .search-bar-container {
-            position: absolute; top: 70px; left: 0; width: 100%; padding: 0 20px;
-            transform: translateY(-20px); opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 40;
+            position: fixed; top: 60px; left: 0; width: 100%; padding: 10px 20px;
+            background: var(--bg-dark); z-index: 40; display: none; border-bottom: 1px solid #222;
         }
-        .search-bar-container.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
-        
+        .search-bar-container.show { display: block; animation: slideDown 0.2s; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
         .search-input {
-            width: 100%; background: #2a2a30; border: none; padding: 12px 20px; 
+            width: 100%; background: #2a2a30; border: none; padding: 12px 40px 12px 20px; 
             border-radius: 12px; color: white; font-size: 1rem; outline: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* --- 3. HERO (PORTADA GIGANTE) --- */
-        .hero-container { padding: 20px; margin-top: 10px; }
+        /* --- ESTILOS COMUNES --- */
+        .hero-container { padding: 20px; }
         .hero-card { 
-            width: 100%; height: 400px; /* Más alto para impactar */
-            border-radius: 25px; overflow: hidden; position: relative; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
-            cursor: pointer; transition: transform 0.2s;
+            width: 100%; height: 380px; border-radius: 25px; overflow: hidden; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer;
         }
-        .hero-card:active { transform: scale(0.98); }
         .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        
         .hero-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); 
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); 
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
         }
-        
-        .hero-tag { 
-            background: var(--primary); color: white; padding: 4px 10px; 
-            border-radius: 6px; font-size: 0.7rem; font-weight: bold; width: fit-content; margin-bottom: 8px;
-        }
-        .hero-title { font-size: 2rem; font-weight: 800; line-height: 1.1; margin-bottom: 10px; text-shadow: 0 2px 4px black; }
-        .hero-btns { display: flex; gap: 10px; }
-        
-        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; margin-right: 10px; }
         .btn-primary { background: white; color: black; }
         .btn-glass { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(5px); }
 
-        /* --- 4. CATEGORÍAS (CIRCULOS) --- */
-        .circles-row { display: flex; gap: 20px; padding: 10px 20px; overflow-x: auto; scrollbar-width: none; }
-        .circle-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 65px; cursor: pointer; }
-        .circle-icon { 
-            width: 65px; height: 65px; border-radius: 50%; 
-            background: linear-gradient(145deg, #23232a, #1a1a1f);
-            border: 1px solid #333; display: flex; justify-content: center; align-items: center; 
-            font-size: 1.5rem; color: #ff3366; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-        .circle-item:active .circle-icon { transform: scale(0.9); border-color: #ff3366; }
-        .circle-label { font-size: 0.75rem; color: var(--text-gray); }
-
-        /* --- 5. LISTAS (SLIDERS) --- */
-        .section-header { padding: 25px 20px 15px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .section-title { font-size: 1.2rem; font-weight: 700; }
-        .see-all { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
-
-        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
+        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; margin-bottom: 20px; }
+        .section-title { padding: 0 20px; margin: 20px 0 10px 0; font-weight: 700; font-size: 1.2rem; }
         
-        .poster-card { 
-            min-width: 130px; position: relative; cursor: pointer; 
-            transition: transform 0.2s;
-        }
-        .poster-card:active { transform: scale(0.95); }
-        .poster-img { 
-            width: 130px; height: 190px; border-radius: 12px; object-fit: cover; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: #222;
-        }
-        /* Etiqueta HD/Nuevo sobre el poster */
-        .poster-badge {
-            position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); 
-            backdrop-filter: blur(4px); padding: 2px 6px; border-radius: 4px; 
-            font-size: 0.6rem; font-weight: bold; color: #ff3366;
-        }
+        .poster-card { min-width: 120px; position: relative; cursor: pointer; }
+        .poster-img { width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: #222; }
 
-        /* --- 6. MENU INFERIOR --- */
+        /* --- GRID (Para Explorar y Mi Lista) --- */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px; padding: 20px;
+        }
+        .empty-msg { text-align: center; color: #666; margin-top: 50px; font-size: 0.9rem; }
+
+        /* --- PERFIL --- */
+        .profile-header { text-align: center; padding: 40px 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff3366; margin-bottom: 15px; }
+        .stats-row { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 1.5rem; font-weight: bold; color: white; }
+        .stat-label { font-size: 0.8rem; color: #888; }
+
+        /* --- MENU INFERIOR --- */
         .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
-            background: rgba(15,16,20,0.95); backdrop-filter: blur(20px); border-top: 1px solid #222;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; 
+            background: rgba(15,16,20,0.98); border-top: 1px solid #222;
             display: flex; justify-content: space-around; align-items: center; z-index: 100;
-            padding-bottom: 10px; /* Para iPhone safe area */
         }
-        .nav-item { 
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: #666; font-size: 0.7rem; text-decoration: none; transition: color 0.3s;
-        }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; cursor: pointer; }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
         .nav-item.active { color: white; }
-        .nav-item.active i { color: #ff3366; filter: drop-shadow(0 0 8px rgba(255,51,102,0.4)); }
+        .nav-item.active i { color: #ff3366; }
 
-        /* --- 7. PANEL DE INFORMACIÓN (BOTTOM SHEET) --- */
-        .sheet-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 150; 
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
-
+        /* --- BOTTOM SHEET (INFO) --- */
+        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
+        .sheet-overlay.active { display: block; }
         .bottom-sheet {
-            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 85vh;
-            background: #18181b; border-radius: 30px 30px 0 0;
-            transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
-            z-index: 200; overflow-y: auto; padding-bottom: 30px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 80vh;
+            background: #18181b; border-radius: 25px 25px 0 0; z-index: 200;
+            transform: translateY(110%); transition: transform 0.3s; overflow-y: auto;
+            padding-bottom: 20px;
         }
         .bottom-sheet.active { transform: translateY(0); }
+        .sheet-banner { width: 100%; height: 200px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+        .sheet-content { padding: 0 25px; margin-top: -50px; position: relative; }
+        .sheet-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+        .sheet-btns { display: flex; gap: 10px; margin: 20px 0; }
+        .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-play-big { background: white; color: black; }
+        .btn-list-big { background: #333; color: white; }
 
-        /* Diseño del Panel */
-        .sheet-header { position: relative; height: 250px; }
-        .sheet-banner { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
-        .sheet-close {
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); 
-            width: 35px; height: 35px; border-radius: 50%; color: white; border: none;
-            font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px); z-index: 10;
-        }
-
-        .sheet-content { padding: 0 25px; margin-top: -60px; position: relative; z-index: 5; }
-        .sheet-title { font-size: 2rem; font-weight: 800; margin-bottom: 10px; line-height: 1.1; }
-        .sheet-meta { display: flex; gap: 15px; color: var(--text-gray); font-size: 0.9rem; margin-bottom: 20px; align-items: center; }
-        .meta-tag { border: 1px solid #444; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
-        
-        .sheet-actions { display: flex; gap: 10px; margin-bottom: 25px; }
-        .btn-play-big { 
-            flex: 2; background: white; color: black; border: none; padding: 15px; 
-            border-radius: 12px; font-weight: 700; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 10px; 
-            cursor: pointer;
-        }
-        .btn-list-big {
-            flex: 1; background: #2a2a30; color: white; border: none; border-radius: 12px;
-            font-size: 1.2rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-        }
-        .btn-list-text { font-size: 0.6rem; text-transform: uppercase; font-weight: bold; }
-
-        .sheet-desc { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="sheetOverlay" class="sheet-overlay" onclick="cerrarInfo()"></div>
+    <header class="header">
+        <div class="logo-heart"><i class="fa-solid fa-heart"></i> FLECHAZO</div>
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 1.2rem; cursor: pointer;" onclick="toggleSearch()"></i>
+    </header>
 
-    <div id="main-content">
-        <header class="header">
-            <div class="logo-heart"><i class="fa-solid fa-heart"></i> FLECHAZO</div>
-            <i class="fa-solid fa-magnifying-glass" style="font-size: 1.2rem; cursor: pointer;" onclick="toggleSearch()"></i>
-        </header>
+    <div id="searchBar" class="search-bar-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." onkeyup="handleSearch(this.value)">
+    </div>
 
-        <div id="searchContainer" class="search-bar-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar películas, series, actores..." onkeyup="filtrarContenido()">
-        </div>
-
-        <div id="heroContainer" class="hero-container">
-            </div>
+    <div id="tab-home" class="tab-content active">
+        <div id="heroContainer" class="hero-container"></div> <div class="section-title">Populares</div>
+        <div class="slider" id="homeSlider1"></div>
         
-        <div class="circles-row">
-            <div class="circle-item"><div class="circle-icon"><i class="fa-brands fa-tiktok"></i></div><span class="circle-label">Shorts</span></div>
-            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-heart"></i></div><span class="circle-label">Romance</span></div>
-            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-fire"></i></div><span class="circle-label">Acción</span></div>
-            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-ghost"></i></div><span class="circle-label">Terror</span></div>
-            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-masks-theater"></i></div><span class="circle-label">Drama</span></div>
-        </div>
+        <div class="section-title">Nuevos</div>
+        <div class="slider" id="homeSlider2"></div>
+    </div>
 
-        <div class="section-header">
-            <div class="section-title">Populares hoy</div>
-            <div class="see-all">Ver todo</div>
-        </div>
-        <div class="slider" id="popularesSlider"></div>
+    <div id="tab-explore" class="tab-content">
+        <div class="section-title" id="exploreTitle">Explorar Todo</div>
+        <div id="exploreGrid" class="grid-container"></div>
+    </div>
 
-        <div class="section-header">
-            <div class="section-title">Recién añadidos</div>
-            <div class="see-all">Ver todo</div>
+    <div id="tab-mylist" class="tab-content">
+        <div class="section-title">Mi Lista Guardada</div>
+        <div id="myListGrid" class="grid-container">
+            <div class="empty-msg">Aún no has guardado nada.</div>
         </div>
-        <div class="slider" id="novedadesSlider"></div>
+    </div>
+
+    <div id="tab-profile" class="tab-content">
+        <div class="profile-header">
+            <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" class="avatar">
+            <h2>Usuario Invitado</h2>
+            <p style="color:#888;">Plan Gratuito</p>
+            
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-num" id="statVistos">0</div><div class="stat-label">Vistos</div></div>
+                <div class="stat-item"><div class="stat-num" id="statLista">0</div><div class="stat-label">En Lista</div></div>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <button class="btn" style="width:100%; background:#333; color:white; padding:15px; margin-bottom:10px;">Editar Perfil</button>
+            <button class="btn" style="width:100%; background:#222; color:#ff3366; padding:15px;">Cerrar Sesión</button>
+        </div>
     </div>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-compass"></i>Explorar</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-bookmark"></i>Mi Lista</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-user"></i>Perfil</a>
+        <div class="nav-item active" onclick="switchTab('home', this)">
+            <i class="fa-solid fa-house"></i> Inicio
+        </div>
+        <div class="nav-item" onclick="switchTab('explore', this)">
+            <i class="fa-solid fa-compass"></i> Explorar
+        </div>
+        <div class="nav-item" onclick="switchTab('mylist', this)">
+            <i class="fa-solid fa-bookmark"></i> Mi Lista
+        </div>
+        <div class="nav-item" onclick="switchTab('profile', this)">
+            <i class="fa-solid fa-user"></i> Perfil
+        </div>
     </nav>
 
+    <div id="sheetOverlay" class="sheet-overlay" onclick="closeSheet()"></div>
     <div id="infoSheet" class="bottom-sheet">
-        <div class="sheet-header">
-            <button class="sheet-close" onclick="cerrarInfo()"><i class="fa-solid fa-xmark"></i></button>
-            <img id="sheetImg" src="" class="sheet-banner">
-        </div>
-        
+        <img id="sheetImg" class="sheet-banner">
         <div class="sheet-content">
-            <h1 id="sheetTitle" class="sheet-title">Título</h1>
-            
-            <div class="sheet-meta">
-                <span id="sheetYear">2024</span>
-                <span class="meta-tag" id="sheetCat">Romance</span>
-                <span class="meta-tag">HD</span>
+            <h1 id="sheetTitle" class="sheet-title">Titulo</h1>
+            <p id="sheetDesc" style="color:#ccc; margin-bottom:20px;">Descripción...</p>
+            <div class="sheet-btns">
+                <button class="btn-big btn-play-big" id="btnPlaySheet"><i class="fa-solid fa-play"></i> Reproducir</button>
+                <button class="btn-big btn-list-big" id="btnAddSheet" onclick="toggleMyList()"><i class="fa-solid fa-plus"></i> Lista</button>
             </div>
-
-            <div class="sheet-actions">
-                <button class="btn-play-big" id="btnPlaySheet">
-                    <i class="fa-solid fa-play"></i> Reproducir
-                </button>
-                <button class="btn-list-big" onclick="toggleFav(this)">
-                    <i class="fa-solid fa-plus"></i>
-                    <span class="btn-list-text">Mi Lista</span>
-                </button>
-                <button class="btn-list-big">
-                    <i class="fa-solid fa-share-nodes"></i>
-                    <span class="btn-list-text">Compartir</span>
-                </button>
-            </div>
-
-            <p id="sheetDesc" class="sheet-desc">Descripción...</p>
         </div>
     </div>
 
     <script>
-        // VARIABLES GLOBALES
-        let globalMovies = [];
+        // DATOS GLOBALES
+        let allMovies = [];
+        let myFavorites = JSON.parse(localStorage.getItem('flechazo_favs')) || [];
+        let currentMovieId = null;
 
-        // 1. CARGAR DATOS
+        // 1. CARGA INICIAL
         window.onload = async () => {
             try {
                 const res = await fetch('/api/movies');
-                globalMovies = await res.json();
+                allMovies = await res.json();
                 
-                if(globalMovies.length > 0) {
-                    construirHero();
-                    construirListas();
-                }
-            } catch(e) { console.error("Error API", e); }
+                renderHome();
+                renderExplore(allMovies);
+                renderMyList();
+                updateStats();
+            } catch(e) { console.log("Error cargando datos"); }
         };
 
-        // 2. RENDER HERO (Portada Principal)
-        function construirHero() {
-            const hero = globalMovies[Math.floor(Math.random() * globalMovies.length)];
-            const img = hero.imagenes ? hero.imagenes.banner : hero.img;
+        // 2. SISTEMA DE PESTAÑAS (TAB SWITCHER)
+        function switchTab(tabName, btnElement) {
+            // Ocultar todas las tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Mostrar la seleccionada
+            document.getElementById(`tab-${tabName}`).classList.add('active');
             
+            // Actualizar iconos menú
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            // Si entra a perfil, actualizar stats
+            if(tabName === 'profile') updateStats();
+            // Si entra a lista, refrescar
+            if(tabName === 'mylist') renderMyList();
+        }
+
+        // 3. RENDERIZADORES
+        function renderHome() {
+            if(allMovies.length === 0) return;
+            const hero = allMovies[0]; // O random
+            const imgHero = hero.imagenes ? hero.imagenes.banner : hero.img;
+            
+            // Hero
             document.getElementById('heroContainer').innerHTML = `
-                <div class="hero-card" onclick="abrirInfo(${hero.id})">
-                    <img src="${img}" class="hero-img">
+                <div class="hero-card" onclick="openSheet(${hero.id})">
+                    <img src="${imgHero}" class="hero-img">
                     <div class="hero-overlay">
-                        <div class="hero-tag">N# 1 EN TENDENCIAS</div>
-                        <div class="hero-title">${hero.title}</div>
-                        <div class="hero-btns">
-                            <button class="btn btn-primary"><i class="fa-solid fa-play"></i> Ver</button>
-                            <button class="btn btn-glass"><i class="fa-solid fa-plus"></i> Mi Lista</button>
-                        </div>
+                        <h2>${hero.title}</h2>
+                        <button class="btn btn-primary">Ver Ahora</button>
                     </div>
                 </div>`;
+
+            // Sliders
+            const s1 = document.getElementById('homeSlider1');
+            const s2 = document.getElementById('homeSlider2');
+            s1.innerHTML = allMovies.map(m => cardHTML(m)).join('');
+            s2.innerHTML = [...allMovies].reverse().map(m => cardHTML(m)).join('');
         }
 
-        // 3. RENDER LISTAS (Sliders)
-        function construirListas() {
-            const slider1 = document.getElementById('popularesSlider');
-            const slider2 = document.getElementById('novedadesSlider');
-            
-            // Populares (Todos)
-            slider1.innerHTML = globalMovies.map(m => crearPosterHTML(m)).join('');
-            
-            // Novedades (Simulado: invertimos el array)
-            const novedades = [...globalMovies].reverse();
-            slider2.innerHTML = novedades.map(m => crearPosterHTML(m)).join('');
+        function renderExplore(lista) {
+            const grid = document.getElementById('exploreGrid');
+            if(lista.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">No hay resultados</div>';
+                return;
+            }
+            grid.innerHTML = lista.map(m => cardHTML(m)).join('');
         }
 
-        function crearPosterHTML(item) {
-            const img = item.imagenes ? item.imagenes.poster : item.img;
-            return `
-                <div class="poster-card" onclick="abrirInfo(${item.id})">
-                    <div class="poster-badge">NUEVO</div>
-                    <img src="${img}" class="poster-img" loading="lazy">
-                </div>
-            `;
+        function renderMyList() {
+            const grid = document.getElementById('myListGrid');
+            const favs = allMovies.filter(m => myFavorites.includes(m.id));
+            
+            if(favs.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">Aún no has agregado nada a tu lista.</div>';
+            } else {
+                grid.innerHTML = favs.map(m => cardHTML(m)).join('');
+            }
+            // Actualizar contador perfil
+            document.getElementById('statLista').innerText = favs.length;
         }
 
-        // 4. LÓGICA DEL PANEL DE INFORMACIÓN (BOTTOM SHEET)
-        function abrirInfo(id) {
-            const movie = globalMovies.find(m => m.id === id);
-            if(!movie) return;
+        function cardHTML(m) {
+            const img = m.imagenes ? m.imagenes.poster : m.img;
+            return `<div class="poster-card" onclick="openSheet(${m.id})"><img src="${img}" class="poster-img"></div>`;
+        }
 
-            // Llenar datos en el panel
-            document.getElementById('sheetImg').src = movie.imagenes ? movie.imagenes.banner : movie.img;
-            document.getElementById('sheetTitle').innerText = movie.title;
-            document.getElementById('sheetDesc').innerText = movie.desc || "Sin descripción disponible.";
-            document.getElementById('sheetCat').innerText = movie.cat || "General";
+        // 4. FUNCIONALIDAD BUSCADOR
+        function toggleSearch() {
+            const bar = document.getElementById('searchBar');
+            bar.classList.toggle('show');
+            if(bar.classList.contains('show')) document.getElementById('searchInput').focus();
+        }
+
+        function handleSearch(text) {
+            const term = text.toLowerCase();
+            const results = allMovies.filter(m => m.title.toLowerCase().includes(term));
             
-            // Configurar botón play
-            const btnPlay = document.getElementById('btnPlaySheet');
-            btnPlay.onclick = () => window.location.href = `player.html?id=${id}`;
+            // Auto cambiar a pestaña explorar
+            switchTab('explore', document.querySelectorAll('.nav-item')[1]);
+            document.getElementById('exploreTitle').innerText = term ? `Resultados: "${text}"` : "Explorar Todo";
+            renderExplore(results);
+        }
 
-            // Mostrar animación
+        // 5. FUNCIONALIDAD BOTTOM SHEET (INFO)
+        function openSheet(id) {
+            const m = allMovies.find(x => x.id === id);
+            if(!m) return;
+            currentMovieId = m.id;
+
+            document.getElementById('sheetImg').src = m.imagenes ? m.imagenes.banner : m.img;
+            document.getElementById('sheetTitle').innerText = m.title;
+            document.getElementById('sheetDesc').innerText = m.desc || "Sin descripción.";
+            
+            // Botón Play
+            document.getElementById('btnPlaySheet').onclick = () => window.location.href = `player.html?id=${id}`;
+            
+            // Estado Botón Lista
+            updateListBtn();
+
             document.getElementById('sheetOverlay').classList.add('active');
             document.getElementById('infoSheet').classList.add('active');
-            document.body.classList.add('modal-open');
         }
 
-        function cerrarInfo() {
+        function closeSheet() {
             document.getElementById('sheetOverlay').classList.remove('active');
             document.getElementById('infoSheet').classList.remove('active');
-            document.body.classList.remove('modal-open');
         }
 
-        // 5. UTILIDADES (Buscador y Favoritos)
-        function toggleSearch() {
-            const bar = document.getElementById('searchContainer');
-            const input = document.getElementById('searchInput');
-            bar.classList.toggle('active');
-            if(bar.classList.contains('active')) input.focus();
-        }
-
-        function toggleFav(btn) {
-            const icon = btn.querySelector('i');
-            if(icon.classList.contains('fa-plus')) {
-                icon.classList.replace('fa-plus', 'fa-check');
-                btn.style.color = '#ff3366';
+        // 6. LÓGICA MI LISTA (LOCALSTORAGE)
+        function toggleMyList() {
+            if(myFavorites.includes(currentMovieId)) {
+                myFavorites = myFavorites.filter(id => id !== currentMovieId);
             } else {
-                icon.classList.replace('fa-check', 'fa-plus');
-                btn.style.color = 'white';
+                myFavorites.push(currentMovieId);
+            }
+            localStorage.setItem('flechazo_favs', JSON.stringify(myFavorites));
+            updateListBtn();
+            renderMyList(); // Actualizar pestaña oculta
+        }
+
+        function updateListBtn() {
+            const btn = document.getElementById('btnAddSheet');
+            if(myFavorites.includes(currentMovieId)) {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Agregado';
+                btn.style.background = '#ff3366';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
+                btn.style.background = '#333';
             }
         }
+
+        function updateStats() {
+            // Simulación de estadísticas
+            document.getElementById('statVistos').innerText = Math.floor(Math.random() * 20); // Dummy
+            document.getElementById('statLista').innerText = myFavorites.length;
+        }
+
     </script>
 </body>
 </html>
