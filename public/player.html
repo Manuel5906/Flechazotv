@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Reproductor Flechazo</title>
+    <title>Reproductor Flechazo PRO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.youtube.com/iframe_api"></script>
     
@@ -50,7 +50,8 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .watermark {
-            position: absolute; top: 20px; right: 20px; z-index: 20; opacity: 0.5; pointer-events: none;
+            position: absolute; top: 20px; right: 60px; /* Movido para dar espacio al engranaje */
+            z-index: 20; opacity: 0.5; pointer-events: none;
             display: flex; align-items: center; gap: 8px;
         }
         .wm-logo { font-size: 1.2rem; color: #ff3366; }
@@ -61,7 +62,12 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 30;
             display: flex; flex-direction: column; justify-content: space-between;
+            transition: opacity 0.3s;
         }
+        /* Ocultar UI si no está pausado y no hay actividad */
+        .ui-layer.fade-out { opacity: 0; }
+        .ui-layer.fade-out .bottom-controls-area { pointer-events: none; }
+
         .top-bar {
             padding: max(15px, env(safe-area-inset-top)) 20px;
             display: flex; align-items: center; gap: 15px;
@@ -71,6 +77,9 @@
         .video-info { flex: 1; overflow: hidden; }
         .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-subtitle { font-size: 0.8rem; color: #ccc; }
+        
+        .settings-btn { font-size: 1.3rem; padding: 10px; cursor: pointer; text-shadow: 0 2px 4px black; transition: transform 0.2s; }
+        .settings-btn:active { transform: rotate(45deg); }
 
         /* --- SIDEBAR --- */
         .sidebar {
@@ -79,7 +88,7 @@
             pointer-events: auto;
         }
         .side-btn {
-            width: 50px; height: 50px; border-radius: 50%;
+            width: 45px; height: 45px; border-radius: 50%;
             background: rgba(30, 30, 30, 0.6); backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.1);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -90,6 +99,19 @@
         #btnNext { transform: translateX(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #btnNext.show { transform: translateX(0); opacity: 1; }
 
+        /* --- SALTAR INTRO --- */
+        .skip-intro {
+            position: absolute; bottom: 90px; left: 20px;
+            background: white; color: black;
+            padding: 8px 16px; border-radius: 4px;
+            font-size: 0.9rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; opacity: 0; transform: translateY(20px); pointer-events: none;
+            transition: all 0.4s ease; z-index: 35; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .skip-intro.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .skip-intro:active { transform: scale(0.95); background: #eee; }
+
         /* --- CONTROLES INFERIORES --- */
         .bottom-controls-area {
             width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
@@ -97,18 +119,22 @@
             display: flex; flex-direction: column; pointer-events: auto;
         }
         .progress-container { width: 100%; height: 20px; display: flex; align-items: center; cursor: pointer; margin-bottom: 5px; }
-        .progress-track { width: 100%; height: 3px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s; }
-        .progress-fill { height: 100%; width: 0%; background: #ff3366; position: relative; }
+        .progress-track { width: 100%; height: 3px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s; margin: 0 10px; border-radius: 2px; }
+        .progress-fill { height: 100%; width: 0%; background: #ff3366; position: relative; border-radius: 2px; }
         .progress-fill::after { content: ''; position: absolute; right: -6px; top: -4px; width: 10px; height: 10px; background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s; }
         .progress-container:active .progress-track { height: 5px; }
         .progress-container:active .progress-fill::after { transform: scale(1.5); }
         .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .left-controls { display: flex; align-items: center; gap: 15px; }
+        .right-controls { display: flex; align-items: center; gap: 15px; }
         .time-display { font-size: 0.85rem; font-family: monospace; font-weight: 600; color: #e0e0e0; text-shadow: 0 1px 2px black; }
-        .fullscreen-btn { font-size: 1.2rem; color: white; padding: 5px; cursor: pointer; transition: transform 0.2s; }
+        .control-icon { font-size: 1.2rem; color: white; cursor: pointer; transition: color 0.2s; }
+        .control-icon:hover { color: #ff3366; }
 
-        /* --- DRAWER --- */
+        /* --- DRAWER & MODALS --- */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        
         .drawer { position: fixed; bottom: 0; left: 0; width: 100%; max-height: 70vh; background: #121212; border-radius: 20px 20px 0 0; z-index: 45; transform: translateY(110%); transition: transform 0.3s; display: flex; flex-direction: column; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
         @media (min-width: 768px) { .drawer { width: 400px; left: 50%; margin-left: -200px; } }
         .drawer.open { transform: translateY(0); }
@@ -119,13 +145,21 @@
         .ep-num { font-size: 1.1rem; font-weight: bold; color: #666; }
         .ep-item.active .ep-num { color: #ff3366; }
 
+        /* MENU CONFIGURACION */
+        .settings-menu { padding: 20px; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .setting-label { font-weight: bold; color: #ccc; }
+        .speed-options { display: flex; gap: 10px; background: #222; padding: 5px; border-radius: 20px; }
+        .speed-opt { padding: 5px 15px; border-radius: 15px; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; }
+        .speed-opt.selected { background: #ff3366; color: white; font-weight: bold; }
+
         /* Animaciones seek */
         .seek-anim { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); padding: 15px; border-radius: 50%; color: white; font-size: 1.5rem; opacity: 0; pointer-events: none; z-index: 15; }
         .seek-left { left: 20%; } .seek-right { right: 20%; }
         .show-seek { animation: fadePop 0.6s ease-out; }
         @keyframes fadePop { 0% { opacity: 0; transform: translateY(-50%) scale(0.8); } 50% { opacity: 1; transform: translateY(-50%) scale(1.1); } 100% { opacity: 0; transform: translateY(-50%) scale(1); } }
         
-        /* Mensajes de Estado y Error */
+        /* Mensajes de Estado */
         #statusMsg {
             position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px;
@@ -133,14 +167,14 @@
             pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 50;
         }
         #statusMsg.visible { opacity: 1; }
-
         #errorMsg { position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); display:none; color: #ccc; text-align: center; font-weight: bold; z-index: 60; }
         .error-sub { font-size: 0.8rem; font-weight: normal; color: #888; margin-top: 5px; display:block;}
+
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="statusMsg"><i class="fa-solid fa-rotate"></i> Cambiando fuente...</div>
+    <div id="statusMsg"><i class="fa-solid fa-rotate"></i> Cargando...</div>
 
     <div id="errorMsg">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br>
@@ -165,17 +199,18 @@
             <i class="fa-solid fa-heart wm-logo"></i><span class="wm-text">FLECHAZO TV</span>
         </div>
 
-        <div class="ui-layer">
+        <div id="uiLayer" class="ui-layer">
             <div class="top-bar">
                 <i class="fa-solid fa-arrow-left back-icon" onclick="goHome()"></i>
                 <div class="video-info">
-                    <div id="ui-title" class="video-title">Título</div>
-                    <div id="ui-subtitle" class="video-subtitle">Subtítulo</div>
+                    <div id="ui-title" class="video-title">Cargando...</div>
+                    <div id="ui-subtitle" class="video-subtitle">Flechazo Series</div>
                 </div>
+                <i class="fa-solid fa-gear settings-btn" onclick="openSettings()"></i>
             </div>
 
             <div class="sidebar">
-                <div id="btnEpList" style="display:none;" onclick="toggleDrawer()">
+                <div id="btnEpList" style="display:none;" onclick="toggleEpList()">
                     <div class="side-btn"><i class="fa-solid fa-layer-group"></i></div>
                     <span class="btn-label">Episodios</span>
                 </div>
@@ -184,89 +219,116 @@
                     <span class="btn-label">Siguiente</span>
                 </div>
             </div>
+
+            <div id="skipIntroBtn" class="skip-intro" onclick="skipIntro()">
+                <span>Saltar Intro</span> <i class="fa-solid fa-forward-step"></i>
+            </div>
             
             <div class="bottom-controls-area">
                 <div class="progress-container" onclick="handleSeek(event)">
                     <div class="progress-track"><div id="prog-fill" class="progress-fill"></div></div>
                 </div>
                 <div class="controls-row">
-                    <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
-                    <div class="fullscreen-btn" onclick="toggleFullScreen()">
-                        <i id="fs-icon" class="fa-solid fa-expand"></i>
+                    <div class="left-controls">
+                        <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+                    </div>
+                    <div class="right-controls">
+                        <i id="pipBtn" class="fa-solid fa-clone control-icon" onclick="togglePiP()" style="display:none;"></i>
+                        <div class="control-icon" onclick="toggleFullScreen()">
+                            <i id="fs-icon" class="fa-solid fa-expand"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
-    <div id="drawer" class="drawer">
+    <div id="overlay" class="drawer-overlay" onclick="closeDrawers()"></div>
+
+    <div id="drawer-eps" class="drawer">
         <div class="drawer-header">
             <h3>Episodios</h3>
-            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="closeDrawers()"></i>
         </div>
         <div id="list" class="ep-list"></div>
     </div>
 
+    <div id="drawer-settings" class="drawer">
+        <div class="drawer-header">
+            <h3>Configuración</h3>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="closeDrawers()"></i>
+        </div>
+        <div class="settings-menu">
+            <div class="setting-row">
+                <span class="setting-label">Velocidad</span>
+                <div class="speed-options">
+                    <div class="speed-opt" onclick="setSpeed(0.5)">0.5x</div>
+                    <div class="speed-opt selected" id="sp-1" onclick="setSpeed(1)">1x</div>
+                    <div class="speed-opt" onclick="setSpeed(1.25)">1.25x</div>
+                    <div class="speed-opt" onclick="setSpeed(1.5)">1.5x</div>
+                    <div class="speed-opt" onclick="setSpeed(2)">2x</div>
+                </div>
+            </div>
+            <div class="setting-row" style="color:#666; font-size:0.8rem; justify-content:center;">
+                Flechazo Player v2.0 - Pro Mode
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- VARIABLES GLOBALES ---
-        let playerType = 'none'; // 'intro', 'html5', 'youtube'
+        let playerType = 'none'; 
         let ytPlayer = null;
         let html5Player = document.getElementById('html5-player');
         let progressInterval = null;
+        let uiTimeout = null;
         
         let itemData = null;
         let currentEp = 0;
         let isSerie = false;
         let isPlayingIntro = false;
 
-        // --- SISTEMA DE SUSTITUCIÓN (COLA DE FUENTES) ---
-        // Almacenamos todos los links posibles (Main, Backup, Mirrors) aquí
+        // Cola de fuentes para fallbacks
         let sourceQueue = [];   
         let currentSourceIndex = 0; 
 
+        // Configuración
+        let currentSpeed = 1;
         const INTRO_URL = "http://googleusercontent.com/generated_video_content/16975865586054294131";
+        
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
-        // --- 1. INICIO ---
+        // --- INICIALIZACIÓN ---
         window.onload = async () => {
-            
-            // --- DETECCIÓN DE ERRORES INTELIGENTE ---
+            // Verificar soporte PiP
+            if (document.pictureInPictureEnabled || html5Player.webkitSupportsPresentationMode) {
+                document.getElementById('pipBtn').style.display = 'block';
+            }
+
+            // Manejo de errores global
             html5Player.onerror = function() {
-                console.warn("Error en HTML5 Player detectado.");
-
-                // Si falla la intro, la saltamos y vamos al video
-                if (isPlayingIntro) {
-                    console.log("Intro falló, saltando...");
-                    handleHtml5Ended();
-                    return;
-                }
-
-                // Si falla el video, intentamos la siguiente fuente de la cola
+                console.warn("Error en HTML5 Player.");
+                if (isPlayingIntro) { handleHtml5Ended(); return; }
                 tryNextSource();
             };
-
             html5Player.onended = handleHtml5Ended;
 
+            // Escuchar teclado
+            document.addEventListener('keydown', handleKeybaord);
+
             if (!id) {
-                // MODO DEMO: Prueba de fallo
-                document.getElementById('ui-title').innerText = "Modo Demo: Sustitución";
-                document.getElementById('ui-subtitle').innerText = "Prueba de Backup";
-                
-                // Simulamos cola: 1. Roto, 2. Roto, 3. Funciona
-                sourceQueue = [
-                    "https://link-roto-1.com/video.mp4",
-                    "https://link-roto-2.com/video.mp4",
-                    "https://www.w3schools.com/html/mov_bbb.mp4" 
-                ];
-                
+                // MODO DEMO
+                document.getElementById('ui-title').innerText = "Modo Demo PRO";
+                document.getElementById('ui-subtitle').innerText = "Prueba todas las funciones";
+                // Video de prueba estable
+                sourceQueue = ["https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"];
                 startPlaybackSequence();
                 return;
             }
 
             try {
-                // API REAL
+                // API REAL (Simulada para este ejemplo)
                 const res = await fetch(`/api/movies/${id}`);
                 if (!res.ok) throw new Error("Error API");
                 itemData = await res.json();
@@ -277,7 +339,7 @@
                     prepareEp(0);
                 } else {
                     document.getElementById('ui-title').innerText = itemData.title;
-                    buildSourceQueue(itemData); // Construir cola automáticamente
+                    buildSourceQueue(itemData); 
                     startPlaybackSequence();
                 }
 
@@ -287,98 +349,80 @@
             }
         };
 
-        // --- CONSTRUCTOR DE COLA DE FUENTES ---
-        // Extrae todos los links posibles del objeto de datos
+        // --- GESTIÓN DE UI (AUTO-HIDE) ---
+        function resetUiTimer() {
+            const ui = document.getElementById('uiLayer');
+            ui.classList.remove('fade-out');
+            document.body.style.cursor = 'auto';
+            
+            clearTimeout(uiTimeout);
+            // Solo ocultar si está reproduciendo
+            const isPlaying = (playerType === 'html5' && !html5Player.paused) || (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
+            
+            if(isPlaying) {
+                uiTimeout = setTimeout(() => {
+                    ui.classList.add('fade-out');
+                    document.body.style.cursor = 'none'; // Ocultar mouse
+                }, 3000);
+            }
+        }
+
+        // --- GESTIÓN DE FUENTES ---
         function buildSourceQueue(dataObj) {
             sourceQueue = [];
-            
-            // 1. URL Principal
             if (dataObj.url) sourceQueue.push(dataObj.url);
-            
-            // 2. URL de Respaldo (Backup)
             if (dataObj.backupUrl) sourceQueue.push(dataObj.backupUrl);
-            
-            // 3. URLs Extra (si tienes una lista de espejos)
             if (dataObj.mirrors && Array.isArray(dataObj.mirrors)) {
                 sourceQueue = sourceQueue.concat(dataObj.mirrors);
             }
-
-            // Fallback por seguridad
             if (sourceQueue.length === 0) sourceQueue.push("");
         }
 
-        // --- LÓGICA DE INTENTO DE FUENTE ---
         function tryNextSource() {
-            currentSourceIndex++; // Avanzar al siguiente link
-
+            currentSourceIndex++; 
             if (currentSourceIndex < sourceQueue.length) {
-                console.log(`Intentando fuente ${currentSourceIndex + 1} de ${sourceQueue.length}`);
-                
-                // Mostrar aviso "Cambiando fuente..."
-                showStatusMsg(true);
-                
-                // Ocultar error viejo, mostrar spinner
-                document.getElementById('errorMsg').style.display = 'none';
-                document.getElementById('spinner').style.display = 'block';
-
+                showStatusMsg("Probando fuente alternativa...");
                 loadMainVideo(sourceQueue[currentSourceIndex]);
             } else {
-                console.error("Todas las fuentes fallaron.");
-                showStatusMsg(false);
-                showError("Video no disponible", "Todas las opciones de reproducción fallaron.");
+                showError("Video no disponible", "Todas las opciones fallaron.");
             }
         }
 
-        function showStatusMsg(show) {
-            const el = document.getElementById('statusMsg');
-            show ? el.classList.add('visible') : el.classList.remove('visible');
-            if(show) setTimeout(() => el.classList.remove('visible'), 2000);
-        }
-
-        // --- 2. SECUENCIA DE REPRODUCCIÓN ---
+        // --- REPRODUCCIÓN ---
         function startPlaybackSequence() {
-            currentSourceIndex = 0; // Resetear índice al link 1
-            document.getElementById('errorMsg').style.display = 'none';
+            currentSourceIndex = 0; 
             playIntro();
         }
 
         function playIntro() {
             isPlayingIntro = true;
             playerType = 'intro';
-            
             document.getElementById('yt-placeholder').classList.add('hidden');
             html5Player.classList.remove('hidden');
-            
             html5Player.src = INTRO_URL;
             html5Player.load();
-            
-            html5Player.play().catch(e => {
-                console.log("Autoplay Intro bloqueado, saltando...");
-                handleHtml5Ended(); 
-            });
+            html5Player.play().catch(() => handleHtml5Ended());
             updatePlayUI(true);
         }
 
         function handleHtml5Ended() {
             if (isPlayingIntro) {
                 isPlayingIntro = false;
-                // Cargar la primera fuente de la cola
-                if (sourceQueue.length > 0) {
-                    loadMainVideo(sourceQueue[0]);
-                } else {
-                    showError("Sin fuentes de video");
-                }
+                if (sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
+                else showError("Sin fuentes");
             } else {
                 checkNextButton(html5Player.duration, html5Player.duration);
             }
         }
 
-        // --- CARGA DEL VIDEO ---
         function loadMainVideo(url) {
-            document.getElementById('errorMsg').style.display = 'none'; // Limpieza preventiva
             const spinner = document.getElementById('spinner');
             spinner.style.display = 'block';
             document.getElementById('touchArea').classList.remove('paused');
+
+            // Recuperar tiempo guardado
+            const savedTime = localStorage.getItem(`flechazo_time_${id}_${currentEp}`);
+            let startTime = savedTime ? parseFloat(savedTime) : 0;
 
             const ytId = getYouTubeId(url);
 
@@ -386,7 +430,7 @@
                 playerType = 'youtube';
                 html5Player.classList.add('hidden');
                 html5Player.pause();
-                initYouTubePlayer(ytId);
+                initYouTubePlayer(ytId, startTime);
             } else {
                 playerType = 'html5';
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
@@ -394,7 +438,8 @@
                 html5Player.classList.remove('hidden');
                 
                 html5Player.src = url;
-                html5Player.load();
+                html5Player.currentTime = startTime; // Restaurar tiempo
+                html5Player.playbackRate = currentSpeed; // Restaurar velocidad
                 
                 var promise = html5Player.play();
                 if (promise !== undefined) { promise.catch(e => console.log("Autoplay bloqueado")); }
@@ -405,28 +450,22 @@
                     spinner.style.display = 'none'; 
                     document.getElementById('errorMsg').style.display = 'none';
                     updatePlayUI(true); 
+                    resetUiTimer();
                 };
-                html5Player.onpause = () => updatePlayUI(false);
+                html5Player.onpause = () => { updatePlayUI(false); resetUiTimer(); };
                 html5Player.ontimeupdate = updateProgressHTML5;
             }
         }
 
-        // --- PREPARAR EPISODIO ---
         function prepareEp(i) {
             if (!itemData.episodios || !itemData.episodios[i]) return;
             currentEp = i;
-            
             let epTitle = `Episodio ${itemData.episodios[i].numero}`;
             if(itemData.episodios[i].titulo) epTitle += `: ${itemData.episodios[i].titulo}`;
-
             document.getElementById('ui-title').innerText = epTitle;
             document.getElementById('ui-subtitle').innerText = itemData.title;
-            
-            // Construir la cola para este episodio
             buildSourceQueue(itemData.episodios[i]);
-            
             startPlaybackSequence();
-            
             document.getElementById('btnNext').classList.remove('show');
             renderList();
         }
@@ -434,6 +473,56 @@
         function nextEp() {
             if (isSerie && itemData.episodios && currentEp + 1 < itemData.episodios.length) {
                 prepareEp(currentEp + 1);
+            }
+        }
+
+        // --- FUNCIONES EXTRA (SKIP, SAVE, SPEED) ---
+        
+        function saveProgress(currentTime) {
+            // Guardar en localStorage cada pocos segundos
+            if(Math.floor(currentTime) % 5 === 0) {
+                localStorage.setItem(`flechazo_time_${id}_${currentEp}`, currentTime);
+            }
+        }
+
+        function checkSkipIntro(currentTime) {
+            // Mostrar botón entre el segundo 10 y el 90
+            const btn = document.getElementById('skipIntroBtn');
+            if (currentTime > 10 && currentTime < 90) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        }
+
+        function skipIntro() {
+            seek(85); // Salta 85 segundos
+            showStatusMsg("Intro Saltada");
+        }
+
+        function setSpeed(rate) {
+            currentSpeed = rate;
+            // UI Update
+            document.querySelectorAll('.speed-opt').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Apply logic
+            if(playerType === 'html5') html5Player.playbackRate = rate;
+            if(playerType === 'youtube' && ytPlayer) ytPlayer.setPlaybackRate(rate);
+            
+            closeDrawers();
+            showStatusMsg(`Velocidad: ${rate}x`);
+        }
+
+        function togglePiP() {
+            if (playerType === 'html5' && html5Player) {
+                if (document.pictureInPictureElement) {
+                    document.exitPictureInPicture();
+                } else if (html5Player.requestPictureInPicture) {
+                    html5Player.requestPictureInPicture();
+                }
+            } else {
+                showStatusMsg("PiP no disponible aquí");
             }
         }
 
@@ -445,33 +534,31 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        function initYouTubePlayer(videoId) {
-            if (!window.YT || !window.YT.Player) { setTimeout(() => initYouTubePlayer(videoId), 100); return; }
-            if (ytPlayer) { document.getElementById('yt-placeholder').classList.remove('hidden'); ytPlayer.loadVideoById(videoId); return; }
+        function initYouTubePlayer(videoId, startSecs) {
+            if (!window.YT || !window.YT.Player) { setTimeout(() => initYouTubePlayer(videoId, startSecs), 100); return; }
+            if (ytPlayer) { 
+                document.getElementById('yt-placeholder').classList.remove('hidden'); 
+                ytPlayer.loadVideoById(videoId, startSecs); 
+                return; 
+            }
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%', videoId: videoId,
-                playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1, 'fs': 0 },
-                events: { 'onReady': onYtReady, 'onStateChange': onYtStateChange, 'onError': onYtError }
+                playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'start': Math.floor(startSecs), 'playsinline': 1, 'fs': 0 },
+                events: { 'onReady': (e)=>{ onYtReady(e); }, 'onStateChange': onYtStateChange, 'onError': ()=> tryNextSource() }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
 
         function onYtReady(event) { 
-            document.getElementById('spinner').style.display = 'none'; 
-            document.getElementById('errorMsg').style.display = 'none'; 
+            event.target.setPlaybackRate(currentSpeed);
             event.target.playVideo(); 
             startProgressLoop(); 
         }
-        function onYtError(event) {
-            // Manejar error de YouTube también
-            console.log("Error YouTube, probando siguiente fuente...");
-            tryNextSource();
-        }
+
         function onYtStateChange(event) {
             if (event.data == YT.PlayerState.PLAYING) { 
                 document.getElementById('spinner').style.display = 'none'; 
-                document.getElementById('errorMsg').style.display = 'none'; 
-                updatePlayUI(true); 
+                updatePlayUI(true); resetUiTimer();
             }
             else if (event.data == YT.PlayerState.PAUSED) updatePlayUI(false);
             else if (event.data == YT.PlayerState.BUFFERING) document.getElementById('spinner').style.display = 'block';
@@ -481,16 +568,40 @@
         // --- CONTROLES Y UI ---
         let lastClick = 0;
         function handleMainClick(e) {
+            resetUiTimer(); // Resetear timer de ocultar UI
             const now = new Date().getTime(); const width = window.innerWidth; const x = e.clientX;
+            // Doble tap
             if (now - lastClick < 300) { 
                 if (x < width / 3) { seek(-10); animSeek('seekLeft'); }
                 else if (x > (width / 3) * 2) { seek(10); animSeek('seekRight'); }
-                else { togglePlay(); }
-            } else { setTimeout(() => { if (new Date().getTime() - lastClick > 300) togglePlay(); }, 350); }
+                else { togglePlay(); } // Doble tap centro hace play/pause rápido
+            } else { 
+                // Single tap: toggle UI primero, luego play/pause
+                setTimeout(() => { 
+                    if (new Date().getTime() - lastClick > 300) {
+                        const ui = document.getElementById('uiLayer');
+                        if (ui.classList.contains('fade-out')) {
+                            resetUiTimer();
+                        } else {
+                            togglePlay();
+                        }
+                    }
+                }, 350); 
+            }
             lastClick = now;
         }
 
+        function handleKeybaord(e) {
+            resetUiTimer();
+            if (e.code === 'Space' || e.code === 'Enter') togglePlay();
+            if (e.code === 'ArrowRight') { seek(10); animSeek('seekRight'); }
+            if (e.code === 'ArrowLeft') { seek(-10); animSeek('seekLeft'); }
+            if (e.code === 'KeyF') toggleFullScreen();
+            if (e.code === 'KeyM') { /* Mute logic if added */ }
+        }
+
         function togglePlay() {
+            resetUiTimer();
             if (playerType === 'youtube' && ytPlayer) { ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); }
             else if (playerType === 'html5' || playerType === 'intro') { html5Player.paused ? html5Player.play() : html5Player.pause(); }
         }
@@ -498,12 +609,14 @@
         function updatePlayUI(playing) { const touchArea = document.getElementById('touchArea'); playing ? touchArea.classList.remove('paused') : touchArea.classList.add('paused'); }
 
         function seek(sec) {
+            resetUiTimer();
             if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + sec, true);
             else html5Player.currentTime += sec;
         }
 
         function handleSeek(e) {
-            e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width;
+            e.stopPropagation(); resetUiTimer();
+            const rect = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width;
             if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
             else html5Player.currentTime = html5Player.duration * pct;
         }
@@ -521,7 +634,13 @@
             progressInterval = setInterval(() => {
                 if (playerType === 'youtube' && ytPlayer && ytPlayer.getCurrentTime) {
                     const cur = ytPlayer.getCurrentTime(); const dur = ytPlayer.getDuration();
-                    if(dur > 0) { updateProgressBar((cur/dur)*100); updateTimeDisplay(cur, dur); checkNextButton(cur, dur); }
+                    if(dur > 0) { 
+                        updateProgressBar((cur/dur)*100); 
+                        updateTimeDisplay(cur, dur); 
+                        checkNextButton(cur, dur);
+                        checkSkipIntro(cur);
+                        saveProgress(cur);
+                    }
                 }
             }, 500);
         }
@@ -529,9 +648,12 @@
         function updateProgressHTML5() {
             if (isPlayingIntro) return;
             if (html5Player.duration) {
-                updateProgressBar((html5Player.currentTime / html5Player.duration) * 100);
-                updateTimeDisplay(html5Player.currentTime, html5Player.duration);
-                checkNextButton(html5Player.currentTime, html5Player.duration);
+                const cur = html5Player.currentTime;
+                updateProgressBar((cur / html5Player.duration) * 100);
+                updateTimeDisplay(cur, html5Player.duration);
+                checkNextButton(cur, html5Player.duration);
+                checkSkipIntro(cur);
+                saveProgress(cur);
             }
         }
         
@@ -539,17 +661,41 @@
         function updateTimeDisplay(cur, total) { document.getElementById('timeDisplay').innerText = `${formatTime(cur)} / ${formatTime(total)}`; }
         function checkNextButton(cur, dur) { if (isSerie && (dur - cur < 60)) document.getElementById('btnNext').classList.add('show'); }
 
-        function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+        // --- DRAWERS ---
+        function closeDrawers() {
+            document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+            document.getElementById('overlay').classList.remove('open');
+            resetUiTimer();
+        }
+        function toggleEpList() { 
+            closeDrawers();
+            document.getElementById('drawer-eps').classList.add('open'); 
+            document.getElementById('overlay').classList.add('open'); 
+        }
+        function openSettings() {
+            closeDrawers();
+            document.getElementById('drawer-settings').classList.add('open'); 
+            document.getElementById('overlay').classList.add('open'); 
+        }
+
         function renderList() {
             const list = document.getElementById('list'); list.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
                 const div = document.createElement('div');
                 div.className = `ep-item ${i === currentEp ? 'active' : ''}`;
                 div.innerHTML = `<span class="ep-num">${ep.numero}</span><span>${ep.titulo || 'Episodio ' + ep.numero}</span>`;
-                div.onclick = () => { prepareEp(i); toggleDrawer(); };
+                div.onclick = () => { prepareEp(i); closeDrawers(); };
                 list.appendChild(div);
             });
         }
+
+        function showStatusMsg(msg) {
+            const el = document.getElementById('statusMsg');
+            el.innerHTML = msg;
+            el.classList.add('visible');
+            setTimeout(() => el.classList.remove('visible'), 2000);
+        }
+
         function showError(msg, sub="") { 
             document.getElementById('errorText').innerText = msg; 
             document.getElementById('errorSub').innerText = sub;
@@ -557,34 +703,22 @@
             document.getElementById('spinner').style.display = 'none'; 
         }
 
-        // --- PANTALLA COMPLETA ROBUSTA ---
         function toggleFullScreen() {
-            const doc = window.document;
-            const docEl = document.getElementById('mainContainer'); // Apuntamos al contenedor principal
-            
-            // Detección estándar y prefixes
+            const doc = window.document; const docEl = document.getElementById('mainContainer');
             const requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullScreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
             const cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-
             if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement && !doc.msFullscreenElement) {
-                // Entrar
-                if(requestFullScreen) {
-                    requestFullScreen.call(docEl);
-                    document.getElementById('fs-icon').className = "fa-solid fa-compress";
-                } else {
-                    // Fallback para iPhone iOS (intenta video nativo si contenedor falla)
-                    if(html5Player.webkitEnterFullscreen) html5Player.webkitEnterFullscreen();
-                }
+                if(requestFullScreen) { requestFullScreen.call(docEl); document.getElementById('fs-icon').className = "fa-solid fa-compress"; } 
+                else if(html5Player.webkitEnterFullscreen) html5Player.webkitEnterFullscreen();
             } else {
-                // Salir
-                if(cancelFullScreen) {
-                    cancelFullScreen.call(doc);
-                    document.getElementById('fs-icon').className = "fa-solid fa-expand";
-                }
+                if(cancelFullScreen) { cancelFullScreen.call(doc); document.getElementById('fs-icon').className = "fa-solid fa-expand"; }
             }
         }
-        
         function goHome() { window.location.href = '/'; }
+
+        // Iniciar detector de inactividad
+        document.addEventListener('mousemove', resetUiTimer);
+        document.addEventListener('click', resetUiTimer);
     </script>
 </body>
 </html>
