@@ -78,7 +78,7 @@
 
         /* --- SIDEBAR & BOTÓN SIGUIENTE --- */
         .sidebar {
-            position: absolute; right: 15px; bottom: max(60px, env(safe-area-inset-bottom));
+            position: absolute; right: 15px; bottom: 100px; /* Subido para dejar espacio a controles */
             display: flex; flex-direction: column; gap: 20px; align-items: center;
             pointer-events: auto;
         }
@@ -98,12 +98,20 @@
         #btnNext .side-btn { background: rgba(255, 51, 102, 0.9); border: none; }
         #btnNext.show { transform: translateX(0); opacity: 1; }
 
-        /* --- BARRA DE PROGRESO --- */
+        /* --- ZONA INFERIOR (Progreso, Tiempo, Fullscreen) --- */
+        .bottom-controls-area {
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column;
+            pointer-events: auto;
+        }
+
+        /* Barra de Progreso */
         .progress-container {
-            width: 100%; height: 30px; 
-            padding-bottom: max(5px, env(safe-area-inset-bottom));
-            display: flex; align-items: flex-end;
-            pointer-events: auto; cursor: pointer;
+            width: 100%; height: 20px; 
+            display: flex; align-items: center;
+            cursor: pointer; margin-bottom: 5px;
         }
         .progress-track { width: 100%; height: 3px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s; }
         .progress-fill { height: 100%; width: 0%; background: #ff3366; position: relative; }
@@ -111,8 +119,23 @@
             content: ''; position: absolute; right: -6px; top: -4px; width: 10px; height: 10px; 
             background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s;
         }
-        .progress-container:active .progress-track { height: 6px; }
+        .progress-container:active .progress-track { height: 5px; }
         .progress-container:active .progress-fill::after { transform: scale(1.5); }
+
+        /* Fila de controles (Tiempo y Fullscreen) */
+        .controls-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px;
+        }
+        .time-display {
+            font-size: 0.85rem; font-family: monospace; font-weight: 600;
+            color: #e0e0e0; text-shadow: 0 1px 2px black;
+        }
+        .fullscreen-btn {
+            font-size: 1.2rem; color: white; padding: 5px; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .fullscreen-btn:active { transform: scale(0.8); color: #ff3366; }
 
         /* --- DRAWER (LISTA EPISODIOS) --- */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -152,7 +175,7 @@
 
     <div id="errorMsg"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br><span id="errorText">Error al cargar</span></div>
 
-    <div class="video-container">
+    <div class="video-container" id="videoContainer">
         <video id="html5-player" class="hidden" playsinline></video>
         <div id="yt-placeholder"></div>
 
@@ -189,8 +212,18 @@
                 </div>
             </div>
             
-            <div class="progress-container" onclick="handleSeek(event)">
-                <div class="progress-track"><div id="prog-fill" class="progress-fill"></div></div>
+            <div class="bottom-controls-area">
+                <div class="progress-container" onclick="handleSeek(event)">
+                    <div class="progress-track"><div id="prog-fill" class="progress-fill"></div></div>
+                </div>
+                
+                <div class="controls-row">
+                    <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+                    
+                    <div class="fullscreen-btn" onclick="toggleFullScreen()">
+                        <i id="fs-icon" class="fa-solid fa-expand"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -221,7 +254,9 @@
         // --- 2. INICIALIZACIÓN (CONEXIÓN API REAL) ---
         window.onload = async () => {
             if (!id) {
-                showError("ID de video no encontrado");
+                // MODO DEMO SI NO HAY ID (Para probar visualmente)
+                document.getElementById('ui-title').innerText = "Modo Demo: Flechazo TV";
+                document.getElementById('ui-subtitle').innerText = "Reproductor UI Test";
                 return;
             }
 
@@ -233,11 +268,9 @@
                 
                 itemData = await res.json();
 
-                // Lógica de carga según tipo
                 if(itemData.tipo === 'serie') {
                     isSerie = true;
                     document.getElementById('btnEpList').style.display = 'block';
-                    // Si tienes guardado el último episodio visto, úsalo aquí, si no, carga el 0
                     loadEp(0);
                 } else {
                     document.getElementById('ui-title').innerText = itemData.title;
@@ -299,7 +332,7 @@
         function loadVideo(url) {
             const spinner = document.getElementById('spinner');
             spinner.style.display = 'block';
-            document.getElementById('touchArea').classList.remove('paused'); // Asumir play al cargar
+            document.getElementById('touchArea').classList.remove('paused');
 
             const ytId = getYouTubeId(url);
 
@@ -318,9 +351,8 @@
                 
                 html5Player.src = url;
                 html5Player.load();
-                html5Player.play().catch(e => console.log("Autoplay bloqueado por navegador"));
+                html5Player.play().catch(e => console.log("Autoplay bloqueado"));
                 
-                // Eventos MP4
                 html5Player.oncanplay = () => spinner.style.display = 'none';
                 html5Player.onwaiting = () => spinner.style.display = 'block';
                 html5Player.onplaying = () => { spinner.style.display = 'none'; updatePlayUI(true); };
@@ -339,20 +371,17 @@
         }
 
         function initYouTubePlayer(videoId) {
-            // Si la API no cargó, esperar
             if (!window.YT || !window.YT.Player) {
                 setTimeout(() => initYouTubePlayer(videoId), 100);
                 return;
             }
 
-            // Si ya existe el player, solo cargamos el nuevo video
             if (ytPlayer) {
                 document.getElementById('yt-placeholder').classList.remove('hidden');
                 ytPlayer.loadVideoById(videoId);
                 return;
             }
 
-            // Crear player por primera vez
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%',
                 videoId: videoId,
@@ -446,7 +475,16 @@
             setTimeout(() => el.classList.remove('show-seek'), 600);
         }
 
-        // --- 7. BUCLE DE PROGRESO Y LÓGICA DE "SIGUIENTE" ---
+        // --- 7. BUCLE DE PROGRESO Y LÓGICA DE TIEMPO ---
+        
+        // Función auxiliar para formatear segundos a MM:SS
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return "00:00";
+            let m = Math.floor(seconds / 60);
+            let s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0'+s : s}`;
+        }
+
         function startProgressLoop() {
             if (progressInterval) clearInterval(progressInterval);
             progressInterval = setInterval(() => {
@@ -455,6 +493,7 @@
                     const dur = ytPlayer.getDuration();
                     if(dur > 0) {
                         updateProgressBar((cur/dur)*100);
+                        updateTimeDisplay(cur, dur); // Actualizar texto
                         checkNextButton(cur, dur);
                     }
                 }
@@ -464,6 +503,7 @@
         function updateProgressHTML5() {
             if (html5Player.duration) {
                 updateProgressBar((html5Player.currentTime / html5Player.duration) * 100);
+                updateTimeDisplay(html5Player.currentTime, html5Player.duration); // Actualizar texto
                 checkNextButton(html5Player.currentTime, html5Player.duration);
             }
         }
@@ -472,9 +512,34 @@
             document.getElementById('prog-fill').style.width = pct + '%';
         }
 
+        function updateTimeDisplay(current, total) {
+            document.getElementById('timeDisplay').innerText = `${formatTime(current)} / ${formatTime(total)}`;
+        }
+
         function checkNextButton(current, duration) {
-            if (isSerie && (duration - current < 60)) { // Si falta menos de 1 min
+            if (isSerie && (duration - current < 60)) { 
                 document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        // --- 8. FUNCIONALIDAD PANTALLA COMPLETA ---
+        function toggleFullScreen() {
+            const doc = window.document;
+            const docEl = doc.documentElement;
+
+            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                if(requestFullScreen) {
+                    requestFullScreen.call(docEl);
+                    document.getElementById('fs-icon').className = "fa-solid fa-compress"; // Cambiar icono
+                }
+            } else {
+                if(cancelFullScreen) {
+                    cancelFullScreen.call(doc);
+                    document.getElementById('fs-icon').className = "fa-solid fa-expand"; // Restaurar icono
+                }
             }
         }
 
