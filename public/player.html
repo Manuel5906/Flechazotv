@@ -18,48 +18,12 @@
             user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- CAPA DE INTRODUCCIÓN (VIDEO) --- */
-        .intro-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #000;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
-        }
-        
-        #intro-video-element {
-            width: 100%; height: 100%; object-fit: cover;
-            position: absolute; top: 0; left: 0;
-        }
-
-        /* Texto superpuesto al video intro */
-        .intro-overlay-text {
-            position: absolute; bottom: 20%; left: 0; width: 100%;
-            text-align: center; z-index: 101;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-        .intro-label {
-            font-size: 0.9rem; color: #ff3366; font-weight: 800; letter-spacing: 2px;
-            text-transform: uppercase; margin-bottom: 10px;
-            opacity: 0; animation: fadeInUp 1s forwards 0.5s;
-        }
-        .intro-drama-title {
-            font-size: 1.8rem; color: white; font-weight: 300;
-            padding: 0 20px;
-            opacity: 0; animation: fadeInUp 1s forwards 1s;
-        }
-
-        .intro-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- CONTENEDOR PRINCIPAL --- */
+        /* --- VIDEO CONTAINER --- */
         .video-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            background: #000; opacity: 0; transition: opacity 0.5s;
+            background: #000;
         }
-        .video-container.visible { opacity: 1; }
-
         video, #yt-placeholder { 
             width: 100%; height: 100%; object-fit: contain; 
             position: absolute; top:0; left:0;
@@ -161,34 +125,16 @@
         .show-seek { animation: fadePop 0.6s ease-out; }
         @keyframes fadePop { 0% { opacity: 0; transform: translateY(-50%) scale(0.8); } 50% { opacity: 1; transform: translateY(-50%) scale(1.1); } 100% { opacity: 0; transform: translateY(-50%) scale(1); } }
         #errorMsg { position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); display:none; color: #ccc; text-align: center; font-weight: bold; }
-        
-        /* Botón Iniciar para navegadores estrictos */
-        #startBtn {
-            position: absolute; z-index: 200; background: #ff3366; color: white;
-            padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 1.2rem;
-            display: none; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.5);
-        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="introContainer" class="intro-container">
-        <video id="intro-video-element" playsinline muted>
-            <source src="http://googleusercontent.com/generated_video_content/16975865586054294131" type="video/mp4">
-        </video>
-        
-        <div class="intro-overlay-text">
-            <div class="intro-label">ESTÁS VIENDO</div>
-            <div id="intro-title-text" class="intro-drama-title">Cargando...</div>
-        </div>
-
-        <button id="startBtn" onclick="forceStart()">REPRODUCIR</button>
-    </div>
-
     <div id="errorMsg"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br><span id="errorText">Error al cargar</span></div>
 
     <div class="video-container" id="mainContainer">
+        
         <video id="html5-player" class="hidden" playsinline></video>
+        
         <div id="yt-placeholder"></div>
 
         <div id="spinner" class="loading-spinner"></div>
@@ -249,33 +195,34 @@
 
     <script>
         // --- VARIABLES GLOBALES ---
-        let playerType = 'none';
+        let playerType = 'none'; // 'intro', 'html5', 'youtube'
         let ytPlayer = null;
         let html5Player = document.getElementById('html5-player');
-        let introVideo = document.getElementById('intro-video-element');
         let progressInterval = null;
         
         let itemData = null;
         let currentEp = 0;
         let isSerie = false;
         
-        // Variable temporal para guardar la URL del video principal mientras pasa la intro
-        let pendingVideoUrl = ""; 
+        // Estado de la Intro
+        let isPlayingIntro = false;
+        let pendingMainUrl = ""; // Aquí guardamos el video real
+        const INTRO_URL = "http://googleusercontent.com/generated_video_content/16975865586054294131";
 
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
-        // --- 1. INICIO Y GESTIÓN DE INTRO ---
+        // --- 1. INICIO ---
         window.onload = async () => {
-            introVideo.addEventListener('ended', onIntroEnded);
+            // Configurar evento de fin de intro/video
+            html5Player.onended = handleHtml5Ended;
 
             if (!id) {
                 // MODO DEMO
-                const demoTitle = "Flechazo TV: Demo";
-                setupIntroUI(demoTitle);
-                // Video dummy para probar
-                pendingVideoUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; 
-                attemptPlayIntro();
+                document.getElementById('ui-title').innerText = "Flechazo TV: Demo";
+                document.getElementById('ui-subtitle').innerText = "Modo Prueba";
+                pendingMainUrl = "https://www.w3schools.com/html/mov_bbb.mp4"; 
+                startPlaybackSequence();
                 return;
             }
 
@@ -290,59 +237,94 @@
                     document.getElementById('btnEpList').style.display = 'block';
                     prepareEp(0);
                 } else {
-                    setupIntroUI(itemData.title);
                     document.getElementById('ui-title').innerText = itemData.title;
-                    pendingVideoUrl = itemData.url;
-                    attemptPlayIntro();
+                    pendingMainUrl = itemData.url;
+                    startPlaybackSequence();
                 }
 
             } catch(e) {
                 console.error(e);
                 showError("No se pudo cargar el contenido");
-                document.getElementById('introContainer').style.display = 'none';
             }
         };
 
-        function setupIntroUI(title) {
-            document.getElementById('intro-title-text').innerText = title;
+        // --- 2. LÓGICA DE SECUENCIA (INTRO -> VIDEO) ---
+        
+        function startPlaybackSequence() {
+            // Paso 1: Reproducir Intro en el player HTML5
+            playIntro();
         }
 
-        // Intenta reproducir intro. Si falla (navegador bloquea), muestra botón.
-        function attemptPlayIntro() {
-            // Desmutear si quieres sonido en la intro (navegadores pueden bloquearlo)
-            // introVideo.muted = false; 
+        function playIntro() {
+            isPlayingIntro = true;
+            playerType = 'intro'; // Usamos el player HTML5 para la intro
             
-            const promise = introVideo.play();
+            // UI Limpia para intro
+            document.getElementById('yt-placeholder').classList.add('hidden');
+            html5Player.classList.remove('hidden');
+            
+            html5Player.src = INTRO_URL;
+            html5Player.load();
+            
+            const promise = html5Player.play();
             if (promise !== undefined) {
                 promise.catch(error => {
-                    console.log("Autoplay bloqueado. Mostrando botón de inicio.");
-                    document.getElementById('startBtn').style.display = 'block';
+                    console.log("Autoplay bloqueado. Esperando toque del usuario.");
+                    updatePlayUI(false);
                 });
+            } else {
+                updatePlayUI(true);
             }
         }
 
-        function forceStart() {
-            document.getElementById('startBtn').style.display = 'none';
-            introVideo.play();
-            // Aseguramos sonido si estaba muteado
-            introVideo.muted = false; 
-        }
-
-        function onIntroEnded() {
-            // Ocultar capa intro
-            const container = document.getElementById('introContainer');
-            container.classList.add('intro-hidden');
-            
-            // Mostrar capa principal
-            document.getElementById('mainContainer').classList.add('visible');
-            
-            // Iniciar video principal
-            if(pendingVideoUrl) {
-                loadVideo(pendingVideoUrl);
+        // Manejador del fin de video HTML5
+        function handleHtml5Ended() {
+            if (isPlayingIntro) {
+                // Si terminó la intro, cargamos el video real
+                console.log("Intro terminada. Cargando video principal...");
+                isPlayingIntro = false;
+                loadMainVideo(pendingMainUrl);
+            } else {
+                // Si terminó el video real
+                checkNextButton(html5Player.duration, html5Player.duration);
             }
         }
 
-        // --- 2. LÓGICA SERIES ---
+        // --- 3. CARGA DEL VIDEO PRINCIPAL ---
+        function loadMainVideo(url) {
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+            document.getElementById('touchArea').classList.remove('paused');
+
+            const ytId = getYouTubeId(url);
+
+            if (ytId) {
+                // CAMBIO A YOUTUBE
+                playerType = 'youtube';
+                html5Player.classList.add('hidden'); // Ocultar MP4 Player
+                html5Player.pause();
+                initYouTubePlayer(ytId);
+            } else {
+                // SEGUIR EN HTML5 (MP4)
+                playerType = 'html5';
+                if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+                document.getElementById('yt-placeholder').classList.add('hidden');
+                html5Player.classList.remove('hidden');
+                
+                html5Player.src = url;
+                html5Player.load();
+                html5Player.play().catch(e => console.log("Autoplay main blocked"));
+                
+                // Eventos específicos para contenido real (no intro)
+                html5Player.oncanplay = () => spinner.style.display = 'none';
+                html5Player.onwaiting = () => spinner.style.display = 'block';
+                html5Player.onplaying = () => { spinner.style.display = 'none'; updatePlayUI(true); };
+                html5Player.onpause = () => updatePlayUI(false);
+                html5Player.ontimeupdate = updateProgressHTML5;
+            }
+        }
+
+        // --- 4. LÓGICA DE SERIES ---
         function prepareEp(i) {
             if (!itemData.episodios || !itemData.episodios[i]) return;
             currentEp = i;
@@ -350,19 +332,13 @@
             let epTitle = `Episodio ${itemData.episodios[i].numero}`;
             if(itemData.episodios[i].titulo) epTitle += `: ${itemData.episodios[i].titulo}`;
 
-            setupIntroUI(epTitle);
             document.getElementById('ui-title').innerText = epTitle;
             document.getElementById('ui-subtitle').innerText = itemData.title;
             
-            pendingVideoUrl = itemData.episodios[i].url;
+            pendingMainUrl = itemData.episodios[i].url;
             
-            // Si es el primer load (intro visible), play intro.
-            // Si ya estamos viendo (intro oculta), cargamos directo.
-            if (!document.getElementById('introContainer').classList.contains('intro-hidden')) {
-                attemptPlayIntro();
-            } else {
-                loadVideo(pendingVideoUrl);
-            }
+            // Reiniciar secuencia desde Intro
+            startPlaybackSequence();
             
             document.getElementById('btnNext').classList.remove('show');
             renderList();
@@ -374,39 +350,7 @@
             }
         }
 
-        // --- 3. PLAYER CORE (YouTube / HTML5) ---
-        function loadVideo(url) {
-            const spinner = document.getElementById('spinner');
-            spinner.style.display = 'block';
-            document.getElementById('touchArea').classList.remove('paused');
-
-            const ytId = getYouTubeId(url);
-
-            if (ytId) {
-                playerType = 'youtube';
-                html5Player.classList.add('hidden');
-                html5Player.pause();
-                initYouTubePlayer(ytId);
-            } else {
-                playerType = 'html5';
-                if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-                document.getElementById('yt-placeholder').classList.add('hidden');
-                html5Player.classList.remove('hidden');
-                
-                html5Player.src = url;
-                html5Player.load();
-                html5Player.play().catch(e => console.log("Autoplay main blocked"));
-                
-                html5Player.oncanplay = () => spinner.style.display = 'none';
-                html5Player.onwaiting = () => spinner.style.display = 'block';
-                html5Player.onplaying = () => { spinner.style.display = 'none'; updatePlayUI(true); };
-                html5Player.onpause = () => updatePlayUI(false);
-                html5Player.ontimeupdate = updateProgressHTML5;
-                html5Player.onended = () => checkNextButton(html5Player.duration, html5Player.duration);
-            }
-        }
-
-        // --- YOUTUBE UTILS ---
+        // --- 5. YOUTUBE API ---
         function getYouTubeId(url) {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -415,12 +359,11 @@
         }
 
         function initYouTubePlayer(videoId) {
-            if (!window.YT || !window.YT.Player) {
-                setTimeout(() => initYouTubePlayer(videoId), 100); return;
-            }
-            if (ytPlayer) {
-                document.getElementById('yt-placeholder').classList.remove('hidden');
-                ytPlayer.loadVideoById(videoId); return;
+            if (!window.YT || !window.YT.Player) { setTimeout(() => initYouTubePlayer(videoId), 100); return; }
+            if (ytPlayer) { 
+                document.getElementById('yt-placeholder').classList.remove('hidden'); 
+                ytPlayer.loadVideoById(videoId); 
+                return; 
             }
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%', videoId: videoId,
@@ -430,52 +373,42 @@
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
 
-        function onYtReady(event) {
-            document.getElementById('spinner').style.display = 'none';
-            event.target.playVideo();
-            startProgressLoop();
-        }
-
+        function onYtReady(event) { document.getElementById('spinner').style.display = 'none'; event.target.playVideo(); startProgressLoop(); }
         function onYtStateChange(event) {
-            if (event.data == YT.PlayerState.PLAYING) {
-                document.getElementById('spinner').style.display = 'none';
-                updatePlayUI(true);
-            } else if (event.data == YT.PlayerState.PAUSED) updatePlayUI(false);
+            if (event.data == YT.PlayerState.PLAYING) { document.getElementById('spinner').style.display = 'none'; updatePlayUI(true); }
+            else if (event.data == YT.PlayerState.PAUSED) updatePlayUI(false);
             else if (event.data == YT.PlayerState.BUFFERING) document.getElementById('spinner').style.display = 'block';
-            else if (event.data == YT.PlayerState.ENDED) {
-                updatePlayUI(false);
-                if (isSerie) document.getElementById('btnNext').classList.add('show');
+            else if (event.data == YT.PlayerState.ENDED) { 
+                updatePlayUI(false); 
+                if (isSerie) document.getElementById('btnNext').classList.add('show'); 
             }
         }
 
-        // --- CONTROLES Y UI ---
+        // --- 6. CONTROLES Y UI ---
         let lastClick = 0;
         function handleMainClick(e) {
-            const now = new Date().getTime();
-            const width = window.innerWidth;
-            const x = e.clientX;
+            const now = new Date().getTime(); const width = window.innerWidth; const x = e.clientX;
+            
+            // Si es doble tap
             if (now - lastClick < 300) { 
+                // Permitir seek incluso en intro si quieres, o bloquearlo:
+                // if(isPlayingIntro) return; 
                 if (x < width / 3) { seek(-10); animSeek('seekLeft'); }
                 else if (x > (width / 3) * 2) { seek(10); animSeek('seekRight'); }
                 else { togglePlay(); }
             } else { 
-                setTimeout(() => { if (new Date().getTime() - lastClick > 300) togglePlay(); }, 350);
+                // Si es un tap simple
+                setTimeout(() => { if (new Date().getTime() - lastClick > 300) togglePlay(); }, 350); 
             }
             lastClick = now;
         }
 
         function togglePlay() {
-            if (playerType === 'youtube' && ytPlayer) {
-                ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
-            } else if (playerType === 'html5') {
-                html5Player.paused ? html5Player.play() : html5Player.pause();
-            }
+            if (playerType === 'youtube' && ytPlayer) { ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); }
+            else if (playerType === 'html5' || playerType === 'intro') { html5Player.paused ? html5Player.play() : html5Player.pause(); }
         }
 
-        function updatePlayUI(playing) {
-            const touchArea = document.getElementById('touchArea');
-            playing ? touchArea.classList.remove('paused') : touchArea.classList.add('paused');
-        }
+        function updatePlayUI(playing) { const touchArea = document.getElementById('touchArea'); playing ? touchArea.classList.remove('paused') : touchArea.classList.add('paused'); }
 
         function seek(sec) {
             if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + sec, true);
@@ -483,17 +416,12 @@
         }
 
         function handleSeek(e) {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-            const pct = (e.clientX - rect.left) / rect.width;
+            e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width;
             if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
             else html5Player.currentTime = html5Player.duration * pct;
         }
 
-        function animSeek(id) {
-            const el = document.getElementById(id);
-            el.classList.add('show-seek'); setTimeout(() => el.classList.remove('show-seek'), 600);
-        }
+        function animSeek(id) { const el = document.getElementById(id); el.classList.add('show-seek'); setTimeout(() => el.classList.remove('show-seek'), 600); }
 
         function formatTime(seconds) {
             if (!seconds || isNaN(seconds)) return "00:00";
@@ -512,6 +440,9 @@
         }
 
         function updateProgressHTML5() {
+            // Solo actualizamos barra de progreso si NO estamos en la intro
+            if (isPlayingIntro) return;
+
             if (html5Player.duration) {
                 updateProgressBar((html5Player.currentTime / html5Player.duration) * 100);
                 updateTimeDisplay(html5Player.currentTime, html5Player.duration);
@@ -523,11 +454,7 @@
         function updateTimeDisplay(cur, total) { document.getElementById('timeDisplay').innerText = `${formatTime(cur)} / ${formatTime(total)}`; }
         function checkNextButton(cur, dur) { if (isSerie && (dur - cur < 60)) document.getElementById('btnNext').classList.add('show'); }
 
-        // --- DRAWER & UTILS ---
-        function toggleDrawer() {
-            document.getElementById('drawer').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('open');
-        }
+        function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
         function renderList() {
             const list = document.getElementById('list'); list.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
@@ -538,15 +465,10 @@
                 list.appendChild(div);
             });
         }
-        function showError(msg) {
-            document.getElementById('errorText').innerText = msg;
-            document.getElementById('errorMsg').style.display = 'block';
-            document.getElementById('spinner').style.display = 'none';
-        }
+        function showError(msg) { document.getElementById('errorText').innerText = msg; document.getElementById('errorMsg').style.display = 'block'; document.getElementById('spinner').style.display = 'none'; }
         function toggleFullScreen() {
             const doc = window.document; const docEl = doc.documentElement;
-            const req = docEl.requestFullscreen || docEl.webkitRequestFullScreen;
-            const can = doc.exitFullscreen || doc.webkitExitFullscreen;
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullScreen; const can = doc.exitFullscreen || doc.webkitExitFullscreen;
             if (!doc.fullscreenElement && !doc.webkitFullscreenElement) { if(req) req.call(docEl); } else { if(can) can.call(doc); }
         }
         function goHome() { window.location.href = '/'; }
