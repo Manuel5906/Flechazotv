@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- ESTILOS BASE Y VARIABLES --- */
+        /* --- ESTILOS (Mismo diseño Premium Glassmorphism) --- */
         :root { 
             --bg-dark: #09090b; 
             --bg-card: #18181b;
@@ -15,8 +15,6 @@
             --text-muted: #a1a1aa;
             --primary: #ff3366;
             --primary-grad: linear-gradient(135deg, #ff3366 0%, #b333ff 100%); 
-            --glass: rgba(24, 24, 27, 0.8);
-            --border: #27272a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -24,28 +22,24 @@
         body { 
             background-color: var(--bg-dark); 
             color: var(--text); 
-            padding-bottom: 80px; /* Espacio para menú */
+            padding-bottom: 80px; 
             overflow-x: hidden;
         }
 
-        /* --- ANIMACIONES --- */
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* --- TABS --- */
+        /* Animaciones */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- HEADER --- */
+        /* Header */
         .header { 
             padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; 
             position: sticky; top: 0; z-index: 50; background: rgba(9,9,11,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .logo-heart { font-size: 1.5rem; font-weight: 800; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
-        .header-icons i { font-size: 1.2rem; margin-left: 15px; cursor: pointer; color: var(--text); transition: color 0.2s; }
-        .header-icons i:hover { color: var(--primary); }
+        .logo-heart { font-size: 1.5rem; font-weight: 800; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-icons i { font-size: 1.2rem; margin-left: 15px; cursor: pointer; color: var(--text); }
 
-        /* --- CHIPS (CATEGORÍAS) --- */
+        /* Chips Categorías */
         .chip-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; }
         .chip { 
             white-space: nowrap; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; 
@@ -53,38 +47,30 @@
         }
         .chip.active { background: #3f3f46; color: white; border-color: var(--primary); }
 
-        /* --- HERO --- */
+        /* Hero */
         .hero-container { padding: 0 20px 20px 20px; }
         .hero-card { 
-            width: 100%; height: 420px; border-radius: 24px; overflow: hidden; position: relative; 
+            width: 100%; height: 400px; border-radius: 24px; overflow: hidden; position: relative; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.6); cursor: pointer;
         }
-        .hero-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
         .hero-overlay { 
             position: absolute; inset: 0; 
             background: linear-gradient(to top, rgba(9,9,11,1) 0%, rgba(9,9,11,0.2) 60%, transparent 100%);
             display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;
         }
-        .hero-badge { 
-            background: var(--primary-grad); padding: 4px 10px; border-radius: 6px; 
-            font-size: 0.7rem; font-weight: bold; width: fit-content; margin-bottom: 10px; text-transform: uppercase;
-        }
-        .hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .hero-meta { color: #ddd; font-size: 0.9rem; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        .hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         
-        /* --- SLIDERS --- */
+        /* Sliders */
         .slider-container { margin-bottom: 30px; }
         .section-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px 15px 20px; }
         .section-title { font-weight: 700; font-size: 1.3rem; color: white; }
-        .section-more { color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; }
-        
         .slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        .poster-card { min-width: 110px; cursor: pointer; transition: transform 0.2s; }
-        .poster-card:active { transform: scale(0.95); }
-        .poster-img { width: 110px; height: 165px; border-radius: 12px; object-fit: cover; background: #222; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .poster-card { min-width: 110px; cursor: pointer; }
+        .poster-img { width: 110px; height: 165px; border-radius: 12px; object-fit: cover; background: #222; }
         .poster-title { font-size: 0.8rem; margin-top: 6px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; color: #e4e4e7; }
 
-        /* --- GRID --- */
+        /* Grid */
         .grid-container {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 12px; padding: 0 20px 20px 20px;
@@ -92,60 +78,37 @@
         .grid-item { position: relative; }
         .grid-img { width: 100%; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; background: #222; }
 
-        /* --- PERFIL --- */
-        .profile-header { 
-            text-align: center; padding: 40px 20px; background: radial-gradient(circle at center, #2a1b2e 0%, var(--bg-dark) 70%);
+        /* Loader */
+        .loader-container { 
+            display: flex; justify-content: center; align-items: center; height: 200px; width: 100%; 
         }
-        .avatar-container { position: relative; width: 100px; height: 100px; margin: 0 auto 15px auto; }
-        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #18181b; box-shadow: 0 0 0 3px var(--primary); object-fit: cover; }
-        .vip-badge { 
-            position: absolute; bottom: 0; right: 0; background: #ffd700; color: black; 
-            font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; border: 2px solid #18181b;
-        }
-        .stats-row { display: flex; justify-content: center; gap: 40px; margin-top: 25px; }
-        .stat-num { font-size: 1.4rem; font-weight: 800; color: white; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .menu-list { padding: 20px; }
-        .menu-item { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 18px; background: var(--bg-card); border-radius: 16px; margin-bottom: 10px; cursor: pointer;
-        }
-        .menu-left { display: flex; align-items: center; gap: 15px; font-weight: 500; }
-        .menu-left i { width: 20px; color: var(--text-muted); }
-
-        /* --- BOTTOM NAV --- */
+        /* Bottom Nav */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
             background: rgba(9,9,11,0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05);
             display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: 10px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #71717a; font-size: 0.65rem; cursor: pointer; transition: color 0.3s; flex: 1; }
-        .nav-item i { font-size: 1.3rem; margin-bottom: 5px; transition: transform 0.2s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #71717a; font-size: 0.65rem; cursor: pointer; flex: 1; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 5px; }
         .nav-item.active { color: var(--primary); }
-        .nav-item.active i { transform: translateY(-2px); }
 
-        /* --- BOTTOM SHEET (INFO) --- */
+        /* Bottom Sheet */
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .sheet-overlay.active { opacity: 1; pointer-events: auto; }
-        
         .bottom-sheet {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 85vh;
             background: #18181b; border-radius: 25px 25px 0 0; z-index: 200;
             transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); overflow-y: auto;
         }
         .bottom-sheet.active { transform: translateY(0); }
-        
         .sheet-header-img { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
         .sheet-content { padding: 0 25px 100px 25px; margin-top: -60px; position: relative; }
-        
-        .sheet-tags { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .sheet-tag { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 5px; font-size: 0.7rem; color: #ccc; }
-        
         .sheet-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; line-height: 1.1; }
-        .sheet-info-row { color: #888; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
         
-        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; margin-top: 20px; }
         .btn-play { 
             flex: 2; background: white; color: black; border: none; padding: 14px; border-radius: 15px; 
             font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;
@@ -155,30 +118,22 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; gap: 5px;
         }
 
-        /* Lista de Episodios en Sheet */
-        .episodes-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; }
-        .episode-list { display: flex; flex-direction: column; gap: 10px; }
-        .episode-item { 
-            display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 10px; 
-            background: rgba(255,255,255,0.03); transition: background 0.2s;
-        }
-        .episode-item:active { background: rgba(255,255,255,0.1); }
-        .ep-number { font-size: 2rem; font-weight: 700; color: #444; width: 40px; text-align: center; }
-        .ep-info { flex: 1; }
-        .ep-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .ep-dur { font-size: 0.75rem; color: #777; }
-        .ep-play { color: var(--primary); }
+        /* Episodios */
+        .episode-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.03); margin-bottom: 8px; }
+        .ep-number { font-size: 1.5rem; font-weight: 700; color: #444; width: 30px; text-align: center; }
 
-        /* --- BUSCADOR --- */
-        .search-modal {
-            position: fixed; inset: 0; background: var(--bg-dark); z-index: 60; display: none; padding: 20px;
-        }
+        /* Search Modal */
+        .search-modal { position: fixed; inset: 0; background: var(--bg-dark); z-index: 60; display: none; padding: 20px; }
         .search-modal.active { display: block; animation: fadeIn 0.2s; }
-        .search-header { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
-        .search-input-box {
-            flex: 1; background: #27272a; border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .search-input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 1rem; }
+        .search-input { width: 100%; background: #27272a; border: none; padding: 15px; border-radius: 12px; color: white; outline: none; margin-bottom: 20px; font-size: 1rem; }
+
+        /* Perfil */
+        .profile-header { text-align: center; padding: 40px 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 10px; object-fit: cover;}
+        .stats-row { display: flex; justify-content: center; gap: 40px; margin-top: 25px; }
+        .stat-num { font-size: 1.4rem; font-weight: 800; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
     </style>
 </head>
 <body>
@@ -186,36 +141,34 @@
     <header class="header">
         <div class="logo-heart"><i class="fa-solid fa-heart"></i> FLECHAZO</div>
         <div class="header-icons">
-            <i class="fa-solid fa-bell"></i>
             <i class="fa-solid fa-magnifying-glass" onclick="toggleSearch(true)"></i>
         </div>
     </header>
 
     <div id="tab-home" class="tab-content active">
         <div class="chip-scroll">
-            <div class="chip active">Todos</div>
-            <div class="chip">Romance</div>
-            <div class="chip">Venganza</div>
-            <div class="chip">CEO</div>
-            <div class="chip">Drama</div>
-            <div class="chip">Misterio</div>
+            <div class="chip active" onclick="filterHome('Todos')">Todos</div>
+            <div class="chip" onclick="filterHome('Romance')">Romance</div>
+            <div class="chip" onclick="filterHome('Drama')">Drama</div>
+            <div class="chip" onclick="filterHome('Acción')">Acción</div>
         </div>
 
         <div id="heroContainer" class="hero-container">
-            </div>
+            <div class="loader-container"><div class="spinner"></div></div>
+        </div>
 
         <div class="slider-container">
             <div class="section-header">
-                <div class="section-title">Populares en Perú</div>
-                <div class="section-more">Ver todo</div>
+                <div class="section-title">Populares</div>
             </div>
-            <div class="slider" id="homeSlider1"></div>
+            <div class="slider" id="homeSlider1">
+                <div class="loader-container" style="height: 100px;"><div class="spinner" style="width: 20px; height: 20px;"></div></div>
+            </div>
         </div>
         
         <div class="slider-container">
             <div class="section-header">
-                <div class="section-title">Recién Agregados</div>
-                <div class="section-more">Ver todo</div>
+                <div class="section-title">Nuevos Lanzamientos</div>
             </div>
             <div class="slider" id="homeSlider2"></div>
         </div>
@@ -230,41 +183,22 @@
 
     <div id="tab-mylist" class="tab-content">
         <div class="section-header" style="margin-top: 20px;">
-            <div class="section-title">Tu Biblioteca</div>
+            <div class="section-title">Mi Lista</div>
         </div>
         <div id="myListGrid" class="grid-container">
-            <p style="color:#666; width:300px; text-align:center; padding:20px;">Tu lista está vacía.</p>
+            <p style="color:#666; width:100%; text-align:center; padding:20px;">No hay guardados.</p>
         </div>
     </div>
 
     <div id="tab-profile" class="tab-content">
         <div class="profile-header">
-            <div class="avatar-container">
-                <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" class="avatar">
-                <div class="vip-badge">VIP</div>
-            </div>
+            <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" class="avatar">
             <h2>Manuel Anthony</h2>
-            <p style="color:#a1a1aa; font-size:0.9rem;">@ElTioSpoiler</p>
+            <p style="color:#a1a1aa;">@ElTioSpoiler</p>
             
             <div class="stats-row">
-                <div class="stat-item"><div class="stat-num">124</div><div class="stat-label">Vistos</div></div>
-                <div class="stat-item"><div class="stat-num" id="profileCount">0</div><div class="stat-label">Lista</div></div>
-                <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Años</div></div>
-            </div>
-        </div>
-
-        <div class="menu-list">
-            <div class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-download"></i> Descargas</div>
-                <i class="fa-solid fa-chevron-right" style="color:#444;"></i>
-            </div>
-            <div class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-wallet"></i> Suscripción</div>
-                <span style="color:var(--primary); font-size:0.8rem; font-weight:bold;">ACTIVO</span>
-            </div>
-            <div class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-gear"></i> Configuración</div>
-                <i class="fa-solid fa-chevron-right" style="color:#444;"></i>
+                <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">Vistos</div></div>
+                <div class="stat-item"><div class="stat-num" id="profileCount">0</div><div class="stat-label">En Lista</div></div>
             </div>
         </div>
     </div>
@@ -286,232 +220,154 @@
 
     <div id="sheetOverlay" class="sheet-overlay" onclick="closeSheet()"></div>
     <div id="infoSheet" class="bottom-sheet">
-        <img id="sheetImg" class="sheet-header-img">
+        <img id="sheetImg" class="sheet-header-img" src="">
         <div class="sheet-content">
-            <div id="sheetTags" class="sheet-tags"></div>
-            <h1 id="sheetTitle" class="sheet-title">Titulo</h1>
-            <div class="sheet-info-row">
-                <span style="color:#4ade80;">98% Match</span>
-                <span>2024</span>
-                <span id="sheetEpsCount">0 Eps</span>
-            </div>
-            
-            <p id="sheetDesc" style="color:#ccc; margin-bottom:20px; line-height:1.5;">Descripción...</p>
+            <h1 id="sheetTitle" class="sheet-title">...</h1>
+            <p id="sheetDesc" style="color:#ccc; margin-bottom:20px;">...</p>
             
             <div class="action-buttons">
-                <button class="btn-play" onclick="playVideo()"><i class="fa-solid fa-play"></i> Reproducir</button>
+                <button class="btn-play" id="btnPlayMain"><i class="fa-solid fa-play"></i> Reproducir</button>
                 <button class="btn-icon" id="btnAddSheet" onclick="toggleMyList()">
                     <i class="fa-solid fa-plus"></i> <span>Lista</span>
                 </button>
-                <button class="btn-icon">
-                    <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
-                </button>
             </div>
 
-            <div class="episodes-title">Episodios</div>
-            <div id="episodesList" class="episode-list">
-                </div>
+            <div style="font-weight:bold; margin-bottom:10px; font-size:1.1rem;">Episodios</div>
+            <div id="episodesList"></div>
         </div>
     </div>
 
     <div id="searchModal" class="search-modal">
-        <div class="search-header">
-            <div class="search-input-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#888;"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar series, actores..." onkeyup="handleSearch(this.value)">
-            </div>
-            <span style="color:var(--primary); font-weight:bold; cursor:pointer;" onclick="toggleSearch(false)">Cancelar</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." onkeyup="handleSearch(this.value)">
+            <span style="color:var(--primary); font-weight:bold; margin-bottom:20px;" onclick="toggleSearch(false)">X</span>
         </div>
-        <div style="color:#666; font-size:0.9rem; margin-bottom:10px;">Resultados</div>
-        <div id="searchResults" class="episode-list"></div>
+        <div id="searchResults" style="margin-top:10px;"></div>
     </div>
 
     <script>
-        // --- BASE DE DATOS LOCAL (MOCK DATA) ---
-        // Esto simula tu API para que funcione de inmediato
-        const mockDB = [
-            { 
-                id: 1, 
-                title: "La Venganza del CEO", 
-                tags: ["CEO", "Venganza", "Romance"],
-                desc: "Tras ser humillada, ella regresa 5 años después con una nueva identidad para recuperar lo que le pertenece.",
-                img: "https://image.tmdb.org/t/p/w500/u3bZgnGQ9TWAZQv92dpa6lM9pUv.jpg",
-                banner: "https://image.tmdb.org/t/p/original/t5zCBSB5xMDKkDqe91qahCOUYVV.jpg",
-                episodes: 24 
-            },
-            { 
-                id: 2, 
-                title: "Amor Inesperado", 
-                tags: ["Romance", "Comedia"],
-                desc: "Un matrimonio por contrato que termina convirtiéndose en amor verdadero.",
-                img: "https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
-                banner: "https://image.tmdb.org/t/p/original/8rpDcsfLJypbO6vREc0547TJqqQ.jpg",
-                episodes: 12 
-            },
-            { 
-                id: 3, 
-                title: "Reina de las Sombras", 
-                tags: ["Drama", "Suspenso"],
-                desc: "En un mundo de traiciones, ella debe elegir entre el poder o el amor.",
-                img: "https://image.tmdb.org/t/p/w500/kdPMUMJzyYAc4roD52qavX0nLIC.jpg",
-                banner: "https://image.tmdb.org/t/p/original/etj8E2o0Bud0HkONVQPjyCkIvpv.jpg",
-                episodes: 40 
-            },
-            { 
-                id: 4, 
-                title: "Destino Cruzado", 
-                tags: ["Fantasia", "Romance"],
-                desc: "Dos almas de mundos diferentes colisionan.",
-                img: "https://image.tmdb.org/t/p/w500/ui4drTngfS1t1aBMOzT6lD6UItM.jpg",
-                banner: "https://image.tmdb.org/t/p/original/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
-                episodes: 16 
-            },
-            { 
-                id: 5, 
-                title: "Secretos de Familia", 
-                tags: ["CEO", "Drama"],
-                desc: "Una herencia millonaria desata la guerra interna.",
-                img: "https://image.tmdb.org/t/p/w500/lyP4Wzm381IXc60QxHe50wMPJSF.jpg",
-                banner: "https://image.tmdb.org/t/p/original/4HodWWzbHsDwe09fK55Bq0Xf4tW.jpg",
-                episodes: 30 
-            }
-        ];
+        // CONFIGURACIÓN API
+        // ⚠️ IMPORTANTE: Cambia esta URL por la tuya real si es diferente
+        const API_URL = '/api/movies'; 
 
-        // --- ESTADO DE LA APP ---
+        // VARIABLES GLOBALES
+        let allData = [];
         let myFavorites = JSON.parse(localStorage.getItem('flechazo_favs')) || [];
-        let currentMovie = null;
+        let currentItem = null;
 
-        // --- INICIALIZACIÓN ---
-        window.onload = () => {
-            renderHome();
-            renderGrid('exploreGrid', mockDB);
-            renderMyList();
+        // 1. CARGA INICIAL (CONECTADA A TU API)
+        window.onload = async () => {
+            try {
+                // Petición real a tu servidor
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Error en red");
+                
+                const rawData = await res.json();
+                
+                // Mapeo de datos (Adapter)
+                // Esto asegura que funcione tanto si tu API devuelve 'img' como 'imagenes.poster'
+                allData = rawData.map(item => normalizeData(item));
+
+                renderHome(allData);
+                renderExplore(allData);
+                renderMyList();
+                updateStats();
+
+            } catch(e) { 
+                console.error("Error cargando API:", e);
+                document.getElementById('heroContainer').innerHTML = 
+                    '<p style="text-align:center; padding:50px;">Error cargando contenido. Revisa tu API.</p>';
+            }
         };
 
-        // --- RENDERIZADO HOME ---
-        function renderHome() {
-            // Hero: Usamos el primero de la lista
-            const hero = mockDB[0];
+        // 2. NORMALIZADOR DE DATOS (ADAPTER)
+        // Convierte cualquier formato de API al formato interno de la UI
+        function normalizeData(item) {
+            return {
+                id: item.id || Math.random(),
+                title: item.title || item.nombre || "Sin Título",
+                // Intenta buscar la imagen en varios lugares comunes
+                img: item.img || (item.imagenes ? item.imagenes.poster : "") || "https://via.placeholder.com/300x450",
+                banner: item.banner || (item.imagenes ? item.imagenes.banner : "") || item.img || "https://via.placeholder.com/800x400",
+                desc: item.desc || item.descripcion || "Sin descripción disponible.",
+                // Si tu API no tiene episodios, asumimos 1
+                episodes: item.episodes || (item.lista_episodios ? item.lista_episodios.length : 1),
+                tags: item.tags || (item.genero ? [item.genero] : ["Drama"])
+            };
+        }
+
+        // 3. RENDERIZADORES
+        function renderHome(data) {
+            if(data.length === 0) return;
+            const hero = data[0]; 
+
+            // Render Hero
             document.getElementById('heroContainer').innerHTML = `
-                <div class="hero-card" onclick="openSheet(${hero.id})">
+                <div class="hero-card" onclick="openSheet('${hero.id}')">
                     <img src="${hero.banner}" class="hero-img">
                     <div class="hero-overlay">
-                        <div class="hero-badge">Nº 1 en Tendencias</div>
+                        <div style="background:var(--primary); padding:4px 8px; border-radius:5px; width:fit-content; font-size:0.7rem; font-weight:bold; margin-bottom:5px;">DESTACADO</div>
                         <div class="hero-title">${hero.title}</div>
-                        <div class="hero-meta">
-                            <span>${hero.tags[0]}</span> • <span>${hero.episodes} Eps</span>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-play" style="padding:10px 20px; font-size:0.9rem; border-radius:30px;">
-                                <i class="fa-solid fa-play"></i> Ver Ahora
-                            </button>
-                            <button style="background:rgba(255,255,255,0.2); backdrop-filter:blur(5px); border:none; color:white; width:45px; height:45px; border-radius:50%; font-size:1.1rem;">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
+                        <button class="btn-play" style="width:140px; font-size:0.9rem; padding:10px;"><i class="fa-solid fa-play"></i> Ver Ahora</button>
                     </div>
-                </div>
-            `;
+                </div>`;
 
-            // Sliders
-            const s1 = document.getElementById('homeSlider1');
-            const s2 = document.getElementById('homeSlider2');
-            
-            s1.innerHTML = mockDB.map(m => cardHTML(m)).join('');
-            // Simulamos datos diferentes invirtiendo el array
-            s2.innerHTML = [...mockDB].reverse().map(m => cardHTML(m)).join('');
+            // Render Sliders
+            document.getElementById('homeSlider1').innerHTML = data.map(m => cardHTML(m)).join('');
+            document.getElementById('homeSlider2').innerHTML = [...data].reverse().map(m => cardHTML(m)).join('');
         }
 
-        // --- COMPONENTE TARJETA ---
-        function cardHTML(m) {
-            return `
-                <div class="poster-card" onclick="openSheet(${m.id})">
-                    <img src="${m.img}" class="poster-img">
-                    <div class="poster-title">${m.title}</div>
-                </div>
-            `;
-        }
-
-        function renderGrid(elementId, data) {
-            const container = document.getElementById(elementId);
-            container.innerHTML = data.map(m => `
-                <div class="grid-item" onclick="openSheet(${m.id})">
+        function renderExplore(data) {
+            document.getElementById('exploreGrid').innerHTML = data.map(m => `
+                <div class="grid-item" onclick="openSheet('${m.id}')">
                     <img src="${m.img}" class="grid-img">
                 </div>
             `).join('');
         }
 
-        // --- NAVEGACIÓN TABS ---
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-
-            if(tabId === 'mylist') renderMyList();
+        function cardHTML(m) {
+            return `
+                <div class="poster-card" onclick="openSheet('${m.id}')">
+                    <img src="${m.img}" class="poster-img">
+                    <div class="poster-title">${m.title}</div>
+                </div>`;
         }
 
-        // --- SEARCH ---
-        function toggleSearch(show) {
-            const modal = document.getElementById('searchModal');
-            if(show) {
-                modal.classList.add('active');
-                document.getElementById('searchInput').focus();
-            } else {
-                modal.classList.remove('active');
-            }
-        }
-
-        function handleSearch(val) {
-            const results = document.getElementById('searchResults');
-            if(val.length < 2) { results.innerHTML = ""; return; }
-            
-            const filtered = mockDB.filter(m => m.title.toLowerCase().includes(val.toLowerCase()));
-            results.innerHTML = filtered.map(m => `
-                <div class="episode-item" onclick="openSheet(${m.id}); toggleSearch(false);">
-                    <img src="${m.img}" style="width:50px; height:70px; border-radius:6px; object-fit:cover;">
-                    <div class="ep-info">
-                        <div class="ep-title">${m.title}</div>
-                        <div class="ep-dur">${m.tags.join(', ')}</div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right" style="color:#666;"></i>
-                </div>
-            `).join('');
-        }
-
-        // --- SHEET & DETAILS ---
+        // 4. LÓGICA DE DETALLES (SHEET)
         function openSheet(id) {
-            const m = mockDB.find(x => x.id === id);
+            // Buscamos por ID (convirtiendo a string por si acaso)
+            const m = allData.find(x => String(x.id) === String(id));
             if(!m) return;
-            currentMovie = m;
+            currentItem = m;
 
+            // Llenar datos
             document.getElementById('sheetImg').src = m.banner;
             document.getElementById('sheetTitle').innerText = m.title;
             document.getElementById('sheetDesc').innerText = m.desc;
-            document.getElementById('sheetEpsCount').innerText = m.episodes + " Eps";
-            
-            // Tags
-            document.getElementById('sheetTags').innerHTML = m.tags.map(t => `<span class="sheet-tag">${t}</span>`).join('');
 
-            // Generar lista de episodios
-            let epsHtml = "";
-            for(let i=1; i<= (m.episodes > 5 ? 5 : m.episodes); i++) {
-                epsHtml += `
-                    <div class="episode-item">
+            // Botón Play Principal (Redirige a player.html con el ID real)
+            document.getElementById('btnPlayMain').onclick = () => {
+                window.location.href = `player.html?id=${m.id}`;
+            };
+
+            // Generar lista de episodios (Simulada si no viene la lista real, o linkeada)
+            let epHtml = "";
+            for(let i = 1; i <= Math.min(m.episodes, 10); i++) {
+                epHtml += `
+                    <div class="episode-item" onclick="window.location.href='player.html?id=${m.id}&ep=${i}'">
                         <div class="ep-number">${i}</div>
-                        <div class="ep-info">
-                            <div class="ep-title">Episodio ${i}</div>
-                            <div class="ep-dur">2 min • Estreno</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">Episodio ${i}</div>
+                            <div style="font-size:0.7rem; color:#888;">2 min</div>
                         </div>
-                        <i class="fa-regular fa-circle-play ep-play"></i>
+                        <i class="fa-regular fa-circle-play" style="color:var(--primary);"></i>
                     </div>
                 `;
             }
-            if(m.episodes > 5) epsHtml += `<div style="text-align:center; padding:10px; color:#666;">Ver ${m.episodes - 5} episodios más...</div>`;
-            document.getElementById('episodesList').innerHTML = epsHtml;
+            if(m.episodes > 10) epHtml += `<div style="text-align:center; padding:10px; color:#666;">+${m.episodes - 10} episodios más en el reproductor</div>`;
+            document.getElementById('episodesList').innerHTML = epHtml;
 
-            updateListButton();
+            updateListBtn();
             document.getElementById('sheetOverlay').classList.add('active');
             document.getElementById('infoSheet').classList.add('active');
         }
@@ -521,60 +377,90 @@
             document.getElementById('infoSheet').classList.remove('active');
         }
 
-        function playVideo() {
-            alert("Aquí se abriría el reproductor de video para: " + currentMovie.title);
-        }
-
-        // --- MI LISTA ---
+        // 5. MI LISTA
         function toggleMyList() {
-            if(!currentMovie) return;
-            const idx = myFavorites.indexOf(currentMovie.id);
-            
-            if(idx > -1) {
-                myFavorites.splice(idx, 1); // Quitar
+            if(!currentItem) return;
+            const id = String(currentItem.id);
+            if(myFavorites.includes(id)) {
+                myFavorites = myFavorites.filter(fav => fav !== id);
             } else {
-                myFavorites.push(currentMovie.id); // Agregar
+                myFavorites.push(id);
             }
-            
             localStorage.setItem('flechazo_favs', JSON.stringify(myFavorites));
-            updateListButton();
+            updateListBtn();
             renderMyList();
         }
 
-        function updateListButton() {
+        function updateListBtn() {
             const btn = document.getElementById('btnAddSheet');
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            
-            if(myFavorites.includes(currentMovie.id)) {
-                icon.className = "fa-solid fa-check";
-                icon.style.color = "var(--primary)";
-                text.innerText = "Listo";
+            const id = String(currentItem.id);
+            if(myFavorites.includes(id)) {
+                btn.querySelector('span').innerText = "Listo";
+                btn.querySelector('i').className = "fa-solid fa-check";
+                btn.style.border = "1px solid var(--primary)";
+                btn.style.color = "var(--primary)";
             } else {
-                icon.className = "fa-solid fa-plus";
-                icon.style.color = "white";
-                text.innerText = "Lista";
+                btn.querySelector('span').innerText = "Lista";
+                btn.querySelector('i').className = "fa-solid fa-plus";
+                btn.style.border = "none";
+                btn.style.color = "white";
             }
-            
-            // Actualizar contador perfil
-            document.getElementById('profileCount').innerText = myFavorites.length;
         }
 
         function renderMyList() {
-            const favsData = mockDB.filter(m => myFavorites.includes(m.id));
+            const favData = allData.filter(m => myFavorites.includes(String(m.id)));
             const grid = document.getElementById('myListGrid');
-            
-            if(favsData.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#666;">Tu lista está vacía</div>';
-            } else {
-                grid.innerHTML = favsData.map(m => `
-                    <div class="grid-item" onclick="openSheet(${m.id})">
-                        <img src="${m.img}" class="grid-img">
-                    </div>
-                `).join('');
+            document.getElementById('profileCount').innerText = favData.length;
+
+            if(favData.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#666; padding-top:40px;">Lista vacía</p>';
+                return;
             }
-            document.getElementById('profileCount').innerText = favsData.length;
+            grid.innerHTML = favData.map(m => `
+                <div class="grid-item" onclick="openSheet('${m.id}')">
+                    <img src="${m.img}" class="grid-img">
+                </div>`).join('');
         }
+
+        // 6. UTILIDADES UI
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            if(tab === 'mylist') renderMyList();
+        }
+
+        function toggleSearch(show) {
+            const el = document.getElementById('searchModal');
+            el.style.display = show ? 'block' : 'none';
+            if(show) {
+                el.classList.add('active');
+                document.getElementById('searchInput').focus();
+            } else {
+                el.classList.remove('active');
+            }
+        }
+
+        function handleSearch(val) {
+            const resContainer = document.getElementById('searchResults');
+            if(val.length < 2) { resContainer.innerHTML = ''; return; }
+            
+            const results = allData.filter(m => m.title.toLowerCase().includes(val.toLowerCase()));
+            resContainer.innerHTML = results.map(m => `
+                <div class="episode-item" onclick="openSheet('${m.id}'); toggleSearch(false);">
+                    <img src="${m.img}" style="width:40px; height:60px; object-fit:cover; border-radius:5px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:bold;">${m.title}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats() {
+            // Aquí podrías llamar a otra API para estadísticas reales si quisieras
+        }
+
     </script>
 </body>
 </html>
