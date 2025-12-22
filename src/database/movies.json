@@ -53,8 +53,8 @@
     "desc": "",
     "cat": "Drama",
     "imagenes": {
-      "poster": "https://www.google.com/search?q=https://img.youtube.com/vi/NngWHhsMLrs/maxresdefault.jpg",
-      "banner": ""
+      "poster": "",
+      "banner": "https://img.youtube.com/vi/NngWHhsMLrs/maxresdefault.jpg"
     },
     "url": "https://youtu.be/NngWHhsMLrs?si=A21xKpoNSNeHc-uo"
   }
