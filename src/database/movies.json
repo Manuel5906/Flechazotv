@@ -3,7 +3,7 @@
     "id": 1,
     "tipo": "serie",
     "title": "El Regreso del CEO",
-    "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa...",
+    "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa para recuperar su imperio y a la mujer que lo salvó.",
     "cat": "Romance",
     "imagenes": {
       "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQot3hEt1Bbg-mJyD0nIUcLFSsgZXXVbtWgqzUqsfaz-w&s",
@@ -23,23 +23,23 @@
     ]
   },
   {
-    "id": 1,
+    "id": 2,
     "tipo": "pelicula",
-    "title": "Navidad Eterna | Película Completa",
-    "desc": "Una historia de amor de 2 horas sin interrupciones.",
+    "title": "Navidad Eterna",
+    "desc": "Una historia de amor conmovedora que desafía el tiempo. Película completa sin cortes.",
     "cat": "Drama",
     "imagenes": {
       "poster": "https://i.pinimg.com/564x/fd/50/25/fd50254b8d745423854580665a6c4293.jpg",
       "banner": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg"
     },
-    "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+    "url": "https://archive.org/download/video_navidad_sample.mp4"
   },
   {
-    "id": 2,
+    "id": 3,
     "tipo": "pelicula",
     "title": "Regreso del Gran Maestro",
-    "desc": "El drama chino 'El regreso del gran maestro' ha causado sensación en redes sociales gracias a su inspiradora trama centrada en la superación, la justicia y la resiliencia. Con capítulos que duran menos de dos minutos, la serie ha logrado enganchar a miles de usuarios que siguen con entusiasmo la historia de su protagonista. Su éxito viral ha despertado un creciente interés por saber dónde ver la serie completa en español y qué alternativas existen para acceder a todos los episodios.",
-    "cat": "Drama",
+    "desc": "El drama viral donde un maestro de artes marciales oculto debe revelar su identidad para salvar a su familia.",
+    "cat": "Acción",
     "imagenes": {
       "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2DtDrKPhtZdSfX5uTtVfUAaTe1SY8lSggQqbj9p5Pbg&s=10",
       "banner": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGWu5yUy58nEwBL3610hSQ8JJrXtfqm-_Qgyqipia5IA&s=10"
@@ -47,27 +47,154 @@
     "url": "https://www.youtube.com/embed/eEh6mqsXZyk"
   },
   {
-    "id": 3,
+    "id": 4,
     "tipo": "pelicula",
     "title": "Amor con Chico Más Joven",
-    "desc": "Para arruinar cita a ciegas, elige a azar mesero para casar, sin saber es CEO multimillonario oculto",
-    "cat": "Drama",
+    "desc": "Para arruinar una cita a ciegas arreglada por sus padres, ella elige al azar a un mesero para casarse, sin saber que es un multimillonario.",
+    "cat": "Comedia",
     "imagenes": {
-      "poster": "",
+      "poster": "https://i.pinimg.com/564x/4a/5b/6c/4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d.jpg",
       "banner": "https://img.youtube.com/vi/NngWHhsMLrs/maxresdefault.jpg"
     },
-    "url": "https://youtu.be/NngWHhsMLrs?si=A21xKpoNSNeHc-uo"
+    "url": "https://youtu.be/NngWHhsMLrs"
   },
   {
-    "id":  4,
+    "id": 5,
     "tipo": "pelicula",
-    "title": "Destino de una Noche Equivocada",
-    "desc": "Tras noche con CEO, huérfana quedó embarazada. 2 meses después, él se casó y la mimó como a princesa",
+    "title": "Destino de una Noche",
+    "desc": "Tras una noche confusa con un desconocido, ella queda embarazada. Meses después descubre que es el nuevo presidente de su empresa.",
     "cat": "Drama",
     "imagenes": {
-      "poster": "",
-      "banner": "https://i.ytimg.com/vi/dx3bzbKf88U/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBwH_Jy-7qEW9FmQmqN9cjzw_WaqA"
+      "poster": "https://i.pinimg.com/564x/11/22/33/11223344556677889900aabbccddeeff.jpg",
+      "banner": "https://i.ytimg.com/vi/dx3bzbKf88U/hq720.jpg"
     },
     "url": "https://m.youtube.com/watch?v=dx3bzbKf88U"
+  },
+  {
+    "id": 6,
+    "tipo": "serie",
+    "title": "La Doble Vida de mi Esposo",
+    "desc": "Todos creían que era un inútil, pero en realidad es el líder de la organización más poderosa de la ciudad.",
+    "cat": "Venganza",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/736x/2a/3b/4c/2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner6/maxresdefault.jpg"
+    },
+    "episodios": [
+      { "numero": 1, "titulo": "Humillación familiar", "url": "url_video_1" },
+      { "numero": 2, "titulo": "La llamada secreta", "url": "url_video_2" },
+      { "numero": 3, "titulo": "El despertar del dragón", "url": "url_video_3" }
+    ]
+  },
+  {
+    "id": 7,
+    "tipo": "serie",
+    "title": "Renacida para Amar",
+    "desc": "Murió traicionada por su hermana y su esposo. Ahora ha despertado 10 años en el pasado y planea su venganza perfecta.",
+    "cat": "Fantasía",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/88/99/00/889900aabbccddeeff112233445566.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner7/maxresdefault.jpg"
+    },
+    "episodios": [
+      { "numero": 1, "titulo": "Una segunda oportunidad", "url": "" },
+      { "numero": 2, "titulo": "El plan maestro", "url": "" }
+    ]
+  },
+  {
+    "id": 8,
+    "tipo": "serie",
+    "title": "El Guardaespaldas",
+    "desc": "Un ex-mercenario de élite es contratado para proteger a la hija caprichosa de un magnate. El odio pronto se convierte en amor.",
+    "cat": "Acción",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/a1/b2/c3/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner8/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 9,
+    "tipo": "serie",
+    "title": "Matrimonio por Contrato",
+    "desc": "Solo debían fingir estar casados por un año para complacer a la abuela, pero los sentimientos se volvieron peligrosamente reales.",
+    "cat": "Romance",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/d4/e5/f6/d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner9/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 10,
+    "tipo": "serie",
+    "title": "La Heredera Perdida",
+    "desc": "Vivió en la pobreza toda su vida siendo intimidada, hasta que una limusina negra apareció frente a su casa: es la heredera de los Rockefeller.",
+    "cat": "Drama",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/g7/h8/i9/g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner10/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 11,
+    "tipo": "pelicula",
+    "title": "Amor en la Mafia",
+    "desc": "La hija de un policía se enamora del hijo del capo más peligroso de la ciudad. Un amor estilo Romeo y Julieta pero con armas.",
+    "cat": "Malianteo",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/z1/x2/c3/z1x2c3v4b5n6m7a8s9d0f1g2h3j4k5l6.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner11/maxresdefault.jpg"
+    },
+    "url": ""
+  },
+  {
+    "id": 12,
+    "tipo": "serie",
+    "title": "Divorcio Millonario",
+    "desc": "Él pidió el divorcio pensando que ella era una mantenida. Al día siguiente, descubre que ella es su principal inversionista.",
+    "cat": "CEO",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/q1/w2/e3/q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner12/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 13,
+    "tipo": "serie",
+    "title": "La Niñera del Presidente",
+    "desc": "Entró a trabajar para cuidar a los hijos del presidente, pero terminó cuidando el corazón del hombre más frío del país.",
+    "cat": "Romance",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/p0/o9/i8/p0o9i8u7y6t5r4e3w2q1a0s9d8f7g6h5.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner13/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 14,
+    "tipo": "serie",
+    "title": "Traición Sangrienta",
+    "desc": "Le quitaron todo: su dinero, su familia y su rostro. Ahora regresa con una nueva cara para destruir a quienes la lastimaron.",
+    "cat": "Venganza",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/l5/k4/j3/l5k4j3h2g1f0d9s8a7q6w5e4r3t2y1u0.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner14/maxresdefault.jpg"
+    },
+    "episodios": []
+  },
+  {
+    "id": 15,
+    "tipo": "pelicula",
+    "title": "El Yerno Despreciado",
+    "desc": "Su suegra lo humillaba por ser pobre, sin saber que él es el 'Dios de la Guerra' retirado.",
+    "cat": "Acción",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/m0/n9/b8/m0n9b8v7c6x5z4a3s2d1f0g9h8j7k6l5.jpg",
+      "banner": "https://img.youtube.com/vi/sample_banner15/maxresdefault.jpg"
+    },
+    "url": ""
   }
 ]
