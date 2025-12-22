@@ -2,91 +2,360 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Flechazo TV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --bg-dark: #0f1014; --text: #ffffff; --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 90px; }
-        
-        /* UI Básica */
-        .header { padding: 20px; display: flex; justify-content: center; position: relative; }
-        .logo-heart { font-size: 1.8rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .search-btn { position: absolute; right: 20px; top: 25px; font-size: 1.4rem; color: white; }
+        /* --- 1. ESTILOS GENERALES --- */
+        :root { 
+            --bg-dark: #0f1014; 
+            --card-bg: #1e1e24;
+            --text: #ffffff; 
+            --text-gray: #a1a1a6;
+            --primary: #ff3366;
+            --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); 
+        }
 
-        /* Hero */
-        .hero-container { padding: 20px; }
-        .hero-card { width: 100%; height: 250px; border-radius: 25px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text); 
+            padding-bottom: 90px; /* Espacio para menú abajo */
+            overflow-x: hidden;
+        }
+
+        /* Efecto Blur para cuando abre el modal */
+        #main-content { transition: filter 0.3s; }
+        body.modal-open #main-content { filter: blur(5px) brightness(0.7); pointer-events: none; }
+
+        /* --- 2. HEADER & BUSCADOR --- */
+        .header { 
+            padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; 
+            position: sticky; top: 0; z-index: 50; background: rgba(15,16,20,0.95); backdrop-filter: blur(10px);
+        }
+        .logo-heart { font-size: 1.6rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .search-bar-container {
+            position: absolute; top: 70px; left: 0; width: 100%; padding: 0 20px;
+            transform: translateY(-20px); opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 40;
+        }
+        .search-bar-container.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        
+        .search-input {
+            width: 100%; background: #2a2a30; border: none; padding: 12px 20px; 
+            border-radius: 12px; color: white; font-size: 1rem; outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* --- 3. HERO (PORTADA GIGANTE) --- */
+        .hero-container { padding: 20px; margin-top: 10px; }
+        .hero-card { 
+            width: 100%; height: 400px; /* Más alto para impactar */
+            border-radius: 25px; overflow: hidden; position: relative; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .hero-card:active { transform: scale(0.98); }
         .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
-        .btn-ver { background: var(--primary-grad); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-
-        /* Categorías y Listas */
-        .circles-row { display: flex; justify-content: space-around; padding: 20px; }
-        .circle { width: 60px; height: 60px; border-radius: 50%; background: #1a1b21; display: flex; justify-content: center; align-items: center; border: 1px solid #333; color: #ff3366; font-size: 1.4rem; }
-        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        .poster { min-width: 110px; height: 160px; border-radius: 15px; overflow: hidden; }
-        .poster img { width: 100%; height: 100%; object-fit: cover; }
-        h3 { padding: 0 20px; margin: 20px 0 10px 0; }
         
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 70px; background: #181920; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
-        .nav-item { color: #666; font-size: 1.5rem; } .nav-item.active { color: #ff3366; }
+        .hero-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); 
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;
+        }
+        
+        .hero-tag { 
+            background: var(--primary); color: white; padding: 4px 10px; 
+            border-radius: 6px; font-size: 0.7rem; font-weight: bold; width: fit-content; margin-bottom: 8px;
+        }
+        .hero-title { font-size: 2rem; font-weight: 800; line-height: 1.1; margin-bottom: 10px; text-shadow: 0 2px 4px black; }
+        .hero-btns { display: flex; gap: 10px; }
+        
+        .btn { border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-primary { background: white; color: black; }
+        .btn-glass { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(5px); }
+
+        /* --- 4. CATEGORÍAS (CIRCULOS) --- */
+        .circles-row { display: flex; gap: 20px; padding: 10px 20px; overflow-x: auto; scrollbar-width: none; }
+        .circle-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 65px; cursor: pointer; }
+        .circle-icon { 
+            width: 65px; height: 65px; border-radius: 50%; 
+            background: linear-gradient(145deg, #23232a, #1a1a1f);
+            border: 1px solid #333; display: flex; justify-content: center; align-items: center; 
+            font-size: 1.5rem; color: #ff3366; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .circle-item:active .circle-icon { transform: scale(0.9); border-color: #ff3366; }
+        .circle-label { font-size: 0.75rem; color: var(--text-gray); }
+
+        /* --- 5. LISTAS (SLIDERS) --- */
+        .section-header { padding: 25px 20px 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .section-title { font-size: 1.2rem; font-weight: 700; }
+        .see-all { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
+
+        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
+        
+        .poster-card { 
+            min-width: 130px; position: relative; cursor: pointer; 
+            transition: transform 0.2s;
+        }
+        .poster-card:active { transform: scale(0.95); }
+        .poster-img { 
+            width: 130px; height: 190px; border-radius: 12px; object-fit: cover; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: #222;
+        }
+        /* Etiqueta HD/Nuevo sobre el poster */
+        .poster-badge {
+            position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); 
+            backdrop-filter: blur(4px); padding: 2px 6px; border-radius: 4px; 
+            font-size: 0.6rem; font-weight: bold; color: #ff3366;
+        }
+
+        /* --- 6. MENU INFERIOR --- */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
+            background: rgba(15,16,20,0.95); backdrop-filter: blur(20px); border-top: 1px solid #222;
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+            padding-bottom: 10px; /* Para iPhone safe area */
+        }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: #666; font-size: 0.7rem; text-decoration: none; transition: color 0.3s;
+        }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-item.active { color: white; }
+        .nav-item.active i { color: #ff3366; filter: drop-shadow(0 0 8px rgba(255,51,102,0.4)); }
+
+        /* --- 7. PANEL DE INFORMACIÓN (BOTTOM SHEET) --- */
+        .sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 150; 
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .bottom-sheet {
+            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 85vh;
+            background: #18181b; border-radius: 30px 30px 0 0;
+            transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
+            z-index: 200; overflow-y: auto; padding-bottom: 30px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        .bottom-sheet.active { transform: translateY(0); }
+
+        /* Diseño del Panel */
+        .sheet-header { position: relative; height: 250px; }
+        .sheet-banner { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
+        .sheet-close {
+            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); 
+            width: 35px; height: 35px; border-radius: 50%; color: white; border: none;
+            font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px); z-index: 10;
+        }
+
+        .sheet-content { padding: 0 25px; margin-top: -60px; position: relative; z-index: 5; }
+        .sheet-title { font-size: 2rem; font-weight: 800; margin-bottom: 10px; line-height: 1.1; }
+        .sheet-meta { display: flex; gap: 15px; color: var(--text-gray); font-size: 0.9rem; margin-bottom: 20px; align-items: center; }
+        .meta-tag { border: 1px solid #444; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+        
+        .sheet-actions { display: flex; gap: 10px; margin-bottom: 25px; }
+        .btn-play-big { 
+            flex: 2; background: white; color: black; border: none; padding: 15px; 
+            border-radius: 12px; font-weight: 700; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 10px; 
+            cursor: pointer;
+        }
+        .btn-list-big {
+            flex: 1; background: #2a2a30; color: white; border: none; border-radius: 12px;
+            font-size: 1.2rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-list-text { font-size: 0.6rem; text-transform: uppercase; font-weight: bold; }
+
+        .sheet-desc { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo-heart"><i class="fa-solid fa-heart"></i></div>
-        <i class="fa-solid fa-magnifying-glass search-btn"></i>
-    </header>
 
-    <div id="heroContainer" class="hero-container"></div>
-    
-    <div class="circles-row">
-        <div class="circle"><i class="fa-brands fa-tiktok"></i></div>
-        <div class="circle"><i class="fa-solid fa-heart"></i></div>
-        <div class="circle"><i class="fa-solid fa-fire"></i></div>
+    <div id="sheetOverlay" class="sheet-overlay" onclick="cerrarInfo()"></div>
+
+    <div id="main-content">
+        <header class="header">
+            <div class="logo-heart"><i class="fa-solid fa-heart"></i> FLECHAZO</div>
+            <i class="fa-solid fa-magnifying-glass" style="font-size: 1.2rem; cursor: pointer;" onclick="toggleSearch()"></i>
+        </header>
+
+        <div id="searchContainer" class="search-bar-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar películas, series, actores..." onkeyup="filtrarContenido()">
+        </div>
+
+        <div id="heroContainer" class="hero-container">
+            </div>
+        
+        <div class="circles-row">
+            <div class="circle-item"><div class="circle-icon"><i class="fa-brands fa-tiktok"></i></div><span class="circle-label">Shorts</span></div>
+            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-heart"></i></div><span class="circle-label">Romance</span></div>
+            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-fire"></i></div><span class="circle-label">Acción</span></div>
+            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-ghost"></i></div><span class="circle-label">Terror</span></div>
+            <div class="circle-item"><div class="circle-icon"><i class="fa-solid fa-masks-theater"></i></div><span class="circle-label">Drama</span></div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">Populares hoy</div>
+            <div class="see-all">Ver todo</div>
+        </div>
+        <div class="slider" id="popularesSlider"></div>
+
+        <div class="section-header">
+            <div class="section-title">Recién añadidos</div>
+            <div class="see-all">Ver todo</div>
+        </div>
+        <div class="slider" id="novedadesSlider"></div>
     </div>
 
-    <h3>Populares</h3>
-    <div class="slider" id="popularesSlider"></div>
-
     <nav class="bottom-nav">
-        <i class="fa-solid fa-house nav-item active"></i>
-        <i class="fa-regular fa-compass nav-item"></i>
-        <i class="fa-regular fa-bookmark nav-item"></i>
-        <i class="fa-regular fa-user nav-item"></i>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
+        <a href="#" class="nav-item"><i class="fa-regular fa-compass"></i>Explorar</a>
+        <a href="#" class="nav-item"><i class="fa-regular fa-bookmark"></i>Mi Lista</a>
+        <a href="#" class="nav-item"><i class="fa-regular fa-user"></i>Perfil</a>
     </nav>
 
-    <script>
-        // REDIRECCIÓN: Aquí enviamos el ID al otro archivo HTML
-        function irAlPlayer(id) {
-            window.location.href = `player.html?id=${id}`;
-        }
-
-        window.onload = async () => {
-            const res = await fetch('/api/movies');
-            const data = await res.json();
+    <div id="infoSheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <button class="sheet-close" onclick="cerrarInfo()"><i class="fa-solid fa-xmark"></i></button>
+            <img id="sheetImg" src="" class="sheet-banner">
+        </div>
+        
+        <div class="sheet-content">
+            <h1 id="sheetTitle" class="sheet-title">Título</h1>
             
-            // Hero
-            const hero = data[Math.floor(Math.random() * data.length)];
+            <div class="sheet-meta">
+                <span id="sheetYear">2024</span>
+                <span class="meta-tag" id="sheetCat">Romance</span>
+                <span class="meta-tag">HD</span>
+            </div>
+
+            <div class="sheet-actions">
+                <button class="btn-play-big" id="btnPlaySheet">
+                    <i class="fa-solid fa-play"></i> Reproducir
+                </button>
+                <button class="btn-list-big" onclick="toggleFav(this)">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="btn-list-text">Mi Lista</span>
+                </button>
+                <button class="btn-list-big">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span class="btn-list-text">Compartir</span>
+                </button>
+            </div>
+
+            <p id="sheetDesc" class="sheet-desc">Descripción...</p>
+        </div>
+    </div>
+
+    <script>
+        // VARIABLES GLOBALES
+        let globalMovies = [];
+
+        // 1. CARGAR DATOS
+        window.onload = async () => {
+            try {
+                const res = await fetch('/api/movies');
+                globalMovies = await res.json();
+                
+                if(globalMovies.length > 0) {
+                    construirHero();
+                    construirListas();
+                }
+            } catch(e) { console.error("Error API", e); }
+        };
+
+        // 2. RENDER HERO (Portada Principal)
+        function construirHero() {
+            const hero = globalMovies[Math.floor(Math.random() * globalMovies.length)];
+            const img = hero.imagenes ? hero.imagenes.banner : hero.img;
+            
             document.getElementById('heroContainer').innerHTML = `
-                <div class="hero-card" onclick="irAlPlayer(${hero.id})">
-                    <img src="${hero.imagenes ? hero.imagenes.banner : hero.img}" class="hero-img">
+                <div class="hero-card" onclick="abrirInfo(${hero.id})">
+                    <img src="${img}" class="hero-img">
                     <div class="hero-overlay">
-                        <h2>${hero.title}</h2>
-                        <button class="btn-ver">Ver Ahora</button>
+                        <div class="hero-tag">N# 1 EN TENDENCIAS</div>
+                        <div class="hero-title">${hero.title}</div>
+                        <div class="hero-btns">
+                            <button class="btn btn-primary"><i class="fa-solid fa-play"></i> Ver</button>
+                            <button class="btn btn-glass"><i class="fa-solid fa-plus"></i> Mi Lista</button>
+                        </div>
                     </div>
                 </div>`;
+        }
 
-            // Lista
-            const slider = document.getElementById('popularesSlider');
-            data.forEach(item => {
-                const img = item.imagenes ? item.imagenes.poster : item.img;
-                slider.innerHTML += `<div class="poster" onclick="irAlPlayer(${item.id})"><img src="${img}"></div>`;
-            });
-        };
+        // 3. RENDER LISTAS (Sliders)
+        function construirListas() {
+            const slider1 = document.getElementById('popularesSlider');
+            const slider2 = document.getElementById('novedadesSlider');
+            
+            // Populares (Todos)
+            slider1.innerHTML = globalMovies.map(m => crearPosterHTML(m)).join('');
+            
+            // Novedades (Simulado: invertimos el array)
+            const novedades = [...globalMovies].reverse();
+            slider2.innerHTML = novedades.map(m => crearPosterHTML(m)).join('');
+        }
+
+        function crearPosterHTML(item) {
+            const img = item.imagenes ? item.imagenes.poster : item.img;
+            return `
+                <div class="poster-card" onclick="abrirInfo(${item.id})">
+                    <div class="poster-badge">NUEVO</div>
+                    <img src="${img}" class="poster-img" loading="lazy">
+                </div>
+            `;
+        }
+
+        // 4. LÓGICA DEL PANEL DE INFORMACIÓN (BOTTOM SHEET)
+        function abrirInfo(id) {
+            const movie = globalMovies.find(m => m.id === id);
+            if(!movie) return;
+
+            // Llenar datos en el panel
+            document.getElementById('sheetImg').src = movie.imagenes ? movie.imagenes.banner : movie.img;
+            document.getElementById('sheetTitle').innerText = movie.title;
+            document.getElementById('sheetDesc').innerText = movie.desc || "Sin descripción disponible.";
+            document.getElementById('sheetCat').innerText = movie.cat || "General";
+            
+            // Configurar botón play
+            const btnPlay = document.getElementById('btnPlaySheet');
+            btnPlay.onclick = () => window.location.href = `player.html?id=${id}`;
+
+            // Mostrar animación
+            document.getElementById('sheetOverlay').classList.add('active');
+            document.getElementById('infoSheet').classList.add('active');
+            document.body.classList.add('modal-open');
+        }
+
+        function cerrarInfo() {
+            document.getElementById('sheetOverlay').classList.remove('active');
+            document.getElementById('infoSheet').classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+
+        // 5. UTILIDADES (Buscador y Favoritos)
+        function toggleSearch() {
+            const bar = document.getElementById('searchContainer');
+            const input = document.getElementById('searchInput');
+            bar.classList.toggle('active');
+            if(bar.classList.contains('active')) input.focus();
+        }
+
+        function toggleFav(btn) {
+            const icon = btn.querySelector('i');
+            if(icon.classList.contains('fa-plus')) {
+                icon.classList.replace('fa-plus', 'fa-check');
+                btn.style.color = '#ff3366';
+            } else {
+                icon.classList.replace('fa-check', 'fa-plus');
+                btn.style.color = 'white';
+            }
+        }
     </script>
 </body>
 </html>
