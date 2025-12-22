@@ -2,427 +2,300 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Flechazo TV - CINEMA PRO</title>
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flechazo TV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- 1. CORE --- */
-        :root { 
-            --bg: #050505; --card: #161616; --primary: #E50914; --text: #fff;
-            --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+        :root {
+            --primary: #e50914; /* Rojo Netflix */
+            --bg: #141414;
+            --text: #ffffff;
+            --glass: rgba(20, 20, 20, 0.85);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .logo-anim { font-size: 2rem; color: var(--primary); font-weight: bold; animation: pulse 1.5s infinite; }
+
+        /* --- UI PRINCIPAL --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; padding: 15px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 100; display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand { color: var(--primary); font-weight: 900; font-size: 1.2rem; text-transform: uppercase; }
+
+        /* HERO BANNER */
+        #hero {
+            height: 70vh; position: relative;
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 20px;
+        }
+        #hero::after {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to top, var(--bg), transparent);
+        }
+        .hero-content { position: relative; z-index: 2; margin-bottom: 20px; }
+        .hero-title { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px black; }
+        .hero-desc { font-size: 0.9rem; color: #ddd; max-width: 80%; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(90px + var(--safe-bottom)); overflow-x: hidden; }
+        .btn-hero {
+            padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-play { background: white; color: black; }
+        .btn-list { background: rgba(109, 109, 110, 0.7); color: white; margin-left: 10px; }
 
-        /* --- 2. PLAYER PRO (EL NUEVO CEREBRO) --- */
-        #player-fs { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; }
-        #video-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        video, iframe { width: 100%; height: 100%; border: none; object-fit: contain; }
-
-        /* UI Overlay del Player */
-        .p-ui { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: calc(20px + var(--safe-top)) 20px 40px; background: linear-gradient(rgba(0,0,0,0.8), transparent 20%, transparent 80%, rgba(0,0,0,0.9)); opacity: 1; transition: opacity 0.3s; z-index: 10; pointer-events: none; }
-        .p-ui.hide { opacity: 0; }
-        .p-ui > * { pointer-events: auto; } /* Reactivar clicks en botones */
-
-        /* Header Player */
-        .p-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .p-title { font-size: 16px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); max-width: 80%; }
-        .p-close { font-size: 28px; color: #fff; filter: drop-shadow(0 2px 4px #000); cursor: pointer; }
-
-        /* Center Controls */
-        .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 50px; }
-        .p-btn-big { font-size: 50px; color: #fff; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); cursor: pointer; transition: 0.2s; opacity: 0.9; }
-        .p-btn-big:active { transform: scale(0.9); opacity: 1; }
-        .p-btn-small { font-size: 35px; color: rgba(255,255,255,0.8); cursor: pointer; }
-
-        /* Bottom Controls */
-        .p-bottom { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        /* LISTAS HORIZONTALES */
+        .category-row { margin: 20px 0; padding-left: 20px; }
+        .cat-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: #e5e5e5; }
         
-        /* Time & Icons Row */
-        .p-controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .p-time { font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 500; text-shadow: 0 1px 2px #000; }
-        .p-actions { display: flex; gap: 20px; align-items: center; }
-        .p-icon { font-size: 18px; cursor: pointer; color: #ddd; transition: 0.2s; }
-        .p-icon.active { color: var(--primary); }
-
-        /* Scrubber (La Aguja) */
-        .scrubber-container { width: 100%; height: 20px; display: flex; align-items: center; position: relative; cursor: pointer; }
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; position: relative; z-index: 2; margin: 0; }
-        input[type=range]:focus { outline: none; }
+        .slider {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;
+            scroll-behavior: smooth; scroll-snap-type: x mandatory;
+        }
+        .slider::-webkit-scrollbar { display: none; } /* Ocultar barra scroll */
         
-        /* Track (Barra Gris) */
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
-        /* Thumb (La Aguja/Bola) */
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary); margin-top: -6px; box-shadow: 0 0 10px rgba(229, 9, 20, 0.5); transform: scale(0); transition: transform 0.2s; }
-        .scrubber-container:hover input[type=range]::-webkit-slider-thumb, 
-        .p-ui:not(.hide) input[type=range]::-webkit-slider-thumb { transform: scale(1); }
+        .card {
+            min-width: 120px; height: 180px; border-radius: 6px;
+            background-color: #333; overflow: hidden; position: relative;
+            cursor: pointer; scroll-snap-align: start; transition: transform 0.2s;
+        }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card:hover { transform: scale(1.05); z-index: 10; border: 2px solid white; }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; height: 60px;
+            background: #121212; border-top: 1px solid #333;
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+        }
+        .nav-item { color: #888; font-size: 0.8rem; text-align: center; text-decoration: none; }
+        .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+        .nav-item.active { color: white; }
+
+        /* MODAL REPRODUCTOR */
+        #playerModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 2000; display: none; flex-direction: column;
+        }
+        .player-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { color: white; font-size: 1.5rem; cursor: pointer; background: none; border: none; }
         
-        /* Progress Fill (Rojo) */
-        .progress-fill { position: absolute; left: 0; top: 8px; height: 4px; background: var(--primary); border-radius: 2px; z-index: 1; pointer-events: none; width: 0%; }
-
-        /* Buffering Spinner */
-        .p-buffer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite; display: none; z-index: 5; }
-
-        /* Locked Mode */
-        .p-lock-btn { position: absolute; left: 20px; bottom: 40px; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
-        .locked-ui .p-center, .locked-ui .p-bottom, .locked-ui .p-top { display: none !important; }
-
-        /* --- 3. APP UI (HOME/LISTS) --- */
-        .screen { display: none; animation: fadeIn 0.4s; }
-        .screen.active { display: block; }
+        video { width: 100%; max-height: 40vh; background: black; }
         
-        .header { position: sticky; top: 0; padding: calc(15px + var(--safe-top)) 20px 15px; background: rgba(5,5,5,0.9); backdrop-filter: blur(20px); z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        .hero-wrap { height: 60vh; position: relative; display: flex; align-items: flex-end; margin-top: -70px; }
-        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; mask-image: linear-gradient(to bottom, black 60%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
-        .hero-info { padding: 20px; z-index: 2; width: 100%; }
-        
-        .h-btn { flex: 1; height: 45px; border-radius: 8px; border: none; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
-        .btn-pri { background: #fff; color: #000; }
-        .btn-sec { background: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(10px); }
+        .player-info { padding: 20px; flex: 1; overflow-y: auto; }
+        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-top: 15px; }
+        .ep-btn {
+            background: #333; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer;
+        }
+        .ep-btn.active { background: var(--primary); }
 
-        .section { margin-top: 30px; }
-        .sec-head { padding: 0 20px 10px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .h-list { display: flex; overflow-x: auto; gap: 12px; padding: 0 20px; scrollbar-width: none; }
-        .card { width: 115px; flex-shrink: 0; position: relative; cursor: pointer; }
-        .card img { width: 100%; height: 165px; border-radius: 8px; object-fit: cover; background: #222; }
-
-        /* Nav */
-        .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; display: flex; justify-content: space-around; padding: 15px 0; z-index: 2000; backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .nav-item { color: #888; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; }
-        .nav-item.active { background: var(--primary); color: #fff; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
-        .nav-item i { font-size: 22px; }
-
-        /* Sheet & Utils */
-        #sheet-ol { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; display: none; align-items: flex-end; backdrop-filter: blur(5px); opacity: 0; transition: 0.3s; }
-        #sheet-ol.open { opacity: 1; }
-        .sheet { background: #121212; width: 100%; max-height: 85vh; border-radius: 30px 30px 0 0; overflow-y: auto; transform: translateY(100%); transition: 0.4s cubic-bezier(0.2, 0.9, 0.3, 1); border-top: 1px solid #333; }
-        #sheet-ol.open .sheet { transform: translateY(0); }
-
-        .hidden { display: none !important; }
-        @keyframes spin { to {transform:rotate(360deg);} }
-        @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     </style>
 </head>
 <body>
 
-    <div id="player-fs">
-        <div id="video-wrap" onclick="toggleUi()">
-            <div class="p-buffer" id="p-buffer"></div>
-            
-            <div class="p-ui" id="p-ui">
-                
-                <div class="p-top">
-                    <i class="fa-solid fa-chevron-down p-close" onclick="closePlayer()"></i>
-                    <div class="p-title" id="p-title-txt">Título del Video</div>
-                    <div style="width:24px;"></div> </div>
-
-                <div class="p-center">
-                    <i class="fa-solid fa-rotate-left p-btn-small" onclick="skip(-10)"></i>
-                    <i class="fa-solid fa-play p-btn-big" id="p-play-btn" onclick="togglePlay(event)"></i>
-                    <i class="fa-solid fa-rotate-right p-btn-small" onclick="skip(10)"></i>
-                </div>
-
-                <div class="p-bottom">
-                    <div class="p-controls-row">
-                        <span class="p-time" id="p-curr">0:00</span>
-                        <div class="p-actions">
-                            <span class="p-time" id="p-speed" onclick="changeSpeed()" style="border:1px solid #fff; padding:2px 6px; border-radius:4px; cursor:pointer;">1x</span>
-                            <i class="fa-solid fa-closed-captioning p-icon"></i>
-                            <i class="fa-solid fa-clone p-icon" onclick="togglePiP()"></i>
-                        </div>
-                        <span class="p-time" id="p-dur">0:00</span>
-                    </div>
-
-                    <div class="scrubber-container">
-                        <div class="progress-fill" id="p-fill"></div>
-                        <input type="range" id="p-seek" min="0" max="100" value="0" step="0.1" oninput="seekVideo(this.value)" onchange="releaseSeek()">
-                    </div>
-                </div>
-
-                <div class="p-lock-btn" onclick="toggleLock()">
-                    <i class="fa-solid fa-unlock" id="p-lock-icon"></i>
-                </div>
-            </div>
-        </div>
+    <div id="splash">
+        <div class="logo-anim">FLECHAZO TV</div>
     </div>
 
-    <div id="sheet-ol" onclick="if(event.target===this) toggleSheet(false)">
-        <div class="sheet"><div id="sheet-content"></div></div>
+    <div class="navbar">
+        <div class="brand">F</div>
+        <div class="user-icon"><i class="fa-solid fa-user"></i></div>
     </div>
 
     <div id="app">
-        <div id="tab-home" class="screen active">
-            <header class="header">
-                <div style="color:var(--primary); font-weight:900; font-size:22px;">FLECHAZO TV</div>
-                <i class="fa-regular fa-bell" style="font-size:22px; color:#fff;"></i>
-            </header>
+        <header id="hero"></header>
 
-            <div id="hero-container"></div> <div class="section">
-                <div class="sec-head"><span class="sec-title">Tendencias</span></div>
-                <div class="h-list" id="list-trends"></div>
-            </div>
+        <div id="categories"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-clapperboard"></i>Shorts</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Explorar</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>Perfil</a>
+    </nav>
+
+    <div id="playerModal">
+        <div class="player-header">
+            <span id="playerTitle">Título</span>
+            <button class="close-btn" onclick="cerrarPlayer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <video id="videoScreen" controls playsinline></video>
+        <div class="player-info">
+            <h2 id="infoTitle" style="margin-bottom: 10px;"></h2>
+            <p id="infoDesc" style="color: #aaa; font-size: 0.9rem;"></p>
             
-            <div id="cat-container"></div> <br><br><br>
+            <div id="seriesZone" style="display:none; margin-top: 20px;">
+                <h4 style="color: #ddd;">Episodios</h4>
+                <div id="episodesList" class="ep-grid"></div>
+            </div>
         </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active"><i class="fa-solid fa-house"></i></div>
-        <div class="nav-item"><i class="fa-solid fa-compass"></i></div>
-        <div class="nav-item"><i class="fa-brands fa-tiktok"></i></div>
-        <div class="nav-item"><i class="fa-solid fa-user"></i></div>
-    </div>
-
     <script>
-        // --- 1. DATOS ---
-        const API = 'https://flechazotv.vercel.app/api/movies';
-        let db = [];
+        // API URL (Ajusta si usas otra ruta)
+        const API_URL = '/api/movies';
 
-        // --- 2. INICIO ---
-        window.onload = async () => {
+        // Variables Globales
+        let contenido = [];
+        const splash = document.getElementById('splash');
+        const hero = document.getElementById('hero');
+        const categoriesContainer = document.getElementById('categories');
+        
+        // Elementos del Reproductor
+        const playerModal = document.getElementById('playerModal');
+        const videoScreen = document.getElementById('videoScreen');
+        const playerTitle = document.getElementById('playerTitle');
+        const infoTitle = document.getElementById('infoTitle');
+        const infoDesc = document.getElementById('infoDesc');
+        const seriesZone = document.getElementById('seriesZone');
+        const episodesList = document.getElementById('episodesList');
+
+        // INICIAR APP
+        window.addEventListener('load', async () => {
+            // Simular carga y quitar Splash
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 1500);
+
+            await cargarDatos();
+        });
+
+        async function cargarDatos() {
             try {
-                const r = await fetch(API);
-                db = await r.json();
-                if(db.length) initApp();
-            } catch(e) { console.log('Error API'); }
-        };
-
-        function initApp() {
-            renderHero(db[0]);
-            renderList('list-trends', db);
-            
-            const cats = [...new Set(db.map(m => m.cat))];
-            document.getElementById('cat-container').innerHTML = cats.map(c => `
-                <div class="section"><div class="sec-head"><span class="sec-title">${c}</span></div>
-                <div class="h-list">${db.filter(m=>m.cat===c).map(m=>`<div class="card" onclick="openSheet(${m.id})"><img src="${m.img}"></div>`).join('')}</div></div>
-            `).join('');
+                const res = await fetch(API_URL);
+                contenido = await res.json();
+                
+                if (contenido.length > 0) {
+                    construirHero(contenido);
+                    construirCategorias(contenido);
+                }
+            } catch (error) {
+                console.error("Error conectando API:", error);
+                hero.innerHTML = "<h1>Error de conexión con el Servidor</h1>";
+            }
         }
 
-        // --- 3. RENDERIZADO ---
-        function renderHero(m) {
-            document.getElementById('hero-container').innerHTML = `
-                <div class="hero-wrap">
-                    <img src="${m.img}" class="hero-bg">
-                    <div class="hero-grad"></div>
-                    <div class="hero-info">
-                        <div style="background:#fff; color:#000; padding:4px 8px; border-radius:4px; display:inline-block; font-size:11px; font-weight:800; margin-bottom:10px;">TOP 1</div>
-                        <h1 style="font-size:38px; font-weight:900; line-height:1; margin-bottom:15px;">${m.title}</h1>
-                        <div style="display:flex; gap:10px;">
-                            <button class="h-btn btn-pri" onclick="playVideo('${m.videoUrl}', ${m.id}, '${m.title}')"><i class="fa-solid fa-play"></i> Ver</button>
-                            <button class="h-btn btn-sec" onclick="openSheet(${m.id})"><i class="fa-solid fa-info"></i></button>
-                        </div>
+        // --- CONSTRUCTOR DEL HERO (Portada Grande) ---
+        function construirHero(datos) {
+            // Elegir uno al azar para la portada
+            const randomItem = datos[Math.floor(Math.random() * datos.length)];
+            
+            hero.style.backgroundImage = `url('${randomItem.img}')`;
+            hero.innerHTML = `
+                <div class="hero-content">
+                    <h1 class="hero-title">${randomItem.title}</h1>
+                    <p class="hero-desc">${randomItem.desc}</p>
+                    <div class="hero-buttons">
+                        <button class="btn-hero btn-play" onclick="abrirPlayer(${randomItem.id})">
+                            <i class="fa-solid fa-play"></i> Reproducir
+                        </button>
+                        <button class="btn-hero btn-list">
+                            <i class="fa-solid fa-plus"></i> Mi Lista
+                        </button>
                     </div>
-                </div>`;
-        }
-
-        function renderList(id, list) {
-            document.getElementById(id).innerHTML = list.map(m => `
-                <div class="card" onclick="openSheet(${m.id})"><img src="${m.img}"></div>
-            `).join('');
-        }
-
-        function openSheet(id) {
-            const m = db.find(x => x.id === id);
-            const box = document.getElementById('sheet-content');
-            box.innerHTML = `
-                <div style="height:250px; position:relative;">
-                    <img src="${m.img}" style="width:100%; height:100%; object-fit:cover; mask-image:linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image:linear-gradient(to bottom, black 50%, transparent 100%);">
-                    <div style="position:absolute; top:20px; right:20px; background:rgba(50,50,50,0.6); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;" onclick="toggleSheet(false)"><i class="fa-solid fa-xmark"></i></div>
                 </div>
-                <div style="padding:20px; margin-top:-60px; position:relative; z-index:2;">
-                    <h1 style="font-size:26px; font-weight:800; margin-bottom:10px;">${m.title}</h1>
-                    <p style="color:#ccc; font-size:14px; line-height:1.5;">${m.desc}</p>
-                    <button style="width:100%; background:#fff; color:#000; font-weight:bold; padding:15px; border-radius:12px; border:none; margin-top:20px; font-size:16px;" onclick="playVideo('${m.videoUrl}', ${m.id}, '${m.title}'); toggleSheet(false)"><i class="fa-solid fa-play"></i> Reproducir</button>
-                </div>`;
-            toggleSheet(true);
-        }
-        function toggleSheet(s) {
-            const el = document.getElementById('sheet-ol');
-            if(s) { el.style.display='block'; setTimeout(()=>el.classList.add('open'),10); }
-            else { el.classList.remove('open'); setTimeout(()=>el.style.display='none',300); }
+            `;
         }
 
-        // --- 4. PLAYER PRO LOGIC (EL CEREBRO) ---
-        let video = null;
-        let isDragging = false;
-        let uiTimeout;
-        let isLocked = false;
+        // --- CONSTRUCTOR DE FILAS ---
+        function construirCategorias(datos) {
+            // Agrupamos por categoría (Romance, Acción, etc.)
+            const categorias = {};
+            datos.forEach(item => {
+                if (!categorias[item.cat]) categorias[item.cat] = [];
+                categorias[item.cat].push(item);
+            });
 
-        function playVideo(url, id, title) {
-            const p = document.getElementById('player-fs');
-            const c = document.getElementById('video-wrap');
-            const ui = document.getElementById('p-ui');
-            const titleTxt = document.getElementById('p-title-txt');
+            // Crear HTML por cada categoría
+            for (const [catNombre, items] of Object.entries(categorias)) {
+                const fila = document.createElement('div');
+                fila.className = 'category-row';
+                
+                let cartasHTML = items.map(item => `
+                    <div class="card" onclick="abrirPlayer(${item.id})">
+                        <img src="${item.img}" alt="${item.title}" loading="lazy">
+                    </div>
+                `).join('');
+
+                fila.innerHTML = `
+                    <h3 class="cat-title">${catNombre}</h3>
+                    <div class="slider">
+                        ${cartasHTML}
+                    </div>
+                `;
+                categoriesContainer.appendChild(fila);
+            }
+        }
+
+        // --- LÓGICA DEL REPRODUCTOR (MÁGICA) ---
+        function abrirPlayer(id) {
+            const item = contenido.find(c => c.id === id);
+            if (!item) return;
+
+            // Llenar datos visuales
+            playerTitle.innerText = item.title;
+            infoTitle.innerText = item.title;
+            infoDesc.innerText = item.desc;
             
-            // Limpiar estado previo
-            c.innerHTML = ''; // Elimina videos anteriores
-            c.appendChild(ui); // Re-inserta la UI
-            c.appendChild(document.getElementById('p-buffer')); // Re-inserta buffer
-            titleTxt.innerText = title || 'Video';
-            isLocked = false;
-            updateLockUI();
-
-            // Detectar Tipo
-            if(url.includes('.m3u8') && Hls.isSupported()) {
-                video = document.createElement('video');
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-            } else if(url.includes('youtu')) {
-                // Fallback a iframe simple para YT (API YT es compleja para UI custom en 1 archivo)
-                // Para V10 PRO con YouTube se recomienda controles nativos
-                let vid = url.includes('v=') ? url.split('v=')[1] : url.split('/').pop();
-                c.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1" allowfullscreen style="width:100%;height:100%;border:none;"></iframe><i class="fa-solid fa-chevron-down" style="position:absolute;top:20px;left:20px;font-size:30px;color:white;text-shadow:0 0 5px black;z-index:9999;" onclick="closePlayer()"></i>`;
-                p.style.display='flex';
-                return; // Salir, no usaremos UI custom para iframe
-            } else {
-                video = document.createElement('video');
-                video.src = url;
-            }
-
-            // Configurar Video
-            video.style.width = '100%';
-            video.style.height = '100%';
-            video.autoplay = true;
-            video.playsInline = true; // Importante para iOS
+            // Limpiar zona de episodios
+            episodesList.innerHTML = '';
             
-            // Eventos del Video
-            video.addEventListener('timeupdate', updateProgress);
-            video.addEventListener('waiting', () => document.getElementById('p-buffer').style.display='block');
-            video.addEventListener('playing', () => document.getElementById('p-buffer').style.display='none');
-            video.addEventListener('click', toggleUi); // Click en video muestra/oculta UI
-            
-            // Insertar (detrás de la UI)
-            c.insertBefore(video, c.firstChild);
-            p.style.display = 'flex';
-            resetTimer();
-        }
-
-        // --- CONTROLES DE REPRODUCCIÓN ---
-        function togglePlay(e) {
-            if(e) e.stopPropagation();
-            const btn = document.getElementById('p-play-btn');
-            if(video.paused) {
-                video.play();
-                btn.className = 'fa-solid fa-pause p-btn-big';
+            // Lógica SERIE vs PELÍCULA
+            if (item.tipo === 'pelicula') {
+                seriesZone.style.display = 'none';
+                videoScreen.src = item.url || ''; 
+                videoScreen.play();
             } else {
-                video.pause();
-                btn.className = 'fa-solid fa-play p-btn-big';
+                // Es SERIE
+                seriesZone.style.display = 'block';
+                
+                // Crear botones para cada episodio
+                if (item.episodios && item.episodios.length > 0) {
+                    item.episodios.forEach((ep, index) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'ep-btn';
+                        btn.innerText = ep.numero;
+                        
+                        if (index === 0) btn.classList.add('active'); // Marcar el 1ro
+
+                        btn.onclick = () => {
+                            // Quitar active a todos
+                            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            // Cambiar video
+                            videoScreen.src = ep.url;
+                            videoScreen.play();
+                        };
+                        episodesList.appendChild(btn);
+                    });
+                    
+                    // Cargar el episodio 1 automáticamente
+                    videoScreen.src = item.episodios[0].url;
+                    videoScreen.play();
+                }
             }
-            resetTimer();
+
+            // Mostrar el modal
+            playerModal.style.display = 'flex';
         }
 
-        function skip(sec) {
-            video.currentTime += sec;
-            resetTimer();
+        function cerrarPlayer() {
+            videoScreen.pause();
+            videoScreen.src = ""; // Detener carga de datos
+            playerModal.style.display = 'none';
         }
-
-        function updateProgress() {
-            if(isDragging) return;
-            const pct = (video.currentTime / video.duration) * 100;
-            document.getElementById('p-seek').value = pct || 0;
-            document.getElementById('p-fill').style.width = pct + '%';
-            document.getElementById('p-curr').innerText = formatTime(video.currentTime);
-            document.getElementById('p-dur').innerText = formatTime(video.duration);
-        }
-
-        function seekVideo(val) {
-            isDragging = true;
-            const time = (val / 100) * video.duration;
-            document.getElementById('p-fill').style.width = val + '%';
-            document.getElementById('p-curr').innerText = formatTime(time);
-        }
-
-        function releaseSeek() {
-            isDragging = false;
-            const val = document.getElementById('p-seek').value;
-            video.currentTime = (val / 100) * video.duration;
-            video.play();
-        }
-
-        // --- FUNCIONES EXTRA ---
-        function changeSpeed() {
-            const speeds = [1, 1.25, 1.5, 2];
-            let current = video.playbackRate;
-            let next = speeds[(speeds.indexOf(current) + 1) % speeds.length] || 1;
-            video.playbackRate = next;
-            document.getElementById('p-speed').innerText = next + 'x';
-        }
-
-        function toggleLock() {
-            isLocked = !isLocked;
-            updateLockUI();
-            toggleUi(true); // Forzar mostrar para ver el candado
-        }
-
-        function updateLockUI() {
-            const ui = document.getElementById('p-ui');
-            const icon = document.getElementById('p-lock-icon');
-            if(isLocked) {
-                ui.classList.add('locked-ui');
-                icon.className = 'fa-solid fa-lock';
-                icon.style.color = '#E50914';
-                // Ocultar todo menos el candado
-                document.querySelector('.p-top').style.opacity = '0';
-                document.querySelector('.p-center').style.opacity = '0';
-                document.querySelector('.p-bottom').style.opacity = '0';
-            } else {
-                ui.classList.remove('locked-ui');
-                icon.className = 'fa-solid fa-unlock';
-                icon.style.color = '#fff';
-                // Mostrar todo
-                document.querySelector('.p-top').style.opacity = '1';
-                document.querySelector('.p-center').style.opacity = '1';
-                document.querySelector('.p-bottom').style.opacity = '1';
-            }
-        }
-
-        function togglePiP() {
-            if (document.pictureInPictureElement) document.exitPictureInPicture();
-            else if (document.pictureInPictureEnabled && video) video.requestPictureInPicture();
-        }
-
-        function toggleUi(forceShow) {
-            if(isLocked && forceShow !== true) {
-                // Si está bloqueado solo mostramos el candado brevemente
-                document.getElementById('p-ui').classList.remove('hide');
-                resetTimer();
-                return;
-            }
-            const ui = document.getElementById('p-ui');
-            ui.classList.toggle('hide');
-            if(!ui.classList.contains('hide')) resetTimer();
-        }
-
-        function resetTimer() {
-            clearTimeout(uiTimeout);
-            uiTimeout = setTimeout(() => {
-                if(!video.paused) document.getElementById('p-ui').classList.add('hide');
-            }, 3500);
-        }
-
-        function closePlayer() {
-            if(video) { video.pause(); video.src = ""; } // Detener y limpiar
-            document.getElementById('video-wrap').innerHTML = ""; // Limpiar DOM
-            document.getElementById('player-fs').style.display = 'none';
-        }
-
-        function formatTime(s) {
-            if(!s || isNaN(s)) return "0:00";
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
-        }
-
     </script>
 </body>
 </html>
