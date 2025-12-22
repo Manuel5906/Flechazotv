@@ -145,12 +145,12 @@
         .show-seek { animation: fadePop 0.6s ease-out; }
         @keyframes fadePop { 0% { opacity: 0; transform: translateY(-50%) scale(0.8); } 50% { opacity: 1; transform: translateY(-50%) scale(1.1); } 100% { opacity: 0; transform: translateY(-50%) scale(1); } }
         
-        #errorMsg { position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); display:none; color: #ccc; text-align: center; }
+        #errorMsg { position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); display:none; color: #ccc; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="errorMsg"><i class="fa-solid fa-circle-exclamation" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Error al cargar</div>
+    <div id="errorMsg"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br><span id="errorText">Error al cargar</span></div>
 
     <div class="video-container">
         <video id="html5-player" class="hidden" playsinline></video>
@@ -218,28 +218,26 @@
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
-        // --- 2. INICIALIZACIÓN ---
+        // --- 2. INICIALIZACIÓN (CONEXIÓN API REAL) ---
         window.onload = async () => {
+            if (!id) {
+                showError("ID de video no encontrado");
+                return;
+            }
+
             try {
-                // AQUI PONES TU URL DE API REAL
-                // const res = await fetch(`/api/movies/${id}`);
-                // itemData = await res.json();
+                // LLAMADA A TU API REAL
+                const res = await fetch(`/api/movies/${id}`);
+                
+                if (!res.ok) throw new Error("Error en la respuesta de la API");
+                
+                itemData = await res.json();
 
-                // --- DATOS MOCK DE PRUEBA (ELIMINAR AL USAR API) ---
-                itemData = {
-                    title: "Dorama de Prueba",
-                    tipo: "serie", // Cambiar a 'pelicula' para probar movie
-                    url: "https://youtu.be/eEh6mqsXZyk", // Fallback
-                    episodios: [
-                        { numero: 1, titulo: "El Comienzo", url: "https://youtu.be/eEh6mqsXZyk" },
-                        { numero: 2, titulo: "La Revelación", url: "https://youtu.be/dummyVideo2" }
-                    ]
-                };
-                // ----------------------------------------------------
-
+                // Lógica de carga según tipo
                 if(itemData.tipo === 'serie') {
                     isSerie = true;
                     document.getElementById('btnEpList').style.display = 'block';
+                    // Si tienes guardado el último episodio visto, úsalo aquí, si no, carga el 0
                     loadEp(0);
                 } else {
                     document.getElementById('ui-title').innerText = itemData.title;
@@ -248,13 +246,21 @@
 
             } catch(e) {
                 console.error(e);
-                document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('ui-title').innerText = "Error";
+                showError("No se pudo cargar el video");
             }
         };
 
+        function showError(msg) {
+            document.getElementById('errorText').innerText = msg;
+            document.getElementById('errorMsg').style.display = 'block';
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('ui-title').innerText = "Error";
+        }
+
         // --- 3. LÓGICA DE SERIES ---
         function loadEp(i) {
+            if (!itemData.episodios || !itemData.episodios[i]) return;
+            
             currentEp = i;
             document.getElementById('ui-title').innerText = `Episodio ${itemData.episodios[i].numero}`;
             document.getElementById('ui-subtitle').innerText = itemData.episodios[i].titulo || "";
@@ -267,7 +273,7 @@
         }
 
         function nextEp() {
-            if (isSerie && currentEp + 1 < itemData.episodios.length) {
+            if (isSerie && itemData.episodios && currentEp + 1 < itemData.episodios.length) {
                 loadEp(currentEp + 1);
             }
         }
@@ -312,7 +318,7 @@
                 
                 html5Player.src = url;
                 html5Player.load();
-                html5Player.play().catch(e => console.log("Autoplay bloqueado"));
+                html5Player.play().catch(e => console.log("Autoplay bloqueado por navegador"));
                 
                 // Eventos MP4
                 html5Player.oncanplay = () => spinner.style.display = 'none';
@@ -326,6 +332,7 @@
 
         // --- 5. YOUTUBE API HANDLING ---
         function getYouTubeId(url) {
+            if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
@@ -376,7 +383,6 @@
                 document.getElementById('spinner').style.display = 'block';
             } else if (event.data == YT.PlayerState.ENDED) {
                 updatePlayUI(false);
-                // Forzar mostrar botón siguiente si termina
                 if (isSerie) document.getElementById('btnNext').classList.add('show');
             }
         }
