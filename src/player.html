@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor - Flechazo TV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff3366; --grad: linear-gradient(135deg, #ff3366, #a033ff); }
+        body { margin: 0; background: black; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+
+        /* Contenedor Video */
+        .video-wrapper { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16/9; }
+        video { width: 100%; height: 100%; background: #000; }
+
+        /* Capa Controles */
+        .controls { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; 
+            padding: 20px; transition: opacity 0.3s; 
+        }
+        .hidden { opacity: 0; pointer-events: none; }
+
+        /* Top Bar */
+        .top-bar { display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 1.5rem; cursor: pointer; color: white; text-decoration: none; }
+        
+        /* Play Centro */
+        .center-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; cursor: pointer; filter: drop-shadow(0 0 10px black); }
+
+        /* Bottom Bar */
+        .bottom-bar { display: flex; flex-direction: column; gap: 10px; position: relative; }
+        
+        /* Botón Siguiente Episodio (Oculto por defecto) */
+        #btnNext { 
+            display: none; /* SE ACTIVA SOLO SI ES SERIE */
+            position: absolute; top: -40px; right: 0; 
+            background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; 
+            font-size: 0.9rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .progress { width: 100%; height: 5px; background: rgba(255,255,255,0.3); border-radius: 5px; cursor: pointer; position: relative; }
+        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 5px; position: relative; }
+        .fill::after { content:''; position: absolute; right: -5px; top: -3px; width: 12px; height: 12px; background: white; border-radius: 50%; }
+
+        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 5px; }
+        
+        /* Botón Lista Episodios (Oculto por defecto) */
+        #btnEpList { display: none; cursor: pointer; align-items: center; gap: 5px; } /* SE ACTIVA SOLO SI ES SERIE */
+
+        /* Panel Lateral (Drawer) */
+        .drawer {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 60vh; 
+            background: #181818; border-radius: 20px 20px 0 0; z-index: 10;
+            transform: translateY(105%); transition: transform 0.3s; padding: 20px;
+            display: flex; flex-direction: column;
+        }
+        .drawer.open { transform: translateY(0); }
+        .ep-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; gap: 10px; }
+        .ep-item:hover { background: #222; }
+        .ep-num { color: var(--primary); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="video-wrapper" onclick="toggleControls()">
+        <video id="vid" playsinline></video>
+
+        <div id="ui" class="controls">
+            <div class="top-bar">
+                <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+                <span id="title">Cargando...</span>
+            </div>
+
+            <i id="playIcon" class="fa-solid fa-play center-play" onclick="togglePlay()"></i>
+
+            <div class="bottom-bar" onclick="event.stopPropagation()">
+                <div id="btnNext" onclick="nextEp()">Siguiente <i class="fa-solid fa-forward"></i></div>
+
+                <div class="progress" onclick="seek(event)"><div id="fill" class="fill"></div></div>
+                
+                <div class="info-row">
+                    <span id="time">00:00</span>
+                    <div id="btnEpList" onclick="toggleDrawer()">
+                        Episodios <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="drawer" class="drawer">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3>Episodios</h3>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
+        </div>
+        <div id="list" style="overflow-y:auto;"></div>
+    </div>
+
+    <script>
+        // 1. Obtener ID de la URL
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        
+        let itemData = null;
+        let currentEp = 0;
+        const vid = document.getElementById('vid');
+        const ui = document.getElementById('ui');
+
+        // 2. Cargar Datos desde tu API
+        window.onload = async () => {
+            try {
+                const res = await fetch(`/api/movies/${id}`);
+                if(!res.ok) return alert("Error cargando video");
+                itemData = await res.json();
+                
+                iniciarReproductor();
+            } catch(e) { console.error(e); }
+        };
+
+        function iniciarReproductor() {
+            // LÓGICA INTELIGENTE: ¿Serie o Película?
+            
+            if (itemData.tipo === 'pelicula') {
+                // ES PELÍCULA: Ocultamos botones de series
+                document.getElementById('title').innerText = itemData.title;
+                vid.src = itemData.url;
+                
+                // Aseguramos que NO se vean los controles de episodios
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('btnEpList').style.display = 'none';
+            
+            } else {
+                // ES SERIE: Mostramos botones y cargamos episodios
+                document.getElementById('btnNext').style.display = 'flex'; // Mostrar botón siguiente
+                document.getElementById('btnEpList').style.display = 'flex'; // Mostrar lista
+                
+                cargarEpisodio(0); // Cargar el primero
+                generarLista();
+            }
+            
+            vid.play();
+        }
+
+        // --- Funciones de Serie ---
+        function cargarEpisodio(index) {
+            if(!itemData.episodios[index]) return;
+            currentEp = index;
+            const ep = itemData.episodios[index];
+            
+            document.getElementById('title').innerText = `${itemData.title} - Ep ${ep.numero}`;
+            vid.src = ep.url;
+            vid.play();
+        }
+
+        function nextEp() {
+            if (currentEp + 1 < itemData.episodios.length) {
+                cargarEpisodio(currentEp + 1);
+            } else {
+                alert("Fin de la temporada");
+            }
+        }
+
+        function generarLista() {
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            itemData.episodios.forEach((ep, i) => {
+                const div = document.createElement('div');
+                div.className = 'ep-item';
+                div.innerHTML = `<span class="ep-num">${ep.numero}</span> <span>${ep.titulo || 'Episodio ' + ep.numero}</span>`;
+                div.onclick = () => { cargarEpisodio(i); toggleDrawer(); };
+                list.appendChild(div);
+            });
+        }
+
+        // --- Controles Generales ---
+        function togglePlay() {
+            if(vid.paused) { vid.play(); document.getElementById('playIcon').className = "fa-solid fa-pause center-play"; }
+            else { vid.pause(); document.getElementById('playIcon').className = "fa-solid fa-play center-play"; }
+        }
+
+        function toggleControls() {
+            ui.classList.toggle('hidden');
+        }
+
+        function toggleDrawer() {
+            document.getElementById('drawer').classList.toggle('open');
+        }
+
+        function seek(e) {
+            const pos = (e.offsetX / e.target.offsetWidth);
+            vid.currentTime = pos * vid.duration;
+            e.stopPropagation();
+        }
+
+        // Barra de progreso
+        vid.ontimeupdate = () => {
+            const perc = (vid.currentTime / vid.duration) * 100;
+            document.getElementById('fill').style.width = perc + "%";
+            
+            let m = Math.floor(vid.currentTime / 60);
+            let s = Math.floor(vid.currentTime % 60);
+            document.getElementById('time').innerText = `${m}:${s<10?'0'+s:s}`;
+        };
+
+    </script>
+</body>
+</html>
