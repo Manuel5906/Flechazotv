@@ -3,110 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Reproductor Vertical</title>
+    <meta name="theme-color" content="#000000">
+    <title>Reproductor Seguro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* --- RESET --- */
+        /* --- 1. CONFIGURACIÓN BASE (CANDADO ANTI-REBOTE) --- */
         html, body {
             margin: 0; padding: 0; background: #000; color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100dvh; width: 100vw; overflow: hidden;
-            position: fixed; top: 0; left: 0; /* Candado anti-rebote */
-            user-select: none; -webkit-tap-highlight-color: transparent;
+            position: fixed; top: 0; left: 0;
+            user-select: none; -webkit-user-select: none; /* Anti-Selección de texto */
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- VIDEO --- */
+        /* --- 2. CONTENEDOR VIDEO --- */
         .video-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             background: #000;
         }
-        video, iframe { width: 100%; height: 100%; object-fit: contain; border: none; }
+        video, iframe { 
+            width: 100%; height: 100%; object-fit: contain; border: none; 
+            pointer-events: none; /* Bloquea clic derecho nativo del video */
+        }
+        .active-player { display: block !important; pointer-events: auto; }
         .hidden { display: none !important; }
 
-        /* --- UI CAPA SUPERIOR --- */
-        .ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Dejar pasar toques al video */
-            display: flex; flex-direction: column; justify-content: space-between;
-            z-index: 10;
+        /* --- 3. MARCA DE AGUA (SEGURIDAD VISUAL) --- */
+        .watermark {
+            position: absolute; top: 20px; right: 20px; z-index: 5;
+            opacity: 0.5; pointer-events: none;
+            display: flex; align-items: center; gap: 8px;
+            filter: drop-shadow(0 2px 4px black);
         }
+        .wm-logo { font-size: 1.2rem; color: #ff3366; }
+        .wm-text { font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
 
-        /* 1. TOP BAR (Título y Volver) */
-        .top-bar {
-            padding: max(15px, env(safe-area-inset-top)) 20px;
-            display: flex; align-items: center; gap: 15px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            pointer-events: auto;
-        }
-        .back-icon { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        .video-info { flex: 1; }
-        .video-title { font-size: 1rem; font-weight: 700; text-shadow: 0 1px 3px black; margin: 0; }
-        .video-subtitle { font-size: 0.8rem; color: #ddd; text-shadow: 0 1px 3px black; }
-
-        /* 2. SIDEBAR (Botones a la derecha estilo TikTok) */
-        .sidebar {
-            position: absolute; 
-            right: 15px; 
-            bottom: max(80px, env(safe-area-inset-bottom)); /* Altura segura */
-            display: flex; flex-direction: column; gap: 20px;
-            align-items: center;
-            pointer-events: auto;
-        }
-
-        .side-btn {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            background: rgba(30, 30, 30, 0.6);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
-            color: white; cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .side-btn:active { transform: scale(0.9); background: rgba(255, 51, 102, 0.8); }
-        .side-btn i { font-size: 1.4rem; margin-bottom: 2px; }
-        .btn-label { font-size: 0.65rem; font-weight: 600; margin-top: 5px; text-shadow: 0 1px 2px black; }
-
-        /* Botón Siguiente (Animado) */
-        #btnNext { 
-            transform: translateX(100px); opacity: 0; transition: all 0.5s; 
-            background: rgba(255, 51, 102, 0.8); /* Rojo destacado */
-        }
-        #btnNext.show { transform: translateX(0); opacity: 1; }
-
-        /* 3. PROGRESS BAR (Muy fina abajo) */
-        .progress-container {
-            width: 100%; height: 40px; /* Área táctil grande invisible */
-            position: absolute; bottom: 0; left: 0;
-            display: flex; align-items: flex-end;
-            pointer-events: auto; cursor: pointer;
-            padding-bottom: max(0px, env(safe-area-inset-bottom)); /* Pegado al borde */
-        }
-        .progress-track {
-            width: 100%; height: 3px; background: rgba(255,255,255,0.3);
-            position: relative; transition: height 0.2s;
-        }
-        .progress-fill {
-            height: 100%; width: 0%; background: #ff3366;
-            position: relative;
-        }
-        /* Bolita indicadora */
-        .progress-fill::after {
-            content: ''; position: absolute; right: -6px; top: -4px;
-            width: 10px; height: 10px; background: white; border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5); transform: scale(0); transition: transform 0.2s;
-        }
-        
-        /* Al tocar, la barra crece */
-        .progress-container:active .progress-track { height: 8px; }
-        .progress-container:active .progress-fill::after { transform: scale(1.5); }
-
-        /* 4. PLAY/PAUSE CENTER (Invisible overlay) */
+        /* --- 4. CAPA TÁCTIL (PLAY/PAUSE) --- */
         .center-touch-area {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 5; pointer-events: auto;
+            z-index: 6; pointer-events: auto; /* Captura clics antes que el video */
             display: flex; align-items: center; justify-content: center;
         }
         .play-icon-anim {
@@ -116,12 +54,70 @@
         }
         .paused .play-icon-anim { opacity: 1; transform: scale(1); }
 
-
-        /* --- DRAWER (Menú) --- */
-        .drawer-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        /* --- 5. INTERFAZ FLOTANTE (UI) --- */
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Deja pasar clicks al video */
+            display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 10;
         }
+
+        /* TOP BAR */
+        .top-bar {
+            padding: max(15px, env(safe-area-inset-top)) 20px;
+            display: flex; align-items: center; gap: 15px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            pointer-events: auto;
+        }
+        .back-icon { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); cursor: pointer; }
+        .video-info { flex: 1; overflow: hidden; }
+        .video-title { font-size: 1rem; font-weight: 700; text-shadow: 0 1px 3px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .video-subtitle { font-size: 0.8rem; color: #ddd; text-shadow: 0 1px 3px black; }
+
+        /* SIDEBAR (BOTONES LATERALES) */
+        .sidebar {
+            position: absolute; right: 15px; bottom: max(90px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column; gap: 20px; align-items: center;
+            pointer-events: auto;
+        }
+        .side-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(30, 30, 30, 0.6); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; cursor: pointer; transition: transform 0.2s;
+        }
+        .side-btn:active { transform: scale(0.9); background: rgba(255, 51, 102, 0.8); }
+        .side-btn i { font-size: 1.4rem; }
+        .btn-label { font-size: 0.65rem; font-weight: 600; margin-top: 5px; text-shadow: 0 1px 2px black; }
+
+        /* BOTÓN SIGUIENTE (ANIMADO) */
+        #btnNext { 
+            transform: translateX(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        #btnNext .side-btn { background: rgba(255, 51, 102, 0.9); border: none; }
+        #btnNext.show { transform: translateX(0); opacity: 1; }
+
+        /* BARRA PROGRESO (FINA ABAJO) */
+        .progress-container {
+            width: 100%; height: 30px; /* Área táctil invisible grande */
+            position: absolute; bottom: 0; left: 0;
+            display: flex; align-items: flex-end;
+            pointer-events: auto; cursor: pointer;
+            padding-bottom: max(0px, env(safe-area-inset-bottom));
+        }
+        .progress-track { width: 100%; height: 3px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s; }
+        .progress-fill { height: 100%; width: 0%; background: #ff3366; position: relative; }
+        .progress-fill::after {
+            content: ''; position: absolute; right: -6px; top: -4px; width: 10px; height: 10px; 
+            background: white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); 
+            transform: scale(0); transition: transform 0.2s;
+        }
+        .progress-container:active .progress-track { height: 8px; }
+        .progress-container:active .progress-fill::after { transform: scale(1.5); }
+
+        /* --- DRAWER (MENÚ) --- */
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 
         .drawer {
@@ -130,38 +126,49 @@
             transform: translateY(110%); transition: transform 0.3s;
             display: flex; flex-direction: column; padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
+        @media (min-width: 768px) { .drawer { width: 400px; left: 50%; margin-left: -200px; } }
         .drawer.open { transform: translateY(0); }
 
         .drawer-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
         .ep-list { overflow-y: auto; padding: 10px 20px; }
-        
         .ep-item { 
             padding: 15px; margin-bottom: 8px; border-radius: 10px; background: #1e1e1e;
-            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: background 0.2s;
         }
+        .ep-item:hover { background: #2a2a2a; }
         .ep-item.active { background: #222; border: 1px solid #ff3366; }
-        .ep-num { font-size: 1.2rem; font-weight: bold; color: #666; }
+        .ep-num { font-size: 1.1rem; font-weight: bold; color: #666; }
         .ep-item.active .ep-num { color: #ff3366; }
 
+        /* ALERTAS SEGURIDAD */
+        #securityMsg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 30px; border-radius: 10px;
+            z-index: 9999; display: none; font-weight: bold; box-shadow: 0 5px 20px black;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return false;"> <div id="securityMsg"><i class="fa-solid fa-lock"></i> Acción Bloqueada</div>
 
     <div class="video-container">
         <video id="vid" playsinline loop></video>
         <iframe id="embedFrame" allowfullscreen allow="autoplay"></iframe>
+
+        <div class="watermark">
+            <i class="fa-solid fa-heart wm-logo"></i>
+            <span class="wm-text">FLECHAZO TV</span>
+        </div>
 
         <div id="touchArea" class="center-touch-area" onclick="togglePlay()">
             <i class="fa-solid fa-play play-icon-anim"></i>
         </div>
 
         <div class="ui-layer">
-            
             <div class="top-bar">
                 <i class="fa-solid fa-arrow-left back-icon" onclick="history.back()"></i>
                 <div class="video-info">
                     <div id="title" class="video-title">Cargando...</div>
-                    <div id="subtitle" class="video-subtitle">Flechazo TV</div>
+                    <div id="subtitle" class="video-subtitle"></div>
                 </div>
             </div>
 
@@ -180,20 +187,41 @@
             <div id="progressContainer" class="progress-container" onclick="seek(event)">
                 <div class="progress-track"><div id="fill" class="progress-fill"></div></div>
             </div>
-
         </div>
     </div>
 
     <div id="overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
     <div id="drawer" class="drawer">
         <div class="drawer-header">
-            <h3>Episodios</h3>
-            <i class="fa-solid fa-xmark" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
+            <h3>Lista de Episodios</h3>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
         </div>
         <div id="list" class="ep-list"></div>
     </div>
 
     <script>
+        // --- SEGURIDAD ---
+        // 1. Bloqueo de Teclas Developer
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+                showSecurityMsg(); return false;
+            }
+            // Atajos PC (Espacio, Flechas)
+            if(document.body.classList.contains('pc-mode') && !document.getElementById('vid').classList.contains('hidden')) {
+                if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
+                if(e.code === 'ArrowRight') { vid.currentTime += 10; }
+                if(e.code === 'ArrowLeft') { vid.currentTime -= 10; }
+            }
+        };
+        // 2. Anti-Drag
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+        function showSecurityMsg() {
+            const m = document.getElementById('securityMsg'); m.style.display='block'; setTimeout(()=>m.style.display='none', 1500);
+        }
+        // 3. Detectar PC
+        if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) document.body.classList.add('pc-mode');
+
+        // --- LÓGICA APP ---
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         let itemData = null, currentEp = 0, isSerie = false;
@@ -210,7 +238,6 @@
             try {
                 const res = await fetch(`/api/movies/${id}`);
                 itemData = await res.json();
-                
                 if(itemData.tipo === 'serie') {
                     isSerie = true;
                     document.getElementById('btnEpList').style.display = 'block';
@@ -235,21 +262,19 @@
             if(url.match(/\.(mp4|webm|mkv)$/i)) {
                 // MP4
                 iframe.classList.add('hidden'); iframe.src = "";
-                vid.classList.remove('hidden'); vid.src = url; vid.play();
+                vid.classList.remove('hidden'); vid.src = url; vid.play().catch(()=>{});
                 document.getElementById('progressContainer').style.display = 'flex';
-                touchArea.style.pointerEvents = 'auto'; // Permitir clic para pausar
+                touchArea.style.pointerEvents = 'auto'; 
             } else {
                 // Embed
                 vid.classList.add('hidden'); vid.pause();
                 iframe.classList.remove('hidden'); iframe.src = url;
-                document.getElementById('progressContainer').style.display = 'none'; // Embed tiene su propia barra
-                touchArea.style.pointerEvents = 'none'; // Permitir tocar el iframe
-                
+                document.getElementById('progressContainer').style.display = 'none';
+                touchArea.style.pointerEvents = 'none'; // Clic directo al iframe
                 if(isSerie && hasNext()) setTimeout(() => btnNext.classList.add('show'), 5000);
             }
         }
 
-        /* LOGICA UI */
         function togglePlay() {
             if(vid.classList.contains('hidden')) return;
             if(vid.paused) { vid.play(); touchArea.classList.remove('paused'); }
@@ -275,7 +300,8 @@
         function toggleDrawer() { drawer.classList.toggle('open'); overlay.classList.toggle('open'); }
         
         function renderList() {
-            const l = document.getElementById('list'); l.innerHTML = '';
+            const l = document.getElementById('list'); 
+            const sp = l.scrollTop; l.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
                 const div = document.createElement('div');
                 div.className = `ep-item ${i===currentEp?'active':''}`;
@@ -283,6 +309,7 @@
                 div.onclick = () => { loadEp(i); toggleDrawer(); };
                 l.appendChild(div);
             });
+            l.scrollTop = sp;
         }
     </script>
 </body>
