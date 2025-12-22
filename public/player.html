@@ -9,178 +9,63 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     
     <style>
-        /* --- CORE --- */
-        html, body {
-            margin: 0; padding: 0; background: #000; color: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100dvh; width: 100vw; overflow: hidden;
-            user-select: none; -webkit-tap-highlight-color: transparent;
-        }
-
-        .video-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; align-items: center; justify-content: center;
-            cursor: default;
-        }
-        
-        /* Ocultar cursor */
+        /* (MISMOS ESTILOS QUE YA TENÍAS - SIN CAMBIOS) */
+        html, body { margin: 0; padding: 0; background: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; height: 100dvh; width: 100vw; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .video-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; cursor: default; }
         .video-container.hide-cursor { cursor: none; }
-
         video, #yt-placeholder { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 0; }
         .hidden { opacity: 0; pointer-events: none; }
-
-        /* --- CAPAS Y GESTOS --- */
-        #brightness-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; opacity: 0; pointer-events: none; z-index: 10;
-            transition: opacity 0.1s;
-        }
-
-        #gestureLayer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20; touch-action: none; 
-        }
-
-        /* Feedback Central */
-        .center-feedback {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.6); padding: 25px; border-radius: 20px;
-            text-align: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 60;
-            backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; min-width: 100px;
-        }
+        #brightness-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; opacity: 0; pointer-events: none; z-index: 10; transition: opacity 0.1s; }
+        #gestureLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; touch-action: none; }
+        .center-feedback { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); padding: 25px; border-radius: 20px; text-align: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 60; backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; min-width: 100px; }
         .center-feedback.visible { opacity: 1; }
         .feedback-icon { font-size: 2.5rem; color: #ff3366; margin-bottom: 10px; }
         .feedback-text { font-size: 1.2rem; font-weight: 800; }
-
-        /* --- UI LAYER --- */
-        .ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 50; display: flex; flex-direction: column; justify-content: space-between;
-            transition: opacity 0.4s ease-in-out;
-            pointer-events: none;
-        }
-        
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.4s ease-in-out; pointer-events: none; }
         .ui-layer.hidden-ui { opacity: 0; }
         .ui-layer > * { pointer-events: auto; }
-
-        /* Top Bar */
-        .top-bar {
-            padding: max(15px, env(safe-area-inset-top)) 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
-            display: flex; align-items: center; gap: 15px;
-        }
+        .top-bar { padding: max(15px, env(safe-area-inset-top)) 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%); display: flex; align-items: center; gap: 15px; }
         .video-info { flex: 1; overflow: hidden; }
         .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .video-subtitle { font-size: 0.8rem; color: #ccc; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        
-        .system-info {
-            display: flex; align-items: center; gap: 10px; font-size: 0.8rem; 
-            color: #ddd; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 15px;
-            backdrop-filter: blur(4px);
-        }
+        .system-info { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: #ddd; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 15px; backdrop-filter: blur(4px); }
         .battery-icon { font-size: 0.9rem; color: #0f0; }
-
         .top-icons { display: flex; gap: 20px; font-size: 1.3rem; margin-left: 10px; }
         .icon-btn { cursor: pointer; filter: drop-shadow(0 2px 2px black); transition: color 0.2s, transform 0.1s; }
         .icon-btn:active { color: #ff3366; transform: scale(0.9); }
-
-        /* Botón Saltar Intro */
-        .skip-intro {
-            position: absolute; bottom: 100px; left: 20px;
-            background: white; color: black; padding: 8px 16px; border-radius: 4px;
-            font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px;
-            cursor: pointer; opacity: 0; transform: translateY(20px); pointer-events: none;
-            transition: all 0.4s ease; z-index: 55; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        .skip-intro { position: absolute; bottom: 100px; left: 20px; background: white; color: black; padding: 8px 16px; border-radius: 4px; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.4s ease; z-index: 55; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .skip-intro.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-
-        /* Sidebar Derecha */
-        .sidebar {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 25px; align-items: center;
-        }
-        .side-circle {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center; color: white;
-            cursor: pointer; backdrop-filter: blur(4px); font-size: 1.1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        /* Botón Desbloquear */
-        #unlockBtn {
-            position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 51, 102, 0.9); padding: 10px 25px; border-radius: 30px;
-            display: flex; align-items: center; gap: 10px; font-weight: bold;
-            z-index: 99; cursor: pointer; display: none; box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
-        }
-
-        /* Controles Inferiores */
-        .bottom-area {
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
-            padding: 0 20px max(20px, env(safe-area-inset-bottom));
-        }
+        .sidebar { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; align-items: center; }
+        .side-circle { width: 45px; height: 45px; border-radius: 50%; background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; backdrop-filter: blur(4px); font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        #unlockBtn { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(255, 51, 102, 0.9); padding: 10px 25px; border-radius: 30px; display: flex; align-items: center; gap: 10px; font-weight: bold; z-index: 99; cursor: pointer; display: none; box-shadow: 0 0 15px rgba(255, 51, 102, 0.4); }
+        .bottom-area { background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%); padding: 0 20px max(20px, env(safe-area-inset-bottom)); }
         .progress-container { width: 100%; height: 30px; display: flex; align-items: center; cursor: pointer; position: relative; }
-        
         .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: absolute; width: 100%; }
         .progress-buffer { width: 0%; height: 4px; background: rgba(255,255,255,0.5); border-radius: 2px; position: absolute; left: 0; transition: width 0.2s; }
         .progress-fill { height: 4px; width: 0%; background: #ff3366; border-radius: 2px; position: absolute; left: 0; z-index: 2; }
-        
-        .progress-fill::after { 
-            content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; 
-            background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
+        .progress-fill::after { content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
         .ui-layer:not(.hidden-ui) .progress-fill::after { transform: scale(1); }
-
-        /* Layout Fila Inferior */
-        .controls-row { 
-            display: flex; justify-content: space-between; align-items: center; margin-top: 5px; 
-        }
-        
-        /* Grupo Izquierdo (Play + Tiempo) */
+        .controls-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .left-controls { display: flex; align-items: center; gap: 20px; }
-
         .time-text { font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #ddd; text-shadow: 0 1px 2px black; }
-
-        /* --- DRAWERS --- */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 70; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-        
-        .drawer { 
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a;
-            border-radius: 20px 20px 0 0; z-index: 75; transform: translateY(110%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom: max(20px, env(safe-area-inset-bottom));
-            max-height: 70vh; display: flex; flex-direction: column;
-        }
+        .drawer { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; border-radius: 20px 20px 0 0; z-index: 75; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom: max(20px, env(safe-area-inset-bottom)); max-height: 70vh; display: flex; flex-direction: column; }
         .drawer.open { transform: translateY(0); }
         .drawer-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        
         .speed-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
         .speed-btn { background: #333; padding: 12px; border-radius: 12px; text-align: center; font-size: 0.9rem; font-weight: 600; }
         .speed-btn.active { background: #ff3366; color: white; }
-
         .ep-list { overflow-y: auto; padding: 10px 20px; }
         .ep-item { padding: 15px; margin-bottom: 8px; border-radius: 10px; background: #252525; display: flex; gap: 15px; cursor: pointer; }
         .ep-item.active { border: 1px solid #ff3366; background: #2a1a1a; }
         .ep-num { color: #ff3366; font-weight: bold; }
-
-        /* Seek Anim */
-        .seek-badge {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 50%;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 40; font-size: 1.2rem;
-        }
+        .seek-badge { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 50%; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 40; font-size: 1.2rem; }
         .seek-badge.visible { opacity: 1; animation: pop 0.4s; }
         @keyframes pop { 50% { transform: translateY(-50%) scale(1.2); } }
-
-        /* Spinner */
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #ff3366; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; position: absolute; z-index: 5; display: none; pointer-events: none; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        .center-play-icon {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5rem; color: rgba(255,255,255,0.7); pointer-events: none; opacity: 0; transition: transform 0.2s, opacity 0.2s; z-index: 30;
-        }
+        .center-play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; color: rgba(255,255,255,0.7); pointer-events: none; opacity: 0; transition: transform 0.2s, opacity 0.2s; z-index: 30; }
         .show-play .center-play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; cursor: pointer; }
     </style>
 </head>
@@ -310,6 +195,7 @@
         
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
+        const directUrl = params.get('url'); // --- NUEVO: CAPTURAR URL DIRECTA ---
 
         // --- INICIO ---
         window.onload = async () => {
@@ -322,14 +208,47 @@
             };
             html5Player.onended = handleHtml5Ended;
 
+            // --- NUEVO: LÓGICA PARA CARGAR DESDE YOUTUBE API ---
+            if (directUrl) {
+                try {
+                    document.getElementById('ui-title').innerText = "Obteniendo datos...";
+                    // Usamos encodeURIComponent para evitar errores con caracteres raros en la URL
+                    const res = await fetch(`/api/youtube/video?url=${encodeURIComponent(directUrl)}`);
+                    
+                    if (!res.ok) throw new Error("Error en API YouTube");
+                    
+                    itemData = await res.json(); // Aquí recibimos el JSON que creamos antes
+                    
+                    // Actualizamos la UI con los datos reales
+                    document.getElementById('ui-title').innerText = itemData.title || "Video de YouTube";
+                    document.getElementById('ui-subtitle').innerText = "YouTube • " + (itemData.cat || "General");
+
+                    // Si hay imagen banner (HD), la ponemos de poster (aunque cargará la intro primero)
+                    if(itemData.imagenes && itemData.imagenes.banner) {
+                        html5Player.poster = itemData.imagenes.banner;
+                    }
+
+                    // Preparamos la cola de reproducción
+                    buildSourceQueue(itemData);
+                    startPlaybackSequence();
+
+                } catch (e) {
+                    console.error("Fallo carga YT:", e);
+                    alert("Error cargando video de YouTube");
+                }
+                return;
+            } 
+            // ---------------------------------------------------
+
             if (!id) {
-                document.getElementById('ui-title').innerText = "Flechazo Demo Ultimate";
-                document.getElementById('ui-subtitle').innerText = "Prueba de Gestos";
+                // Modo Demo
+                document.getElementById('ui-title').innerText = "Flechazo Demo";
                 sourceQueue = ["https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"];
                 startPlaybackSequence();
                 return;
             }
 
+            // Modo Base de Datos (Tu código original)
             try {
                 const res = await fetch(`/api/movies/${id}`);
                 if (!res.ok) throw new Error("API Error");
@@ -341,6 +260,9 @@
                     prepareEp(0);
                 } else {
                     document.getElementById('ui-title').innerText = itemData.title;
+                    if(itemData.imagenes && itemData.imagenes.banner) {
+                        html5Player.poster = itemData.imagenes.banner;
+                    }
                     buildSourceQueue(itemData);
                     startPlaybackSequence();
                 }
@@ -383,6 +305,7 @@
         // --- GESTIÓN DE FUENTES ---
         function buildSourceQueue(data) {
             sourceQueue = [];
+            // Tu API nueva devuelve "url" en el campo "url", compatible con esto:
             if(data.url) sourceQueue.push(data.url);
             if(data.backupUrl) sourceQueue.push(data.backupUrl);
             if(data.mirrors) sourceQueue = sourceQueue.concat(data.mirrors);
@@ -408,7 +331,7 @@
             
             html5Player.src = INTRO_URL;
             html5Player.muted = true;
-            updateBottomIcon(true); // Icono Pausa
+            updateBottomIcon(true);
             
             var playPromise = html5Player.play();
 
@@ -416,7 +339,7 @@
                 playPromise.then(_ => { console.log("Intro iniciada auto"); })
                 .catch(error => { 
                     document.getElementById('bigPlay').classList.add('show-play'); 
-                    updateBottomIcon(false); // Icono Play si falla
+                    updateBottomIcon(false);
                 });
             }
         }
@@ -428,13 +351,16 @@
                 if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
             } else if(isSerie) {
                 showNextButton();
-                updateBottomIcon(false); // Video terminó, mostrar play
+                updateBottomIcon(false);
             }
         }
 
         function loadMainVideo(url) {
             document.getElementById('spinner').style.display = 'block';
-            const savedTime = localStorage.getItem(`flechazo_time_${id}_${currentEp}`) || 0;
+            // Guardamos el progreso basado en ID o en URL si es YouTube directo
+            const storageKey = id ? `flechazo_time_${id}_${currentEp}` : `flechazo_time_yt_${url}`;
+            const savedTime = localStorage.getItem(storageKey) || 0;
+            
             const ytId = getYouTubeId(url);
             
             if (ytId) {
@@ -454,7 +380,7 @@
                 html5Player.muted = false;
 
                 html5Player.play().catch(e=>console.log(e));
-                updateBottomIcon(true); // Icono Pausa
+                updateBottomIcon(true);
                 
                 html5Player.onplaying = () => {
                     document.getElementById('spinner').style.display = 'none';
@@ -467,11 +393,9 @@
             }
         }
 
-        // --- GESTOS ---
+        // --- GESTOS (Mismo código) ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
-            
-            // CLICK
             layer.addEventListener('click', (e) => {
                 if(isLocked) { animateLockBtn(); return; }
                 const now = new Date().getTime();
@@ -490,8 +414,6 @@
                 }
                 lastClickTime = now;
             });
-
-            // SWIPE START
             layer.addEventListener('touchstart', (e) => {
                 if(isLocked) return;
                 resetUiTimer();
@@ -501,16 +423,12 @@
                 if(x < w/2) activeGesture = 'bright';
                 else activeGesture = 'vol';
             });
-
-            // SWIPE MOVE
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
                 if (e.cancelable) e.preventDefault();
                 resetUiTimer();
-                
                 const y = e.touches[0].clientY;
                 const delta = touchStartY - y;
-                
                 if(Math.abs(delta) > 5) {
                     const sensitivity = 2;
                     const step = (delta / window.innerHeight) * sensitivity;
@@ -519,7 +437,6 @@
                     touchStartY = y;
                 }
             });
-
             layer.addEventListener('touchend', () => {
                 activeGesture = null;
                 setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 500);
@@ -537,7 +454,6 @@
             let icon = 'fa-volume-low';
             if(currentVol > 0.5) icon = 'fa-volume-high';
             if(currentVol === 0) icon = 'fa-volume-xmark';
-            
             showFeedback(icon, Math.round(currentVol * 100) + '%');
         }
 
@@ -559,7 +475,6 @@
             const ui = document.getElementById('uiLayer');
             const lockBtn = document.getElementById('unlockBtn');
             const container = document.getElementById('mainContainer');
-            
             if(isLocked) {
                 ui.classList.add('hidden-ui');
                 container.classList.add('hide-cursor');
@@ -573,21 +488,15 @@
             setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 1000);
         }
 
-        // --- FUNCIONES UI PRO ---
         function resetUiTimer() {
             if(isLocked) return;
-            
             const ui = document.getElementById('uiLayer');
             const container = document.getElementById('mainContainer');
-            
             ui.classList.remove('hidden-ui');
             container.classList.remove('hide-cursor');
-            
             clearTimeout(uiTimeout);
-            
             const isPlaying = (playerType === 'html5' && !html5Player.paused && !html5Player.ended) || 
                               (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
-            
             if(isPlaying) {
                 uiTimeout = setTimeout(() => {
                     ui.classList.add('hidden-ui');
@@ -599,18 +508,13 @@
 
         function updateBottomIcon(isPlaying) {
             const btn = document.getElementById('bottomPlayBtn');
-            if(isPlaying) {
-                btn.className = "fa-solid fa-pause icon-btn";
-            } else {
-                btn.className = "fa-solid fa-play icon-btn";
-            }
+            if(isPlaying) btn.className = "fa-solid fa-pause icon-btn";
+            else btn.className = "fa-solid fa-play icon-btn";
         }
 
         function togglePlay() {
             if(isLocked) return;
-            
             const bigPlay = document.getElementById('bigPlay');
-            
             if(playerType === 'html5') {
                 if(isPlayingIntro && html5Player.muted) {
                     html5Player.muted = false;
@@ -621,8 +525,7 @@
                     bigPlay.classList.remove('show-play'); 
                     updateBottomIcon(true);
                     resetUiTimer();
-                } 
-                else { 
+                } else { 
                     html5Player.pause(); 
                     bigPlay.classList.add('show-play'); 
                     updateBottomIcon(false);
@@ -634,8 +537,7 @@
                     bigPlay.classList.add('show-play'); 
                     updateBottomIcon(false);
                     resetUiTimer();
-                }
-                else { 
+                } else { 
                     ytPlayer.playVideo(); 
                     bigPlay.classList.remove('show-play'); 
                     updateBottomIcon(true);
@@ -644,17 +546,13 @@
             }
         }
 
-        // --- UPDATE LOOP ---
         function updateProgressLoop() {
             if(isPlayingIntro) return;
-            
             let cur = 0, dur = 0, buff = 0;
             if(playerType === 'html5') {
                 cur = html5Player.currentTime;
                 dur = html5Player.duration;
-                if (html5Player.buffered.length > 0) {
-                    buff = html5Player.buffered.end(html5Player.buffered.length - 1);
-                }
+                if (html5Player.buffered.length > 0) buff = html5Player.buffered.end(html5Player.buffered.length - 1);
             } else if(ytPlayer && ytPlayer.getCurrentTime) {
                 cur = ytPlayer.getCurrentTime();
                 dur = ytPlayer.getDuration();
@@ -665,9 +563,12 @@
                 document.getElementById('progFill').style.width = (cur/dur)*100 + '%';
                 document.getElementById('progBuffer').style.width = (buff/dur)*100 + '%';
                 document.getElementById('timeDisplay').innerText = formatTime(cur) + " / " + formatTime(dur);
-                
                 checkSkipIntro(cur);
-                if(Math.floor(cur)%5 === 0) localStorage.setItem(`flechazo_time_${id}_${currentEp}`, cur);
+                
+                // Guardar tiempo: usa ID si existe, sino usa la URL directa
+                const storageKey = id ? `flechazo_time_${id}_${currentEp}` : `flechazo_time_yt_${sourceQueue[0]}`;
+                if(Math.floor(cur)%5 === 0) localStorage.setItem(storageKey, cur);
+                
                 if(isSerie && (dur - cur < 60)) showNextButton();
             }
         }
@@ -676,7 +577,6 @@
             if(isLocked) return;
             if(playerType==='html5') html5Player.currentTime += sec;
             else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime()+sec, true);
-            
             const el = document.getElementById(sec > 0 ? 'seekRight' : 'seekLeft');
             el.classList.remove('visible'); void el.offsetWidth; el.classList.add('visible');
             resetUiTimer();
@@ -690,7 +590,6 @@
             else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
         }
 
-        // --- HELPERS ---
         function formatTime(s) {
             if(!s || isNaN(s)) return "00:00";
             const m = Math.floor(s/60);
@@ -714,7 +613,6 @@
             setTimeout(() => btn.style.transform = "translateX(-50%) scale(1)", 200);
         }
 
-        // --- DRAWERS ---
         function toggleDrawer(id) {
             if(isLocked) return;
             closeDrawers();
@@ -763,7 +661,6 @@
         }
         function goBack() { window.history.back(); }
 
-        // YOUTUBE
         function getYouTubeId(url) {
             if (!url) return null;
             const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
