@@ -170,7 +170,7 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 5rem; color: rgba(255,255,255,0.7); pointer-events: none; opacity: 0; transition: transform 0.2s, opacity 0.2s; z-index: 30;
         }
-        .show-play .center-play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .show-play .center-play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; cursor: pointer; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -187,7 +187,7 @@
             <div id="feedText" class="feedback-text">100%</div>
         </div>
         
-        <div id="bigPlay" class="center-play-icon"><i class="fa-solid fa-play"></i></div>
+        <div id="bigPlay" class="center-play-icon" onclick="togglePlay()"><i class="fa-solid fa-play"></i></div>
 
         <div id="seekLeft" class="seek-badge" style="left: 20%;"><i class="fa-solid fa-backward"></i> 10s</div>
         <div id="seekRight" class="seek-badge" style="right: 20%;"><i class="fa-solid fa-forward"></i> 10s</div>
@@ -291,7 +291,11 @@
 
         let sourceQueue = [];
         let currentSourceIndex = 0;
+        
+        // --- URL INTRO ---
+        // Se recomienda verificar que este enlace funcione.
         const INTRO_URL = "https://ia601709.us.archive.org/4/items/gemini_generated_video_B83D69A3/gemini_generated_video_B83D69A3.mp4";
+        
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
@@ -383,24 +387,48 @@
             if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]);
         }
 
-        // --- PLAYBACK ---
+        // --- PLAYBACK SEQUENCE ---
         function startPlaybackSequence() {
             currentSourceIndex = 0;
             playIntro();
         }
 
+        // --- [CORREGIDO] LÓGICA DE INTRO SEGURA ---
         function playIntro() {
             isPlayingIntro = true;
             playerType = 'intro';
+            
             html5Player.classList.remove('hidden');
             document.getElementById('yt-placeholder').classList.add('hidden');
+            
             html5Player.src = INTRO_URL;
-            html5Player.play().catch(() => handleHtml5Ended());
+            
+            // 1. Iniciamos mudo para satisfacer políticas de navegadores
+            html5Player.muted = true;
+            
+            // 2. Intentamos reproducir con promesa
+            var playPromise = html5Player.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Autoplay exitoso (video mudo)
+                    console.log("Intro iniciada automáticamente (Muted)");
+                })
+                .catch(error => {
+                    // Autoplay bloqueado por el navegador
+                    console.log("Autoplay bloqueado. Esperando toque usuario.");
+                    // Mostramos el botón Play grande
+                    document.getElementById('bigPlay').classList.add('show-play');
+                });
+            }
         }
 
         function handleHtml5Ended() {
             if(isPlayingIntro) {
                 isPlayingIntro = false;
+                // Al terminar intro, cargamos video principal
+                // Desmuteamos por si acaso
+                html5Player.muted = false; 
                 if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
             } else if(isSerie) {
                 showNextButton();
@@ -426,6 +454,10 @@
                 html5Player.src = url;
                 html5Player.currentTime = parseFloat(savedTime);
                 html5Player.playbackRate = currentSpeed;
+                
+                // Aseguramos que el video principal tenga sonido
+                html5Player.muted = false;
+
                 html5Player.play().catch(e=>console.log(e));
                 
                 html5Player.onplaying = () => {
@@ -437,7 +469,7 @@
             }
         }
 
-        // --- GESTOS LOGIC (CORREGIDO) ---
+        // --- GESTOS LOGIC ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
             
@@ -475,21 +507,20 @@
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
                 
-                // PREVENIR SCROLL DEL NAVEGADOR (CLAVE)
+                // PREVENIR SCROLL
                 if (e.cancelable) e.preventDefault();
                 
                 const y = e.touches[0].clientY;
                 const delta = touchStartY - y;
                 
-                // Umbral mínimo
                 if(Math.abs(delta) > 5) {
-                    const sensitivity = 2; // Más alto = más rápido cambia
+                    const sensitivity = 2;
                     const step = (delta / window.innerHeight) * sensitivity;
                     
                     if(activeGesture === 'vol') setVolume(currentVol + step);
                     if(activeGesture === 'bright') setBrightness(currentBright + step);
                     
-                    touchStartY = y; // Resetear para movimiento continuo
+                    touchStartY = y;
                 }
             });
 
@@ -501,7 +532,11 @@
 
         function setVolume(val) {
             currentVol = Math.max(0, Math.min(1, val));
-            if(html5Player) html5Player.volume = currentVol;
+            if(html5Player) {
+                html5Player.volume = currentVol;
+                // Si movemos volumen, asegurar que no esté en mute
+                if(val > 0) html5Player.muted = false; 
+            }
             if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(currentVol * 100);
             
             let icon = 'fa-volume-low';
@@ -556,14 +591,29 @@
             }
         }
 
+        // --- [CORREGIDO] TOGGLE PLAY INTELIGENTE ---
         function togglePlay() {
             if(isLocked) return;
             resetUiTimer();
             const bigPlay = document.getElementById('bigPlay');
             
             if(playerType === 'html5') {
-                if(html5Player.paused) { html5Player.play(); bigPlay.classList.remove('show-play'); } 
-                else { html5Player.pause(); bigPlay.classList.add('show-play'); }
+                // DETALLE IMPORTANTE:
+                // Si la intro estaba corriendo en silencio (muted), al tocar quitamos el silencio
+                if(isPlayingIntro && html5Player.muted) {
+                    html5Player.muted = false;
+                    // Mostramos feedback visual de que el sonido se activó
+                    showFeedback('fa-volume-high', 'Sonido On');
+                }
+
+                if(html5Player.paused) { 
+                    html5Player.play(); 
+                    bigPlay.classList.remove('show-play'); 
+                } 
+                else { 
+                    html5Player.pause(); 
+                    bigPlay.classList.add('show-play'); 
+                }
             } else if(playerType === 'youtube' && ytPlayer) {
                 if(ytPlayer.getPlayerState() === 1) { ytPlayer.pauseVideo(); bigPlay.classList.add('show-play'); }
                 else { ytPlayer.playVideo(); bigPlay.classList.remove('show-play'); }
@@ -578,7 +628,6 @@
             if(playerType === 'html5') {
                 cur = html5Player.currentTime;
                 dur = html5Player.duration;
-                // Buffer Calculation
                 if (html5Player.buffered.length > 0) {
                     buff = html5Player.buffered.end(html5Player.buffered.length - 1);
                 }
