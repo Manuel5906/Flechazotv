@@ -73,12 +73,11 @@ router.get('/search', (req, res) => {
     });
 });
 
-// --- 5. RUTAS DE YOUTUBE (SCRAPING AVANZADO) ---
+// --- 5. RUTAS DE YOUTUBE (CORREGIDO Y ROBUSTO) ---
 
-// A) Obtener videos de un canal (Acepta URL completa o ID)
+// A) Obtener videos de un canal (Acepta URL completa, Handle o ID)
 // Uso: /youtube/channel?url=https://youtube.com/@primetvoficial
 router.get('/youtube/channel', async (req, res) => {
-    // Aceptamos 'url' o 'id' por compatibilidad
     let inputUrl = req.query.url || req.query.id;
 
     if (!inputUrl) {
@@ -88,49 +87,68 @@ router.get('/youtube/channel', async (req, res) => {
     try {
         let channelId = '';
 
-        // PASO 1: Detectar si es un Link/Handle (@) o un ID directo
-        if (inputUrl.includes('youtube.com') || inputUrl.includes('@')) {
-            // Limpiamos la URL para buscar el nombre exacto
-            const cleanQuery = inputUrl.split('?')[0]; 
-            console.log(`Buscando ID para: ${cleanQuery}`);
+        // PASO 1: Obtener el ID Técnico (UC...)
+        // Si el input NO parece un ID técnico (no empieza con UC), hay que buscarlo.
+        if (!inputUrl.startsWith('UC')) {
+            // Limpiamos la URL para quedarnos con el nombre o handle
+            const cleanQuery = inputUrl.includes('youtube.com') 
+                ? inputUrl.split('?')[0].split('/').pop() // Intenta sacar el handle (ej: @primetvoficial)
+                : inputUrl;
+
+            console.log(`Buscando ID técnico para: ${cleanQuery}`);
             
-            // Buscamos el canal usando yt-search
             const searchResult = await yts(cleanQuery);
             
-            // Filtramos para encontrar el objeto tipo 'channel'
-            const channel = searchResult.channels && searchResult.channels.length > 0 
+            // Estrategia A: Intentar sacar el ID del resultado tipo 'Channel'
+            const channelObj = searchResult.channels && searchResult.channels.length > 0 
                 ? searchResult.channels[0] 
-                : searchResult.all.find(item => item.type === 'channel');
+                : null;
 
-            if (!channel) {
-                return res.status(404).json({ error: 'No se encontró el canal con ese enlace.' });
-            }
+            if (channelObj && channelObj.url && channelObj.url.includes('/channel/UC')) {
+                channelId = channelObj.url.split('/channel/')[1];
+            } 
             
-            // Extraemos el ID de la url que devuelve la búsqueda
-            // channel.url suele ser ".../channel/UCxxxx"
-            channelId = channel.url.split('/').pop(); 
+            // Estrategia B (Respaldo): Si A falla (o devuelve un handle), buscamos el autor del primer VIDEO
+            // Esto es mucho más seguro porque los videos siempre tienen el ID real del autor.
+            if (!channelId) {
+                console.log("Buscando ID a través de los videos del canal...");
+                const videoObj = searchResult.videos.length > 0 ? searchResult.videos[0] : null;
+                
+                if (videoObj && videoObj.author && videoObj.author.url) {
+                    // La url del autor suele ser ".../channel/UCxxxxxxx"
+                    const parts = videoObj.author.url.split('/channel/');
+                    if (parts.length > 1) {
+                        channelId = parts[1];
+                    }
+                }
+            }
+
+            if (!channelId) {
+                return res.status(404).json({ error: 'No se pudo encontrar el ID técnico. Intenta pegar el link de un video del canal en lugar del canal.' });
+            }
+
         } else {
-            // Si ya es un ID (ej: UC123...)
+            // Si el usuario ya dio un ID tipo UC...
             channelId = inputUrl;
         }
 
+        console.log(`ID Técnico confirmado: ${channelId}`);
+
         // PASO 2: Convertir ID de Canal (UC...) a Playlist de Subidas (UU...)
-        // Esto es necesario para usar ytpl y sacar la lista de videos
-        const uploadsId = channelId.startsWith('UC') ? channelId.replace('UC', 'UU') : channelId;
+        const uploadsId = channelId.replace(/^UC/, 'UU');
 
         // PASO 3: Obtener los videos
-        // limit: 20 trae los últimos 20. Puedes subirlo hasta 100 si quieres más.
         const playlist = await ytpl(uploadsId, { limit: 20 });
 
-        // PASO 4: Formatear los datos
+        // PASO 4: Formatear
         const videos = playlist.items.map(item => ({
             id: item.id,
             title: item.title,
-            thumbnail: item.bestThumbnail.url, // La mejor calidad disponible
+            thumbnail: item.bestThumbnail.url,
             url: item.shortUrl,
             duration: item.duration,
             views: item.shortViewCount,
-            isShort: item.durationSec < 60 // True si dura menos de 1 min
+            isShort: item.durationSec < 60
         }));
 
         res.json({
@@ -143,7 +161,10 @@ router.get('/youtube/channel', async (req, res) => {
 
     } catch (error) {
         console.error("Error API YouTube:", error.message);
-        res.status(500).json({ error: 'Error obteniendo videos. Verifica el link o intenta más tarde.' });
+        res.status(500).json({ 
+            error: 'Error interno obteniendo videos.',
+            details: error.message 
+        });
     }
 });
 
