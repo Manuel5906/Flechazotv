@@ -9,7 +9,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     
     <style>
-        /* --- CORE --- */
+        /* --- CORE SYSTEM --- */
         html, body {
             margin: 0; padding: 0; background: #000; color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -28,12 +28,12 @@
         /* Estilos para el Zoom/Fit */
         video, #yt-placeholder { 
             width: 100%; height: 100%; 
-            object-fit: contain; /* Por defecto ajustado */
+            object-fit: contain; /* Por defecto ajustado (barras negras si es necesario) */
             position: absolute; z-index: 0; 
             transition: transform 0.3s ease, object-fit 0.3s ease;
         }
         
-        /* Clase para cuando activamos el ZOOM (Llenar pantalla) */
+        /* Cuando activamos el ZOOM (Llenar pantalla) */
         .video-zoomed video { object-fit: cover !important; }
         .video-zoomed #yt-placeholder { transform: scale(1.35); } /* Truco para Zoom en YouTube */
 
@@ -110,7 +110,7 @@
         .video-title { font-weight: 700; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .video-subtitle { font-size: 0.85rem; color: #ccc; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-top: 2px; }
         
-        /* Nuevo Badge de Calidad */
+        /* Badge de Calidad */
         .quality-badge {
             background: rgba(255,255,255,0.2); color: #fff; padding: 2px 6px; 
             border-radius: 4px; font-size: 0.7rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.4);
@@ -157,7 +157,7 @@
 
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .left-controls { display: flex; align-items: center; gap: 20px; }
-        .right-controls { display: flex; align-items: center; gap: 25px; } /* Nuevo grupo derecha */
+        .right-controls { display: flex; align-items: center; gap: 25px; }
 
         .time-text { font-family: monospace; font-size: 0.9rem; font-weight: 600; color: #ddd; text-shadow: 0 1px 2px black; }
 
@@ -174,7 +174,6 @@
         .drawer.open { transform: translateY(0); }
         .drawer-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1rem; }
         
-        /* Opciones del menú */
         .menu-list { padding: 10px 0; overflow-y: auto; }
         .menu-item { 
             padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; 
@@ -184,7 +183,7 @@
         .menu-item i { margin-right: 15px; width: 20px; text-align: center; color: #aaa; }
         .menu-value { color: #ff3366; font-weight: 600; font-size: 0.9rem; }
 
-        /* Grid de Velocidad (Submenú) */
+        /* Grid de Velocidad */
         .submenu { display: none; padding: 20px; }
         .submenu.active { display: block; }
         .speed-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -261,15 +260,13 @@
 
                 <div class="top-icons">
                     <i class="fa-solid fa-clone icon-btn" onclick="togglePiP()" title="Picture in Picture"></i>
-                    
                     <i class="fa-solid fa-gear icon-btn" onclick="openSettings()" title="Ajustes"></i>
-                    
                     <i class="fa-solid fa-lock icon-btn" onclick="toggleLock()" title="Bloquear Pantalla"></i>
                 </div>
             </div>
 
             <div class="sidebar">
-                <div class="side-circle" onclick="toggleDrawer('eps')" id="btnEpList" style="display:none; width:50px; height:50px; border-radius:50%; background:rgba(30,30,30,0.8); border:1px solid rgba(255,255,255,0.2); align-items:center; justify-content:center; box-shadow:0 4px 10px black;">
+                <div class="side-circle" onclick="toggleDrawer('eps')" id="btnEpList" style="display:none; width:50px; height:50px; border-radius:50%; background:rgba(30,30,30,0.8); border:1px solid rgba(255,255,255,0.2); align-items:center; justify-content:center; box-shadow:0 4px 10px black; cursor:pointer;">
                     <i class="fa-solid fa-layer-group" style="color:white; font-size:1.2rem;"></i>
                 </div>
             </div>
@@ -281,7 +278,8 @@
             <div class="bottom-area">
                 <div class="progress-container" onclick="handleSeekClick(event)">
                     <div class="progress-bg"></div>
-                    <div id="progBuffer" class="progress-buffer"></div> <div id="progFill" class="progress-fill"></div>
+                    <div id="progBuffer" class="progress-buffer"></div> 
+                    <div id="progFill" class="progress-fill"></div>
                 </div>
                 
                 <div class="controls-row">
@@ -291,9 +289,8 @@
                     </div>
                     
                     <div class="right-controls">
-                        <i id="fitBtn" class="fa-solid fa-expand icon-btn" onclick="toggleFit()" title="Ajustar Pantalla"></i>
-                        
-                        <i class="fa-solid fa-maximize icon-btn" onclick="toggleFS()" style="font-size:1.4rem;" title="Pantalla Completa"></i>
+                        <i id="fitBtn" class="fa-solid fa-crop-simple icon-btn" onclick="toggleFit()" title="Ajustar Pantalla"></i>
+                        <i class="fa-solid fa-expand icon-btn" onclick="toggleFS()" style="font-size:1.4rem;" title="Pantalla Completa"></i>
                     </div>
                 </div>
             </div>
@@ -360,18 +357,16 @@
         let currentBright = 1;
         let isZoomed = false; // Estado del Zoom
 
-        // Gestos y Seek
+        // Gestos
         let touchStartY = 0;
         let activeGesture = null;
         let seekAccumulator = 0;
         let seekOverlayTimer = null;
         let lastTapSide = null;
 
-        // Cola de Video
         let sourceQueue = [];
         let currentSourceIndex = 0;
         
-        // --- CONFIG ---
         const INTRO_URL = "https://ia601709.us.archive.org/4/items/gemini_generated_video_B83D69A3/gemini_generated_video_B83D69A3.mp4";
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
@@ -387,7 +382,7 @@
             };
             html5Player.onended = handleHtml5Ended;
 
-            // 1. CARGA DESDE YOUTUBE DIRECTO
+            // 1. YouTube Directo
             if (directUrl) {
                 try {
                     document.getElementById('ui-title').innerText = "Cargando...";
@@ -398,17 +393,13 @@
                     
                     document.getElementById('ui-title').innerText = itemData.title || "Video";
                     document.getElementById('ui-subtitle').innerText = "YouTube • " + (itemData.cat || "Stream");
-                    
-                    // Ajustar Badge de calidad
                     document.getElementById('qualityBadge').innerText = "PRO";
 
                     if(itemData.imagenes && itemData.imagenes.banner) {
                         html5Player.poster = itemData.imagenes.banner;
                     }
-
                     buildSourceQueue(itemData);
                     startPlaybackSequence();
-
                 } catch (e) {
                     console.error("YT Error:", e);
                     alert("Error cargando video");
@@ -416,7 +407,7 @@
                 return;
             } 
 
-            // 2. MODO DB LOCAL
+            // 2. DB Local
             if (id) {
                 try {
                     const res = await fetch(`/api/movies/${id}`);
@@ -437,33 +428,23 @@
                 return;
             }
 
-            // 3. DEMO DEFAULT
+            // 3. Demo
             document.getElementById('ui-title').innerText = "Flechazo Demo";
             sourceQueue = ["https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"];
             startPlaybackSequence();
         };
 
-        // --- FUNCIONES PREMIUM NUEVAS ---
-
-        // 1. Picture in Picture (PiP)
+        // --- FUNCIONES PREMIUM ---
         async function togglePiP() {
             if (playerType === 'html5' && html5Player) {
                 try {
-                    if (document.pictureInPictureElement) {
-                        await document.exitPictureInPicture();
-                    } else {
-                        await html5Player.requestPictureInPicture();
-                    }
-                } catch (err) {
-                    console.error("PiP Error:", err);
-                    showFeedback('fa-circle-exclamation', 'No Soportado');
-                }
-            } else {
-                showFeedback('fa-youtube', 'Usar App YT');
-            }
+                    if (document.pictureInPictureElement) await document.exitPictureInPicture();
+                    else await html5Player.requestPictureInPicture();
+                } catch (err) { showFeedback('fa-circle-exclamation', 'No Soportado'); }
+            } else { showFeedback('fa-youtube', 'Usar App YT'); }
         }
 
-        // 2. Screen Fit / Zoom
+        // --- FUNCION ZOOM (CORREGIDA) ---
         function toggleFit() {
             isZoomed = !isZoomed;
             const container = document.getElementById('mainContainer');
@@ -471,20 +452,18 @@
             
             if(isZoomed) {
                 container.classList.add('video-zoomed');
-                icon.className = "fa-solid fa-compress icon-btn";
-                showFeedback('fa-up-right-and-down-left-from-center', 'Zoom: Llenar');
+                icon.className = "fa-solid fa-compress icon-btn"; // Icono "Restaurar"
+                showFeedback('fa-crop-simple', 'Zoom: Llenar');
             } else {
                 container.classList.remove('video-zoomed');
-                icon.className = "fa-solid fa-expand icon-btn";
-                showFeedback('fa-compress', 'Zoom: Normal');
+                icon.className = "fa-solid fa-crop-simple icon-btn"; // Icono "Recortar"
+                showFeedback('fa-image', 'Zoom: Normal');
             }
         }
 
-        // 3. Gestión de Menús (Settings)
         function openSettings() {
             if(isLocked) return;
-            toggleDrawer('settings');
-            showMainMenu();
+            toggleDrawer('settings'); showMainMenu();
         }
         function showMainMenu() {
             document.getElementById('mainMenu').style.display = 'block';
@@ -495,15 +474,13 @@
             document.getElementById('submenu-'+id).classList.add('active');
         }
 
-        // --- GESTOS Y SEEK (Código anterior mejorado) ---
+        // --- GESTOS ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
-            
             layer.addEventListener('click', (e) => {
                 if(isLocked) { animateLockBtn(); return; }
                 const w = window.innerWidth;
                 const x = e.clientX;
-
                 if(x < w * 0.30) performSmartSeek(-10, 'left');
                 else if(x > w * 0.70) performSmartSeek(10, 'right');
                 else {
@@ -511,21 +488,16 @@
                     ui.classList.contains('hidden-ui') ? resetUiTimer() : togglePlay();
                 }
             });
-
             layer.addEventListener('touchstart', (e) => {
-                if(isLocked) return;
-                resetUiTimer();
+                if(isLocked) return; resetUiTimer();
                 touchStartY = e.touches[0].clientY;
-                const x = e.touches[0].clientX;
-                const w = window.innerWidth;
+                const x = e.touches[0].clientX; const w = window.innerWidth;
                 if(x < w/2) activeGesture = 'bright'; else activeGesture = 'vol';
             });
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
-                if (e.cancelable) e.preventDefault();
-                resetUiTimer();
-                const y = e.touches[0].clientY;
-                const delta = touchStartY - y;
+                if (e.cancelable) e.preventDefault(); resetUiTimer();
+                const y = e.touches[0].clientY; const delta = touchStartY - y;
                 if(Math.abs(delta) > 5) {
                     const step = (delta / window.innerHeight) * 2;
                     if(activeGesture === 'vol') setVolume(currentVol + step);
@@ -545,8 +517,7 @@
                 document.getElementById('seekLeft').classList.remove('visible');
                 document.getElementById('seekRight').classList.remove('visible');
             }
-            clearTimeout(seekOverlayTimer);
-            seekAccumulator += seconds;
+            clearTimeout(seekOverlayTimer); seekAccumulator += seconds;
             
             if(playerType === 'html5') html5Player.currentTime += seconds;
             else if(playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + seconds, true);
@@ -563,7 +534,7 @@
             resetUiTimer();
         }
 
-        // --- CORE PLAYER LOGIC ---
+        // --- PLAYBACK ---
         function buildSourceQueue(data) {
             sourceQueue = [];
             if(data.url) sourceQueue.push(data.url);
@@ -575,25 +546,17 @@
             currentSourceIndex++;
             if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]);
         }
-        function startPlaybackSequence() {
-            currentSourceIndex = 0; playIntro();
-        }
+        function startPlaybackSequence() { currentSourceIndex = 0; playIntro(); }
         function playIntro() {
             isPlayingIntro = true; playerType = 'intro';
-            html5Player.classList.remove('hidden');
-            document.getElementById('yt-placeholder').classList.add('hidden');
+            html5Player.classList.remove('hidden'); document.getElementById('yt-placeholder').classList.add('hidden');
             html5Player.src = INTRO_URL; html5Player.muted = true;
             updateBottomIcon(true);
-            html5Player.play().catch(() => { 
-                document.getElementById('bigPlay').classList.add('show-play'); 
-                updateBottomIcon(false);
-            });
+            html5Player.play().catch(() => { document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); });
         }
         function handleHtml5Ended() {
-            if(isPlayingIntro) {
-                isPlayingIntro = false; html5Player.muted = false; 
-                if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
-            } else if(isSerie) nextEp();
+            if(isPlayingIntro) { isPlayingIntro = false; html5Player.muted = false; if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]); } 
+            else if(isSerie) nextEp();
         }
 
         function loadMainVideo(url) {
@@ -611,10 +574,8 @@
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
                 document.getElementById('yt-placeholder').classList.add('hidden');
                 html5Player.classList.remove('hidden');
-                html5Player.src = url;
-                html5Player.currentTime = parseFloat(savedTime);
-                html5Player.playbackRate = currentSpeed;
-                html5Player.muted = false;
+                html5Player.src = url; html5Player.currentTime = parseFloat(savedTime);
+                html5Player.playbackRate = currentSpeed; html5Player.muted = false;
                 html5Player.play().catch(e=>console.log(e));
                 updateBottomIcon(true);
                 html5Player.onplaying = () => { document.getElementById('spinner').style.display = 'none'; resetUiTimer(); updateBottomIcon(true); };
@@ -624,7 +585,7 @@
             }
         }
 
-        // --- HELPERS UI ---
+        // --- HELPERS ---
         function setVolume(val) {
             currentVol = Math.max(0, Math.min(1, val));
             if(html5Player) { html5Player.volume = currentVol; if(val>0) html5Player.muted=false; }
@@ -723,7 +684,6 @@
             setTimeout(() => btn.style.transform = "translateX(-50%) scale(1)", 200);
         }
         
-        // Drawers
         function toggleDrawer(id) {
             if(isLocked) return; closeDrawers();
             document.getElementById('drawer-'+id).classList.add('open');
@@ -741,14 +701,9 @@
             if(ytPlayer) ytPlayer.setPlaybackRate(rate);
             document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // Actualizar etiqueta texto menú
             document.getElementById('speedValueLabel').innerText = rate + 'x';
-            
-            showMainMenu(); // Volver al menú principal en lugar de cerrar
+            showMainMenu();
         }
-
-        // Series
         function renderEpList() {
             const list = document.getElementById('epList'); list.innerHTML = '';
             itemData.episodios.forEach((ep, i) => {
@@ -774,7 +729,6 @@
         }
         function goBack() { window.history.back(); }
 
-        // YouTube Helpers
         function getYouTubeId(url) {
             if (!url) return null;
             const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
