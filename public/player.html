@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Flechazo Player FINAL</title>
+    <title>Flechazo Player PRO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.youtube.com/iframe_api"></script>
     
@@ -17,10 +17,15 @@
             user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
+        /* Contenedor Principal */
         .video-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: flex; align-items: center; justify-content: center;
+            cursor: default; /* Cursor por defecto */
         }
+        
+        /* CLASE PRO: Ocultar cursor cuando la UI se va */
+        .video-container.hide-cursor { cursor: none; }
 
         video, #yt-placeholder { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 0; }
         .hidden { opacity: 0; pointer-events: none; }
@@ -32,13 +37,12 @@
             transition: opacity 0.1s;
         }
 
-        /* touch-action: none permite que el dedo controle el volumen sin mover la pantalla */
         #gestureLayer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20; touch-action: none; 
         }
 
-        /* Feedback Central (Volumen/Brillo) */
+        /* Feedback Central */
         .center-feedback {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.6); padding: 25px; border-radius: 20px;
@@ -49,34 +53,39 @@
         .feedback-icon { font-size: 2.5rem; color: #ff3366; margin-bottom: 10px; }
         .feedback-text { font-size: 1.2rem; font-weight: 800; }
 
-        /* --- UI LAYER --- */
+        /* --- UI LAYER (CONTROLES) --- */
         .ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 50; display: flex; flex-direction: column; justify-content: space-between;
-            transition: opacity 0.3s ease; pointer-events: none;
+            transition: opacity 0.5s ease-in-out; /* Transición suave PRO */
+            pointer-events: none;
         }
+        
+        /* Estado oculto */
         .ui-layer.hidden-ui { opacity: 0; }
+        
         .ui-layer > * { pointer-events: auto; }
 
         /* Top Bar */
         .top-bar {
             padding: max(15px, env(safe-area-inset-top)) 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             display: flex; align-items: center; gap: 15px;
+            transition: transform 0.3s;
         }
         .video-info { flex: 1; overflow: hidden; }
-        .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .video-subtitle { font-size: 0.8rem; color: #ccc; }
+        .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .video-subtitle { font-size: 0.8rem; color: #ccc; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         
-        /* Reloj y Batería */
         .system-info {
             display: flex; align-items: center; gap: 10px; font-size: 0.8rem; 
             color: #ddd; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 15px;
+            backdrop-filter: blur(4px);
         }
         .battery-icon { font-size: 0.9rem; color: #0f0; }
 
         .top-icons { display: flex; gap: 20px; font-size: 1.3rem; margin-left: 10px; }
-        .icon-btn { cursor: pointer; filter: drop-shadow(0 2px 2px black); transition: color 0.2s; }
+        .icon-btn { cursor: pointer; filter: drop-shadow(0 2px 2px black); transition: color 0.2s, transform 0.1s; }
         .icon-btn:active { color: #ff3366; transform: scale(0.9); }
 
         /* Botón Saltar Intro */
@@ -99,6 +108,7 @@
             background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255,255,255,0.1);
             display: flex; align-items: center; justify-content: center; color: white;
             cursor: pointer; backdrop-filter: blur(4px); font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         /* Botón Desbloquear */
@@ -111,14 +121,12 @@
 
         /* Controles Inferiores */
         .bottom-area {
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             padding: 0 20px max(20px, env(safe-area-inset-bottom));
         }
         .progress-container { width: 100%; height: 30px; display: flex; align-items: center; cursor: pointer; position: relative; }
         
         .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: absolute; width: 100%; }
-        
-        /* Barra de Buffer */
         .progress-buffer { width: 0%; height: 4px; background: rgba(255,255,255,0.5); border-radius: 2px; position: absolute; left: 0; transition: width 0.2s; }
         
         .progress-fill { height: 4px; width: 0%; background: #ff3366; border-radius: 2px; position: absolute; left: 0; z-index: 2; }
@@ -126,10 +134,11 @@
             content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; 
             background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
+        /* Solo mostrar bolita cuando UI visible */
         .ui-layer:not(.hidden-ui) .progress-fill::after { transform: scale(1); }
 
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .time-text { font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #ddd; }
+        .time-text { font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #ddd; text-shadow: 0 1px 2px black; }
 
         /* --- DRAWERS --- */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 70; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -177,7 +186,7 @@
 
     <div id="brightness-overlay"></div>
 
-    <div class="video-container" id="mainContainer">
+    <div class="video-container" id="mainContainer" onmousemove="resetUiTimer()">
         <video id="html5-player" class="hidden" playsinline></video>
         <div id="yt-placeholder"></div>
         <div id="spinner" class="spinner"></div>
@@ -300,8 +309,6 @@
             initGestures();
             initSystemInfo();
             
-            // ELIMINADA: Lógica de inicialización de PiP
-            
             html5Player.onerror = () => {
                 if(isPlayingIntro) { handleHtml5Ended(); return; }
                 tryNextSource();
@@ -398,13 +405,8 @@
             var playPromise = html5Player.play();
 
             if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    console.log("Intro iniciada automáticamente (Muted)");
-                })
-                .catch(error => {
-                    console.log("Autoplay bloqueado. Esperando toque usuario.");
-                    document.getElementById('bigPlay').classList.add('show-play');
-                });
+                playPromise.then(_ => { console.log("Intro iniciada auto"); })
+                .catch(error => { document.getElementById('bigPlay').classList.add('show-play'); });
             }
         }
 
@@ -443,7 +445,7 @@
                 
                 html5Player.onplaying = () => {
                     document.getElementById('spinner').style.display = 'none';
-                    resetUiTimer();
+                    resetUiTimer(); // Iniciar timer al reproducir
                 };
                 html5Player.onwaiting = () => document.getElementById('spinner').style.display = 'block';
                 html5Player.ontimeupdate = updateProgressLoop;
@@ -477,6 +479,7 @@
             // SWIPE START
             layer.addEventListener('touchstart', (e) => {
                 if(isLocked) return;
+                resetUiTimer(); // Tocar pantalla despierta UI
                 touchStartY = e.touches[0].clientY;
                 const x = e.touches[0].clientX;
                 const w = window.innerWidth;
@@ -488,6 +491,7 @@
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
                 if (e.cancelable) e.preventDefault();
+                resetUiTimer(); // Mover dedo mantiene UI despierta
                 
                 const y = e.touches[0].clientY;
                 const delta = touchStartY - y;
@@ -539,9 +543,11 @@
             isLocked = !isLocked;
             const ui = document.getElementById('uiLayer');
             const lockBtn = document.getElementById('unlockBtn');
+            const container = document.getElementById('mainContainer');
             
             if(isLocked) {
                 ui.classList.add('hidden-ui');
+                container.classList.add('hide-cursor'); // Ocultar cursor al bloquear
                 lockBtn.style.display = 'flex';
                 showFeedback('fa-lock', 'Bloqueado');
             } else {
@@ -552,24 +558,37 @@
             setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 1000);
         }
 
+        // --- [LOGICA PRO] AUTO-OCULTAR UI ---
         function resetUiTimer() {
             if(isLocked) return;
+            
             const ui = document.getElementById('uiLayer');
+            const container = document.getElementById('mainContainer');
+            
+            // 1. Mostrar UI inmediatamente
             ui.classList.remove('hidden-ui');
+            container.classList.remove('hide-cursor');
+            
             clearTimeout(uiTimeout);
             
-            const isPlaying = (playerType === 'html5' && !html5Player.paused) || (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
+            // 2. Comprobar si está reproduciendo
+            const isPlaying = (playerType === 'html5' && !html5Player.paused && !html5Player.ended) || 
+                              (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
+            
+            // 3. Solo iniciar temporizador si está reproduciendo
+            // Si está pausado, la UI se queda visible para siempre (comportamiento PRO)
             if(isPlaying) {
                 uiTimeout = setTimeout(() => {
                     ui.classList.add('hidden-ui');
+                    container.classList.add('hide-cursor'); // Adiós cursor
                     closeDrawers();
-                }, 3500);
+                }, 3000); // 3 segundos de espera
             }
         }
 
         function togglePlay() {
             if(isLocked) return;
-            resetUiTimer();
+            
             const bigPlay = document.getElementById('bigPlay');
             
             if(playerType === 'html5') {
@@ -577,11 +596,27 @@
                     html5Player.muted = false;
                     showFeedback('fa-volume-high', 'Sonido On');
                 }
-                if(html5Player.paused) { html5Player.play(); bigPlay.classList.remove('show-play'); } 
-                else { html5Player.pause(); bigPlay.classList.add('show-play'); }
+                if(html5Player.paused) { 
+                    html5Player.play(); 
+                    bigPlay.classList.remove('show-play'); 
+                    resetUiTimer(); // Al dar play, inicia el timer para ocultar
+                } 
+                else { 
+                    html5Player.pause(); 
+                    bigPlay.classList.add('show-play'); 
+                    resetUiTimer(); // Al pausar, el resetUiTimer detectará la pausa y NO ocultará la UI
+                }
             } else if(playerType === 'youtube' && ytPlayer) {
-                if(ytPlayer.getPlayerState() === 1) { ytPlayer.pauseVideo(); bigPlay.classList.add('show-play'); }
-                else { ytPlayer.playVideo(); bigPlay.classList.remove('show-play'); }
+                if(ytPlayer.getPlayerState() === 1) { 
+                    ytPlayer.pauseVideo(); 
+                    bigPlay.classList.add('show-play'); 
+                    resetUiTimer();
+                }
+                else { 
+                    ytPlayer.playVideo(); 
+                    bigPlay.classList.remove('show-play'); 
+                    resetUiTimer();
+                }
             }
         }
 
@@ -702,7 +737,6 @@
             if(!document.fullscreenElement) document.documentElement.requestFullscreen();
             else if(document.exitFullscreen) document.exitFullscreen();
         }
-        // ELIMINADA: togglePiP()
         function goBack() { window.history.back(); }
 
         // YOUTUBE
