@@ -3,298 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flechazo TV</title>
+    <title>Flechazo TV - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* --- 1. VARIABLES Y BASE --- */
         :root {
-            --primary: #e50914; /* Rojo Netflix */
-            --bg: #141414;
+            --primary: #E50914; /* Rojo Netflix */
+            --bg: #141414;      /* Fondo Oscuro */
+            --card-bg: #2f2f2f;
             --text: #ffffff;
-            --glass: rgba(20, 20, 20, 0.85);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
-
-        /* --- SPLASH SCREEN --- */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 9999; display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            padding-bottom: 80px; /* Espacio para el menú de abajo */
+            overflow-x: hidden; /* Evitar scroll lateral en toda la web */
         }
-        .logo-anim { font-size: 2rem; color: var(--primary); font-weight: bold; animation: pulse 1.5s infinite; }
 
-        /* --- UI PRINCIPAL --- */
+        /* --- 2. NAVBAR (Transparente a Negro) --- */
         .navbar {
-            position: fixed; top: 0; width: 100%; padding: 15px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-            z-index: 100; display: flex; justify-content: space-between; align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            padding: 0 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            z-index: 1000;
+            transition: background-color 0.3s;
         }
-        .brand { color: var(--primary); font-weight: 900; font-size: 1.2rem; text-transform: uppercase; }
-
-        /* HERO BANNER */
-        #hero {
-            height: 70vh; position: relative;
-            background-size: cover; background-position: center;
-            display: flex; flex-direction: column; justify-content: flex-end;
-            padding: 20px;
-        }
-        #hero::after {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(to top, var(--bg), transparent);
-        }
-        .hero-content { position: relative; z-index: 2; margin-bottom: 20px; }
-        .hero-title { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px black; }
-        .hero-desc { font-size: 0.9rem; color: #ddd; max-width: 80%; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .navbar.scrolled { background-color: #000; } /* Se pone negra al bajar */
         
+        .logo { color: var(--primary); font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .user-avatar { width: 32px; height: 32px; background: #ddd; border-radius: 4px; cursor: pointer; }
+
+        /* --- 3. HERO BANNER (Gigante) --- */
+        .hero {
+            position: relative;
+            height: 80vh; /* 80% de la altura de la pantalla */
+            width: 100%;
+            background-size: cover;
+            background-position: center top;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Degradado para que el texto se lea bien */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(0deg, var(--bg) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            padding-left: 4%;
+            max-width: 600px;
+            margin-top: 100px;
+        }
+
+        .hero-title { font-size: 3rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1.1; }
+        .hero-desc { font-size: 1rem; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: #e5e5e5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
         .btn-hero {
-            padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: transform 0.2s;
         }
-        .btn-play { background: white; color: black; }
-        .btn-list { background: rgba(109, 109, 110, 0.7); color: white; margin-left: 10px; }
+        .btn-hero:hover { transform: scale(1.05); }
+        .btn-white { background: white; color: black; }
+        .btn-gray { background: rgba(109, 109, 110, 0.7); color: white; }
 
-        /* LISTAS HORIZONTALES */
-        .category-row { margin: 20px 0; padding-left: 20px; }
-        .cat-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: #e5e5e5; }
-        
+        /* --- 4. LISTAS Y TARJETAS (Tu Petición) --- */
+        .category-section {
+            padding: 20px 0 20px 4%;
+            position: relative;
+            z-index: 20;
+            margin-top: -50px; /* Para que la primera lista suba sobre el Hero */
+        }
+        /* Ajuste para las siguientes filas */
+        .category-section + .category-section { margin-top: 0; }
+
+        .cat-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; color: #e5e5e5; }
+
         .slider {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;
-            scroll-behavior: smooth; scroll-snap-type: x mandatory;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            padding-right: 4%;
+            /* Ocultar barra scroll pero permitir deslizar */
+            scrollbar-width: none; 
         }
-        .slider::-webkit-scrollbar { display: none; } /* Ocultar barra scroll */
-        
-        .card {
-            min-width: 120px; height: 180px; border-radius: 6px;
-            background-color: #333; overflow: hidden; position: relative;
-            cursor: pointer; scroll-snap-align: start; transition: transform 0.2s;
-        }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card:hover { transform: scale(1.05); z-index: 10; border: 2px solid white; }
+        .slider::-webkit-scrollbar { display: none; }
 
-        /* BOTTOM NAVIGATION */
+        /* --- AQUI ESTÁ TU CSS CORREGIDO --- */
+        .card {
+            flex: 0 0 auto; /* No encogerse */
+            min-width: 140px; 
+            height: 220px;  /* Vertical estilo Netflix */
+            
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, border 0.2s;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* CLAVE: Recorta la imagen para llenar el hueco */
+            object-position: center top; /* CLAVE: Enfoca las caras arriba */
+        }
+
+        .card:hover {
+            transform: scale(1.1); 
+            z-index: 100;
+            border: 2px solid white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* --- 5. MODAL REPRODUCTOR (Inteligente) --- */
+        #videoModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 5000;
+            display: none; /* Oculto por defecto */
+            flex-direction: column;
+        }
+        
+        .modal-header { padding: 15px; position: absolute; width: 100%; z-index: 10; display: flex; justify-content: flex-end; }
+        .close-btn { color: white; font-size: 2rem; background: none; border: none; cursor: pointer; text-shadow: 0 0 5px black; }
+
+        .video-wrapper { flex: 1; display: flex; align-items: center; background: black; width: 100%; }
+        video { width: 100%; max-height: 100vh; }
+
+        .modal-info { padding: 20px; background: #141414; min-height: 200px; overflow-y: auto; }
+        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 10px; margin-top: 15px; }
+        
+        .ep-btn {
+            background: #333; color: white; border: 1px solid #555; padding: 10px; border-radius: 4px; cursor: pointer; text-align: center;
+        }
+        .ep-btn.active { background: var(--primary); border-color: var(--primary); font-weight: bold; }
+
+        /* --- 6. MENU INFERIOR (Móvil) --- */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 60px;
             background: #121212; border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+            display: flex; justify-content: space-around; align-items: center; z-index: 2000;
         }
-        .nav-item { color: #888; font-size: 0.8rem; text-align: center; text-decoration: none; }
-        .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+        .nav-item { color: #666; text-decoration: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; }
+        .nav-item i { font-size: 1.2rem; margin-bottom: 4px; }
         .nav-item.active { color: white; }
 
-        /* MODAL REPRODUCTOR */
-        #playerModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 2000; display: none; flex-direction: column;
-        }
-        .player-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .close-btn { color: white; font-size: 1.5rem; cursor: pointer; background: none; border: none; }
-        
-        video { width: 100%; max-height: 40vh; background: black; }
-        
-        .player-info { padding: 20px; flex: 1; overflow-y: auto; }
-        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-top: 15px; }
-        .ep-btn {
-            background: #333; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer;
-        }
-        .ep-btn.active { background: var(--primary); }
-
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="logo-anim">FLECHAZO TV</div>
-    </div>
-
-    <div class="navbar">
-        <div class="brand">F</div>
-        <div class="user-icon"><i class="fa-solid fa-user"></i></div>
-    </div>
-
-    <div id="app">
-        <header id="hero"></header>
-
-        <div id="categories"></div>
-    </div>
-
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-clapperboard"></i>Shorts</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Explorar</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>Perfil</a>
+    <nav class="navbar" id="navbar">
+        <div class="logo">FLECHAZO</div>
+        <div class="user-avatar">
+            <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" style="width:100%; border-radius:4px;">
+        </div>
     </nav>
 
-    <div id="playerModal">
-        <div class="player-header">
-            <span id="playerTitle">Título</span>
-            <button class="close-btn" onclick="cerrarPlayer()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <video id="videoScreen" controls playsinline></video>
-        <div class="player-info">
-            <h2 id="infoTitle" style="margin-bottom: 10px;"></h2>
-            <p id="infoDesc" style="color: #aaa; font-size: 0.9rem;"></p>
-            
-            <div id="seriesZone" style="display:none; margin-top: 20px;">
-                <h4 style="color: #ddd;">Episodios</h4>
-                <div id="episodesList" class="ep-grid"></div>
+    <div id="hero" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">Cargando...</h1>
+            <p class="hero-desc" id="heroDesc">Espera un momento...</p>
+            <div class="hero-buttons">
+                <button class="btn-hero btn-white" id="heroPlayBtn"><i class="fa-solid fa-play"></i> Reproducir</button>
+                <button class="btn-hero btn-gray"><i class="fa-solid fa-circle-info"></i> Más Info</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // API URL (Ajusta si usas otra ruta)
-        const API_URL = '/api/movies';
+    <div id="main-container">
+        </div>
 
-        // Variables Globales
-        let contenido = [];
-        const splash = document.getElementById('splash');
-        const hero = document.getElementById('hero');
-        const categoriesContainer = document.getElementById('categories');
+    <div id="videoModal">
+        <div class="modal-header">
+            <button class="close-btn" onclick="cerrarPlayer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
         
-        // Elementos del Reproductor
-        const playerModal = document.getElementById('playerModal');
-        const videoScreen = document.getElementById('videoScreen');
-        const playerTitle = document.getElementById('playerTitle');
-        const infoTitle = document.getElementById('infoTitle');
-        const infoDesc = document.getElementById('infoDesc');
-        const seriesZone = document.getElementById('seriesZone');
-        const episodesList = document.getElementById('episodesList');
+        <div class="video-wrapper">
+            <video id="reproductor" controls playsinline></video>
+        </div>
 
-        // INICIAR APP
-        window.addEventListener('load', async () => {
-            // Simular carga y quitar Splash
-            setTimeout(() => {
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
-            }, 1500);
+        <div class="modal-info">
+            <h2 id="modalTitle">Título</h2>
+            <div id="seriesControls" style="display:none;">
+                <h4 style="color:#aaa; margin-top:10px;">Episodios:</h4>
+                <div id="episodiosList" class="ep-grid"></div>
+            </div>
+        </div>
+    </div>
 
-            await cargarDatos();
-        });
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
+        <a href="#" class="nav-item"><i class="fa-brands fa-tiktok"></i>Shorts</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i>Buscar</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-download"></i>Descargas</a>
+    </div>
 
-        async function cargarDatos() {
+    <script>
+        // CONFIGURACIÓN
+        const API_URL = '/api/movies'; 
+        let contenidoGlobal = [];
+
+        // DOM Elements
+        const hero = document.getElementById('hero');
+        const mainContainer = document.getElementById('main-container');
+        const modal = document.getElementById('videoModal');
+        const video = document.getElementById('reproductor');
+        
+        // 1. Efecto Navbar al bajar scroll
+        window.onscroll = () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        };
+
+        // 2. Cargar Datos
+        window.onload = async () => {
             try {
                 const res = await fetch(API_URL);
-                contenido = await res.json();
+                contenidoGlobal = await res.json();
                 
-                if (contenido.length > 0) {
-                    construirHero(contenido);
-                    construirCategorias(contenido);
+                if(contenidoGlobal.length > 0) {
+                    cargarHero(contenidoGlobal);
+                    cargarCategorias(contenidoGlobal);
                 }
-            } catch (error) {
-                console.error("Error conectando API:", error);
-                hero.innerHTML = "<h1>Error de conexión con el Servidor</h1>";
+            } catch (e) {
+                console.error("Error cargando API", e);
             }
-        }
+        };
 
-        // --- CONSTRUCTOR DEL HERO (Portada Grande) ---
-        function construirHero(datos) {
-            // Elegir uno al azar para la portada
-            const randomItem = datos[Math.floor(Math.random() * datos.length)];
+        // 3. Renderizar Hero
+        function cargarHero(datos) {
+            // Elegir aleatorio
+            const destacado = datos[Math.floor(Math.random() * datos.length)];
             
-            hero.style.backgroundImage = `url('${randomItem.img}')`;
-            hero.innerHTML = `
-                <div class="hero-content">
-                    <h1 class="hero-title">${randomItem.title}</h1>
-                    <p class="hero-desc">${randomItem.desc}</p>
-                    <div class="hero-buttons">
-                        <button class="btn-hero btn-play" onclick="abrirPlayer(${randomItem.id})">
-                            <i class="fa-solid fa-play"></i> Reproducir
-                        </button>
-                        <button class="btn-hero btn-list">
-                            <i class="fa-solid fa-plus"></i> Mi Lista
-                        </button>
-                    </div>
-                </div>
-            `;
+            hero.style.backgroundImage = `url('${destacado.img}')`;
+            document.getElementById('heroTitle').innerText = destacado.title;
+            document.getElementById('heroDesc').innerText = destacado.desc;
+            
+            // Configurar botón play del hero
+            document.getElementById('heroPlayBtn').onclick = () => abrirPlayer(destacado.id);
         }
 
-        // --- CONSTRUCTOR DE FILAS ---
-        function construirCategorias(datos) {
-            // Agrupamos por categoría (Romance, Acción, etc.)
+        // 4. Renderizar Filas y Tarjetas
+        function cargarCategorias(datos) {
+            // Agrupar por categoría
             const categorias = {};
             datos.forEach(item => {
-                if (!categorias[item.cat]) categorias[item.cat] = [];
+                if(!categorias[item.cat]) categorias[item.cat] = [];
                 categorias[item.cat].push(item);
             });
 
-            // Crear HTML por cada categoría
-            for (const [catNombre, items] of Object.entries(categorias)) {
-                const fila = document.createElement('div');
-                fila.className = 'category-row';
+            // Crear HTML
+            mainContainer.innerHTML = ''; // Limpiar
+            
+            for (const [nombreCat, items] of Object.entries(categorias)) {
+                // Crear sección
+                const seccion = document.createElement('div');
+                seccion.className = 'category-section';
                 
-                let cartasHTML = items.map(item => `
-                    <div class="card" onclick="abrirPlayer(${item.id})">
-                        <img src="${item.img}" alt="${item.title}" loading="lazy">
-                    </div>
-                `).join('');
+                // Título categoría
+                const titulo = document.createElement('h3');
+                titulo.className = 'cat-title';
+                titulo.innerText = nombreCat;
+                
+                // Slider
+                const slider = document.createElement('div');
+                slider.className = 'slider';
 
-                fila.innerHTML = `
-                    <h3 class="cat-title">${catNombre}</h3>
-                    <div class="slider">
-                        ${cartasHTML}
-                    </div>
-                `;
-                categoriesContainer.appendChild(fila);
+                // Tarjetas
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => abrirPlayer(item.id);
+                    
+                    card.innerHTML = `
+                        <img src="${item.img}" alt="${item.title}" loading="lazy">
+                    `;
+                    slider.appendChild(card);
+                });
+
+                seccion.appendChild(titulo);
+                seccion.appendChild(slider);
+                mainContainer.appendChild(seccion);
             }
         }
 
-        // --- LÓGICA DEL REPRODUCTOR (MÁGICA) ---
+        // 5. Sistema de Reproductor Inteligente
         function abrirPlayer(id) {
-            const item = contenido.find(c => c.id === id);
+            const item = contenidoGlobal.find(m => m.id === id);
             if (!item) return;
 
-            // Llenar datos visuales
-            playerTitle.innerText = item.title;
-            infoTitle.innerText = item.title;
-            infoDesc.innerText = item.desc;
+            document.getElementById('modalTitle').innerText = item.title;
+            const zonaSeries = document.getElementById('seriesControls');
+            const listaEpisodios = document.getElementById('episodiosList');
+
+            // Limpiar anterior
+            listaEpisodios.innerHTML = '';
             
-            // Limpiar zona de episodios
-            episodesList.innerHTML = '';
-            
-            // Lógica SERIE vs PELÍCULA
+            // DETECTAR TIPO
             if (item.tipo === 'pelicula') {
-                seriesZone.style.display = 'none';
-                videoScreen.src = item.url || ''; 
-                videoScreen.play();
+                // MODO PELÍCULA
+                zonaSeries.style.display = 'none';
+                video.src = item.url;
+                video.play();
             } else {
-                // Es SERIE
-                seriesZone.style.display = 'block';
+                // MODO SERIE
+                zonaSeries.style.display = 'block';
                 
-                // Crear botones para cada episodio
                 if (item.episodios && item.episodios.length > 0) {
-                    item.episodios.forEach((ep, index) => {
+                    item.episodios.forEach((ep, i) => {
                         const btn = document.createElement('button');
                         btn.className = 'ep-btn';
                         btn.innerText = ep.numero;
                         
-                        if (index === 0) btn.classList.add('active'); // Marcar el 1ro
+                        if(i === 0) btn.classList.add('active'); // Marcar primero
 
                         btn.onclick = () => {
-                            // Quitar active a todos
+                            // Resetear estilo botones
                             document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
                             btn.classList.add('active');
-                            // Cambiar video
-                            videoScreen.src = ep.url;
-                            videoScreen.play();
+                            // Play
+                            video.src = ep.url;
+                            video.play();
                         };
-                        episodesList.appendChild(btn);
+                        listaEpisodios.appendChild(btn);
                     });
                     
-                    // Cargar el episodio 1 automáticamente
-                    videoScreen.src = item.episodios[0].url;
-                    videoScreen.play();
+                    // Cargar el 1ro por defecto
+                    video.src = item.episodios[0].url;
+                    video.play();
                 }
             }
 
-            // Mostrar el modal
-            playerModal.style.display = 'flex';
+            modal.style.display = 'flex';
         }
 
         function cerrarPlayer() {
-            videoScreen.pause();
-            videoScreen.src = ""; // Detener carga de datos
-            playerModal.style.display = 'none';
+            video.pause();
+            video.src = ""; // Parar carga
+            modal.style.display = 'none';
         }
     </script>
 </body>
