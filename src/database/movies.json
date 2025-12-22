@@ -23,7 +23,7 @@
     ]
   },
   {
-    "id": 2,
+    "id": 1,
     "tipo": "pelicula",
     "title": "Navidad Eterna",
     "desc": "Una historia de amor de 2 horas sin interrupciones.",
@@ -33,5 +33,17 @@
       "banner": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg"
     },
     "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
+  },
+  {
+    "id": 2,
+    "tipo": "pelicula",
+    "title": "Regreso del Gran Maestro (Doblado)",
+    "desc": "",
+    "cat": "Drama",
+    "imagenes": {
+      "poster": "",
+      "banner": ""
+    },
+    "url": "https://youtu.be/eEh6mqsXZyk?si=JSlaXg24zsHvKZ-g"
   }
 ]
