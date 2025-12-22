@@ -253,7 +253,7 @@
                 </div>
 
                 <div class="top-icons">
-                    <i class="fa-solid fa-clone icon-btn" onclick="togglePiP()" title="PiP"></i>
+                    <i id="btnPip" class="fa-solid fa-clone icon-btn" onclick="togglePiP()" title="PiP"></i>
                     <i class="fa-solid fa-gear icon-btn" onclick="openSettings()" title="Ajustes"></i>
                     <i class="fa-solid fa-lock icon-btn" onclick="toggleLock()" title="Bloquear"></i>
                 </div>
@@ -284,7 +284,7 @@
                     
                     <div class="right-controls">
                         <i id="fitBtn" class="fa-solid fa-crop-simple icon-btn" onclick="toggleFit()" title="Ajustar Pantalla"></i>
-                        <i class="fa-solid fa-expand icon-btn" onclick="toggleFS()" style="font-size:1.4rem;" title="Pantalla Completa"></i>
+                        <i id="btnFS" class="fa-solid fa-expand icon-btn" onclick="toggleFS()" style="font-size:1.4rem;" title="Pantalla Completa"></i>
                     </div>
                 </div>
             </div>
@@ -424,7 +424,7 @@
             startPlaybackSequence();
         };
 
-        // --- GESTOS Y SONIDO (CORREGIDO) ---
+        // --- GESTOS Y SONIDO ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
             
@@ -474,7 +474,7 @@
             });
         }
 
-        // --- FUNCION VOLUMEN (CORREGIDA PARA YOUTUBE) ---
+        // --- FUNCION VOLUMEN ---
         function setVolume(val) {
             currentVol = Math.max(0, Math.min(1, val));
             
@@ -484,7 +484,7 @@
                 if(currentVol > 0) html5Player.muted = false; 
             }
             
-            // 2. YOUTUBE (CLAVE: USAR UNMUTE)
+            // 2. YOUTUBE
             if(ytPlayer && ytPlayer.setVolume) {
                 ytPlayer.setVolume(currentVol * 100);
                 if(currentVol > 0) ytPlayer.unMute(); 
@@ -542,13 +542,29 @@
             const savedTime = localStorage.getItem(storageKey) || 0;
             const ytId = getYouTubeId(url);
             
+            // --- LOGICA MODIFICADA PARA OCULTAR BOTONES EN YOUTUBE ---
+            const btnPip = document.getElementById('btnPip');
+            const btnFs = document.getElementById('btnFS');
+
             if (ytId) {
+                // MODO YOUTUBE
                 playerType = 'youtube';
                 html5Player.classList.add('hidden'); html5Player.pause();
+                
+                // Ocultar botones no soportados en YT
+                if(btnPip) btnPip.style.display = 'none';
+                if(btnFs) btnFs.style.display = 'none';
+
                 initYouTubePlayer(ytId, parseFloat(savedTime));
             } else {
+                // MODO HTML5/MP4
                 playerType = 'html5';
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+                
+                // Mostrar botones
+                if(btnPip) btnPip.style.display = 'inline-block';
+                if(btnFs) btnFs.style.display = 'inline-block';
+
                 document.getElementById('yt-placeholder').classList.add('hidden'); html5Player.classList.remove('hidden');
                 html5Player.src = url; html5Player.currentTime = parseFloat(savedTime);
                 html5Player.playbackRate = currentSpeed; 
@@ -565,7 +581,6 @@
 
         // --- CALIDAD SIMPLIFICADA (AUTO) ---
         function setQuality(level) {
-            // Visualmente seleccionamos la opción
             document.querySelectorAll('.grid-quality .option-btn').forEach(btn => btn.classList.remove('active'));
             const btnId = 'qual-' + (level === 'default' ? 'auto' : level);
             const btn = document.getElementById(btnId);
@@ -574,14 +589,11 @@
             const label = btn ? btn.innerText : 'Auto';
             document.getElementById('qualityValueLabel').innerText = label;
 
-            // Lógica Simplificada
             if(playerType === 'youtube' && ytPlayer && ytPlayer.setPlaybackQuality) {
                 ytPlayer.setPlaybackQuality(level);
                 showFeedback('fa-sliders', 'Solicitando: ' + label);
             } else {
-                // En HTML5 (MP4 único), siempre será Auto/Optimizado
                 showFeedback('fa-wand-magic-sparkles', 'Calidad: Auto (Optimizado)');
-                // Reseteamos visualmente a Auto para no confundir al usuario
                 setTimeout(() => {
                     document.getElementById('qualityValueLabel').innerText = 'Auto';
                     document.querySelectorAll('.grid-quality .option-btn').forEach(b => b.classList.remove('active'));
