@@ -13,56 +13,66 @@
             --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.6) 100%);
         }
         
-        /* --- CORRECCIÓN DEL "SALTO" DE PANTALLA --- */
-        html {
-            height: 100%;
-            overflow: hidden; /* Evita cualquier scroll en el documento */
-        }
-
-        body { 
-            margin: 0; 
-            background: #000; 
-            color: white; 
+        /* 1. ESTRUCTURA FIJA (Evita saltos) */
+        html, body {
+            margin: 0; padding: 0;
+            background: #000; color: white; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* TRUCO MAESTRO: position: fixed evita que el navegador redimensione el body al mostrar la barra URL */
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            height: 100dvh; /* Altura dinámica real */
+            width: 100vw; 
+            overflow: hidden; /* Sin scroll en el body */
+            position: fixed; /* Candado para evitar rebotes en iOS */
+            top: 0; left: 0;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* El contenedor ahora llena el body fijo */
+        /* 2. CONTENEDOR VIDEO */
         .video-wrapper { 
-            position: absolute; 
-            top: 0; left: 0; width: 100%; height: 100%; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; 
             display: flex; align-items: center; justify-content: center; 
         }
 
-        video, iframe { width: 100%; height: 100%; border: none; display: none; }
+        video, iframe { 
+            width: 100%; height: 100%; 
+            border: none; 
+            display: none; 
+            object-fit: contain; /* El video nunca se recorta, se ajusta */
+        }
         .active-player { display: block !important; }
 
-        /* --- UI LAYER --- */
+        /* 3. CAPA DE CONTROLES (UI) */
         .controls-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--overlay-bg);
             display: flex; flex-direction: column; justify-content: space-between;
-            /* Áreas seguras para notches de iPhone */
-            padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+            
+            /* Padding inteligente (Respeta el Notch de iPhone) */
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            
             z-index: 10; transition: opacity 0.3s ease; pointer-events: none;
         }
+        
         .interactive { pointer-events: auto; cursor: pointer; }
         .hidden { opacity: 0; }
 
+        /* AJUSTE PARA PC (Que los botones no se vayan a las esquinas extremas) */
+        @media (min-width: 1024px) {
+            .controls-layer {
+                padding-left: 10%; padding-right: 10%; /* Márgenes laterales en PC */
+            }
+        }
+
         /* TOP BAR */
-        .top-bar { display: flex; align-items: center; gap: 15px; z-index: 20; }
-        .back-btn { font-size: 1.5rem; color: white; text-decoration: none; filter: drop-shadow(0 2px 4px black); }
+        .top-bar { display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 1.5rem; color: white; text-decoration: none; filter: drop-shadow(0 2px 4px black); transition: transform 0.2s; }
+        .back-btn:hover { transform: scale(1.1); color: var(--primary); }
+        
         #title { 
-            font-size: 1rem; font-weight: 600; text-shadow: 0 2px 4px black; 
+            font-size: 1.1rem; font-weight: 600; text-shadow: 0 2px 4px black; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9;
         }
 
@@ -75,7 +85,7 @@
         .center-play:active { transform: translate(-50%, -50%) scale(0.9); }
 
         /* BOTTOM BAR */
-        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px; position: relative; z-index: 20; }
+        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px; position: relative; }
 
         /* BOTÓN SIGUIENTE */
         #btnNext { 
@@ -84,21 +94,30 @@
             padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600;
             border: 1px solid rgba(255,255,255,0.3); 
             display: flex; align-items: center; gap: 8px;
+            
             transform: translateX(150%); opacity: 0;
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
         }
         #btnNext.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
-        #btnNext:active { background: rgba(255,255,255,0.4); }
+        #btnNext:hover { background: rgba(255,255,255,0.3); }
 
         /* BARRA PROGRESO */
         .progress-area { display: none; width: 100%; height: 20px; align-items: center; cursor: pointer; }
-        .track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; position: relative; overflow: hidden; }
+        .track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; position: relative; overflow: hidden; transition: height 0.2s; }
         .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 4px; }
+        
+        /* Efecto Hover en PC */
+        .progress-area:hover .track { height: 6px; }
 
-        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #ddd; }
-        #btnEpList { display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #ddd; }
+        
+        #btnEpList { 
+            display: none; align-items: center; gap: 8px; 
+            background: rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; transition: background 0.2s;
+        }
+        #btnEpList:hover { background: rgba(255,255,255,0.25); }
 
-        /* --- PANEL LATERAL (DRAWER) --- */
+        /* --- 4. PANEL LATERAL (DRAWER) OPTIMIZADO --- */
         .drawer-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -106,11 +125,27 @@
         .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 
         .drawer {
-            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 75vh; 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            max-height: 75vh; 
             background: #1e1e1e; border-radius: 25px 25px 0 0; z-index: 30;
-            transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1); 
+            
+            /* Animación */
+            transform: translateY(110%); 
+            transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1); 
+            
             display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
         }
+
+        /* OPTIMIZACIÓN PC: Centrar el menú y limitar ancho */
+        @media (min-width: 768px) {
+            .drawer {
+                width: 450px; /* Ancho fijo elegante */
+                left: 50%; /* Centrar */
+                margin-left: -225px; /* Mitad del ancho para centrar exacto */
+                border-radius: 25px 25px 0 0;
+            }
+        }
+
         .drawer.open { transform: translateY(0); }
         
         .drawer-header { 
@@ -122,14 +157,19 @@
         .ep-list { 
             overflow-y: auto; flex: 1; padding: 15px 20px; 
             padding-bottom: max(30px, env(safe-area-inset-bottom));
-            overscroll-behavior: contain; /* Evita que el scroll de la lista mueva el body */
         }
         
+        /* SCROLLBAR BONITO (PC) */
+        .ep-list::-webkit-scrollbar { width: 6px; }
+        .ep-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
         .ep-item { 
             padding: 16px; border-radius: 12px; margin-bottom: 10px; background: #2a2a2a;
-            cursor: pointer; display: flex; gap: 15px; align-items: center; transition: background 0.2s;
+            cursor: pointer; display: flex; gap: 15px; align-items: center; transition: background 0.2s, transform 0.1s;
         }
+        .ep-item:hover { background: #333; }
         .ep-item:active { transform: scale(0.98); }
+        
         .ep-item.active { background: #2a2a2a; border: 1px solid #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
         .ep-num { color: #888; font-weight: bold; font-size: 1.1rem; min-width: 25px; }
         .ep-item.active .ep-num { color: #ff3366; }
@@ -140,6 +180,7 @@
             display: none;
         }
         .ep-item.active .playing-indicator { display: block; }
+        
         @keyframes blink { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
     </style>
@@ -159,6 +200,7 @@
             <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
 
             <div class="bottom-bar">
+                
                 <div id="btnNext" class="interactive" onclick="nextEp()">
                     Siguiente Episodio <i class="fa-solid fa-forward"></i>
                 </div>
@@ -180,7 +222,7 @@
     <div id="drawerBackdrop" class="drawer-backdrop" onclick="toggleDrawer()"></div>
     <div id="drawer" class="drawer">
         <div class="drawer-header">
-            <h3 style="margin:0;">Temporada 1</h3>
+            <h3 style="margin:0;">Lista de Episodios</h3>
             <i class="fa-solid fa-xmark interactive" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
         </div>
         <div id="list" class="ep-list"></div>
@@ -207,10 +249,10 @@
         window.onload = async () => {
             try {
                 const res = await fetch(`/api/movies/${id}`);
-                if(!res.ok) throw new Error("Error API");
+                if(!res.ok) throw new Error("API Error");
                 itemData = await res.json();
                 iniciarSistema();
-            } catch(e) { document.getElementById('title').innerText = "Error"; }
+            } catch(e) { document.getElementById('title').innerText = "Error cargando video"; }
         };
 
         function iniciarSistema() {
@@ -218,7 +260,6 @@
                 isSerie = true;
                 document.getElementById('btnEpList').style.display = 'flex';
                 cargarEpisodio(0);
-                generarLista();
             } else {
                 isSerie = false;
                 document.getElementById('title').innerText = itemData.title;
@@ -248,12 +289,11 @@
         function activarModoMP4(url) {
             iframe.classList.remove('active-player'); iframe.src = "";
             vid.classList.add('active-player'); vid.src = url;
-            vid.play().catch(e => {});
+            vid.play().catch(() => {});
 
             playIcon.style.display = 'block';
             progressArea.style.display = 'flex';
             timeLabel.style.display = 'block';
-            
             ui.onclick = (e) => { if(e.target === ui) toggleUI(); };
         }
 
@@ -264,11 +304,10 @@
             playIcon.style.display = 'none';
             progressArea.style.display = 'none';
             timeLabel.style.display = 'none';
-            ui.onclick = null;
+            ui.onclick = null; 
 
-            if(isSerie && haySiguienteEp()) {
-                setTimeout(() => { btnNext.classList.add('show'); }, 5000);
-            }
+            // Embed: Mostrar 'Siguiente' tras 5s (fallback)
+            if(isSerie && haySiguienteEp()) setTimeout(() => btnNext.classList.add('show'), 5000);
         }
 
         vid.ontimeupdate = () => {
@@ -279,6 +318,7 @@
 
             if(isSerie && haySiguienteEp()) {
                 const timeLeft = vid.duration - vid.currentTime;
+                // Mostrar botón si faltan menos de 60s
                 if(timeLeft <= 60) btnNext.classList.add('show');
                 else btnNext.classList.remove('show');
             }
@@ -289,13 +329,8 @@
             if(isSerie && haySiguienteEp()) btnNext.classList.add('show');
         };
 
-        function haySiguienteEp() {
-            return itemData.episodios && currentEp + 1 < itemData.episodios.length;
-        }
-
-        function nextEp() {
-            if (haySiguienteEp()) cargarEpisodio(currentEp + 1);
-        }
+        function haySiguienteEp() { return itemData.episodios && currentEp + 1 < itemData.episodios.length; }
+        function nextEp() { if (haySiguienteEp()) cargarEpisodio(currentEp + 1); }
 
         function toggleUI() {
             ui.classList.toggle('hidden');
@@ -341,16 +376,20 @@
             if(vid.paused) { vid.play(); playIcon.className = "fa-solid fa-pause center-play interactive"; resetInteraction(); }
             else { vid.pause(); playIcon.className = "fa-solid fa-play center-play interactive"; ui.classList.remove('hidden'); }
         }
+
         function seek(e) {
             const rect = progressArea.getBoundingClientRect();
             vid.currentTime = ((e.clientX - rect.left) / rect.width) * vid.duration;
             e.stopPropagation();
         }
+
         function formatTime(s) {
             const m = Math.floor(s / 60);
             let sec = Math.floor(s % 60);
             return `${m}:${sec<10?'0'+sec:sec}`;
         }
+        
+        // PC Mouse Interaction
         ui.onmousemove = () => { ui.classList.remove('hidden'); resetInteraction(); };
 
     </script>
