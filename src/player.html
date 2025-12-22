@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Reproductor Seguro - Flechazo TV</title>
+    <title>Reproductor Flechazo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. VARIABLES & BASE --- */
+        /* --- 1. CONFIGURACIÓN VISUAL --- */
         :root { 
             --primary: #ff3366; 
-            --grad: linear-gradient(135deg, #ff3366, #a033ff); 
-            --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 30%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
+            --grad: linear-gradient(90deg, #ff3366, #ff6b6b); 
+            --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.8) 100%);
         }
         
         html, body {
@@ -20,148 +20,163 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100dvh; width: 100vw; overflow: hidden; 
             position: fixed; top: 0; left: 0;
-            user-select: none; -webkit-user-select: none; /* No seleccionar texto */
-            -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 2. LAYOUT VIDEO --- */
         .video-wrapper { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; display: flex; align-items: center; justify-content: center; 
         }
 
         video, iframe { 
-            width: 100%; height: 100%; border: none; display: none; object-fit: contain; 
-            pointer-events: none; /* Bloquea clic derecho nativo en el video */
+            width: 100%; height: 100%; border: none; display: none; object-fit: contain; pointer-events: none; 
         }
         .active-player { display: block !important; pointer-events: auto; }
 
-        /* --- 3. MARCA DE AGUA (COPYRIGHT) --- */
-        .watermark {
-            position: absolute; top: 20px; right: 20px; 
-            opacity: 0.5; z-index: 5; pointer-events: none; /* No interfiere con clics */
-            display: flex; align-items: center; gap: 8px;
-            filter: drop-shadow(0 2px 4px black);
-        }
-        .wm-logo { font-size: 1.5rem; color: #ff3366; }
-        .wm-text { font-weight: 900; letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase; color: rgba(255,255,255,0.8); }
-
-        /* --- 4. INTERFAZ (UI) --- */
+        /* --- 2. INTERFAZ FLOTANTE --- */
         .controls-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--overlay-bg);
             display: flex; flex-direction: column; justify-content: space-between;
+            
+            /* Padding seguro + Extra abajo para que no quede pegado */
             padding-top: max(20px, env(safe-area-inset-top));
-            padding-bottom: max(60px, env(safe-area-inset-bottom));
+            padding-bottom: max(50px, env(safe-area-inset-bottom)); /* <--- LEVANTADO AQUÍ */
             padding-left: max(20px, env(safe-area-inset-left));
             padding-right: max(20px, env(safe-area-inset-right));
+            
             z-index: 10; transition: opacity 0.3s ease;
         }
         
         .hidden { opacity: 0; pointer-events: none; }
-        /* En PC, si está oculto, ocultamos el cursor para inmersión */
-        .pc-mode .controls-layer.hidden { cursor: none; }
+        .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* HEADER */
-        .top-bar { display: flex; align-items: center; gap: 15px; pointer-events: auto; }
-        .back-btn { font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); cursor: pointer; }
-        #title { font-size: 1rem; font-weight: 600; text-shadow: 0 2px 4px black; opacity: 0.9; }
+        /* TOP BAR */
+        .top-bar { display: flex; align-items: center; gap: 20px; padding: 10px; }
+        .back-btn { font-size: 1.4rem; color: white; filter: drop-shadow(0 2px 4px black); }
+        #title { 
+            font-size: 1rem; font-weight: 600; text-shadow: 0 2px 4px black; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9;
+        }
 
-        /* PLAY GIGANTE */
+        /* PLAY CENTRO */
         .center-play { 
             align-self: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5rem; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); opacity: 0.9;
-            display: none; transition: transform 0.1s; pointer-events: auto; cursor: pointer;
+            font-size: 4.5rem; filter: drop-shadow(0 0 20px rgba(0,0,0,0.5)); opacity: 0.9;
+            display: none; transition: transform 0.1s;
         }
         .center-play:active { transform: scale(0.9); }
 
-        /* BARRA INFERIOR */
-        .bottom-bar { display: flex; flex-direction: column; gap: 15px; position: relative; pointer-events: auto; }
+        /* --- 3. BARRA INFERIOR MEJORADA --- */
+        .bottom-bar { 
+            display: flex; flex-direction: column; gap: 10px; 
+            position: relative; width: 100%;
+        }
 
-        /* Botón Siguiente */
+        /* FILA DE INFO (Tiempo y Botón Episodios) - AHORA ARRIBA */
+        .info-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            font-size: 0.85rem; color: #ddd; font-weight: 500;
+            padding: 0 5px; /* Alineado con la barra */
+        }
+        
+        #btnEpList { 
+            display: none; align-items: center; gap: 6px; 
+            background: rgba(255,255,255,0.15); 
+            padding: 6px 12px; border-radius: 20px; /* Estilo píldora */
+            backdrop-filter: blur(5px); transition: background 0.2s;
+            font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1);
+        }
+        #btnEpList:active { background: rgba(255,255,255,0.3); }
+
+        /* BARRA PROGRESO (Ahora abajo del todo) */
+        .progress-area { 
+            width: 100%; height: 20px; /* Área táctil cómoda */
+            display: flex; align-items: center; cursor: pointer; 
+        }
+        .track { 
+            width: 100%; height: 4px; background: rgba(255,255,255,0.3); 
+            border-radius: 4px; position: relative; overflow: hidden; 
+            transition: height 0.2s;
+        }
+        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 4px; }
+        
+        /* Efecto al tocar la barra */
+        .progress-area:active .track { height: 6px; }
+
+        /* BOTÓN SIGUIENTE (Flotante) */
         #btnNext { 
-            align-self: flex-end; 
+            position: absolute; bottom: 60px; right: 0; /* Flotando encima de todo */
             background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
-            padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; gap: 8px;
-            transform: translateX(150%); opacity: 0; transition: transform 0.5s, opacity 0.5s; cursor: pointer;
+            padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2); 
+            display: flex; align-items: center; gap: 8px;
+            transform: translateX(120%); opacity: 0; 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
         }
         #btnNext.show { transform: translateX(0); opacity: 1; }
 
-        /* Progreso */
-        .progress-area { width: 100%; height: 25px; display: flex; align-items: center; cursor: pointer; }
-        .track { width: 100%; height: 5px; background: rgba(255,255,255,0.3); border-radius: 10px; position: relative; overflow: hidden; }
-        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 10px; }
-        
-        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #eee; }
-        
-        #btnEpList { 
-            display: none; align-items: center; gap: 8px; 
-            background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 12px; cursor: pointer;
+        /* --- 4. PANEL LATERAL (DRAWER) --- */
+        .drawer-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-
-        /* --- 5. DRAWER (MENÚ EPISODIOS) --- */
-        .drawer-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 
         .drawer {
             position: fixed; bottom: 0; left: 0; width: 100%; max-height: 70vh; 
-            background: #1e1e1e; border-radius: 25px 25px 0 0; z-index: 30;
-            transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1); 
+            background: #121212; border-radius: 20px 20px 0 0; z-index: 30;
+            transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); 
             display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
             padding-bottom: max(30px, env(safe-area-inset-bottom));
         }
-        /* Ajuste PC: Centrado */
         @media (min-width: 768px) { .drawer { width: 400px; left: 50%; margin-left: -200px; } }
         .drawer.open { transform: translateY(0); }
         
-        .drawer-header { padding: 20px 25px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .ep-list { overflow-y: auto; flex: 1; padding: 15px 20px; }
-        .ep-item { padding: 16px; border-radius: 12px; margin-bottom: 10px; background: #2a2a2a; cursor: pointer; display: flex; gap: 15px; align-items: center; }
-        .ep-item.active { border: 1px solid #ff3366; background: #222; }
-        .ep-num { color: #888; font-weight: bold; font-size: 1.1rem; }
-        .ep-item.active .ep-num { color: #ff3366; }
-
-        /* Mensaje Seguridad */
-        #securityMsg {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(255, 0, 0, 0.8); color: white; padding: 20px; border-radius: 10px;
-            z-index: 9999; display: none; text-align: center; font-weight: bold;
+        .drawer-header { padding: 15px 20px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
+        .ep-list { overflow-y: auto; flex: 1; padding: 10px 15px; }
+        .ep-item { 
+            padding: 14px; border-radius: 10px; margin-bottom: 8px; background: #1f1f1f; 
+            cursor: pointer; display: flex; gap: 15px; align-items: center; transition: background 0.2s;
         }
+        .ep-item:active { transform: scale(0.98); }
+        .ep-item.active { background: #2a2a2a; border: 1px solid #ff3366; }
+        .ep-num { color: #888; font-weight: bold; font-size: 1.1rem; min-width: 25px; }
+        .ep-item.active .ep-num { color: #ff3366; }
 
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="securityMsg"><i class="fa-solid fa-lock"></i> Contenido Protegido</div>
+<body oncontextmenu="return false;">
 
     <div class="video-wrapper">
         <video id="vid" playsinline onclick="togglePlay()"></video>
         <iframe id="embedFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 
-        <div class="watermark">
-            <i class="fa-solid fa-heart wm-logo"></i>
-            <span class="wm-text">FLECHAZO TV</span>
-        </div>
+        <div style="position: absolute; top: 20px; right: 20px; opacity: 0.5; pointer-events: none; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">FLECHAZO TV</div>
 
         <div id="ui" class="controls-layer">
-            <div class="top-bar">
+            <div class="top-bar interactive">
                 <div class="back-btn" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></div>
                 <span id="title">Cargando...</span>
             </div>
 
-            <i id="playIcon" class="fa-solid fa-play center-play" onclick="togglePlay()"></i>
+            <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
 
             <div class="bottom-bar">
-                <div id="btnNext" onclick="nextEp()">Siguiente <i class="fa-solid fa-forward"></i></div>
-
-                <div id="progressArea" class="progress-area" onclick="seek(event)">
-                    <div class="track"><div id="fill" class="fill"></div></div>
+                <div id="btnNext" class="interactive" onclick="nextEp()">
+                    Siguiente <i class="fa-solid fa-forward"></i>
                 </div>
-                
-                <div class="info-row">
+
+                <div class="info-row interactive">
                     <span id="time" style="display:none; font-variant-numeric: tabular-nums;">00:00 / 00:00</span>
+                    
                     <div id="btnEpList" onclick="toggleDrawer()">
-                        Episodios <i class="fa-solid fa-list-ul"></i>
+                        <i class="fa-solid fa-layer-group"></i> Episodios
                     </div>
+                </div>
+
+                <div id="progressArea" class="progress-area interactive" onclick="seek(event)">
+                    <div class="track"><div id="fill" class="fill"></div></div>
                 </div>
             </div>
         </div>
@@ -170,57 +185,14 @@
     <div id="drawerBackdrop" class="drawer-backdrop" onclick="toggleDrawer()"></div>
     <div id="drawer" class="drawer">
         <div class="drawer-header">
-            <h3 style="margin:0;">Lista de Episodios</h3>
-            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
+            <h3 style="margin:0; font-size: 1.1rem;">Lista de Episodios</h3>
+            <i class="fa-solid fa-xmark interactive" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
         </div>
         <div id="list" class="ep-list"></div>
     </div>
 
     <script>
-        // --- 1. SEGURIDAD & DETECCIÓN ---
-        
-        // Detectar si es Móvil o PC
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if(!isMobile) {
-            document.body.classList.add('pc-mode');
-            console.log("Modo PC Activado: Atajos de teclado habilitados.");
-        } else {
-            console.log("Modo Móvil Activado: Touch optimizado.");
-        }
-
-        // Bloquear Teclas de Desarrollador (F12, Ctrl+U, etc)
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) { // F12
-                showSecurityMsg(); return false;
-            }
-            if(e.ctrlKey && (e.shiftKey && e.keyCode == 73)) { // Ctrl+Shift+I
-                showSecurityMsg(); return false;
-            }
-            if(e.ctrlKey && (e.keyCode == 85)) { // Ctrl+U
-                showSecurityMsg(); return false;
-            }
-            
-            // Atajos de Reproductor (Solo PC)
-            if(!isMobile && document.getElementById('vid').classList.contains('active-player')) {
-                const v = document.getElementById('vid');
-                if(e.code === 'Space') { e.preventDefault(); togglePlay(); }
-                if(e.code === 'ArrowRight') { v.currentTime += 10; updateTimeUI(); }
-                if(e.code === 'ArrowLeft') { v.currentTime -= 10; updateTimeUI(); }
-                if(e.code === 'KeyF') { toggleFullScreen(); }
-            }
-        };
-
-        function showSecurityMsg() {
-            const msg = document.getElementById('securityMsg');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 2000);
-        }
-
-        // Evitar arrastrar imágenes (Protección visual)
-        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
-
-
-        // --- 2. LÓGICA REPRODUCTOR ---
+        // CONFIGURACIÓN Y VARIABLES
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         let itemData = null;
@@ -228,6 +200,7 @@
         let hideTimer;
         let isSerie = false;
 
+        // DOM
         const vid = document.getElementById('vid');
         const iframe = document.getElementById('embedFrame');
         const ui = document.getElementById('ui');
@@ -238,13 +211,14 @@
         const drawer = document.getElementById('drawer');
         const backdrop = document.getElementById('drawerBackdrop');
 
+        // INICIO
         window.onload = async () => {
             try {
                 const res = await fetch(`/api/movies/${id}`);
-                if(!res.ok) throw new Error("Error");
+                if(!res.ok) throw new Error("API Error");
                 itemData = await res.json();
                 iniciar();
-            } catch(e) { document.getElementById('title').innerText = "Contenido no disponible"; }
+            } catch(e) { document.getElementById('title').innerText = "Video no encontrado"; }
         };
 
         function iniciar() {
@@ -273,18 +247,14 @@
             if (url.match(/\.(mp4|webm|mkv)$/i)) modoMP4(url);
             else modoEmbed(url);
         }
-        const detectarFuente = detectingFuente; 
+        const detectarFuente = detectingFuente;
 
         function modoMP4(url) {
             iframe.classList.remove('active-player'); iframe.src = "";
             vid.classList.add('active-player'); vid.src = url;
             vid.play().catch(()=>{});
             playIcon.style.display = 'block'; progressArea.style.display = 'flex'; timeLabel.style.display = 'block';
-            
-            // Permitir clic en el video para pausar (Solo si la UI está visible o en PC)
-            ui.onclick = (e) => { 
-                if(e.target === ui) toggleUI(); 
-            };
+            ui.onclick = (e) => { if(e.target === ui) toggleUI(); };
         }
 
         function modoEmbed(url) {
@@ -295,8 +265,8 @@
             if(isSerie && haySiguiente()) setTimeout(() => btnNext.classList.add('show'), 5000);
         }
 
-        // --- ACTUALIZACIÓN TIEMPO ---
-        function updateTimeUI() {
+        // TIME UPDATE
+        vid.ontimeupdate = () => {
             if(isNaN(vid.duration)) return;
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
@@ -306,31 +276,26 @@
                 if(vid.duration - vid.currentTime <= 60) btnNext.classList.add('show');
                 else btnNext.classList.remove('show');
             }
-        }
-        vid.ontimeupdate = updateTimeUI;
+        };
 
         vid.onended = () => { ui.classList.remove('hidden'); if(isSerie && haySiguiente()) btnNext.classList.add('show'); };
+        
         function haySiguiente() { return itemData.episodios && currentEp + 1 < itemData.episodios.length; }
         function nextEp() { if(haySiguiente()) cargarEp(currentEp + 1); }
-        
-        // --- UI TOGGLES ---
+
         function toggleUI() { ui.classList.toggle('hidden'); if(!ui.classList.contains('hidden')) resetInt(); }
-        
         function resetInt() { 
             clearTimeout(hideTimer); 
-            // En móvil ocultamos a los 3.5s, en PC igual si el mouse no se mueve
             if(!vid.paused && vid.classList.contains('active-player')) 
                 hideTimer = setTimeout(()=>ui.classList.add('hidden'), 3500); 
         }
-        
+
         function toggleDrawer() { drawer.classList.toggle('open'); backdrop.classList.toggle('open'); }
-        
         function togglePlay() { 
             if(!vid.classList.contains('active-player')) return; 
-            if(vid.paused){vid.play(); playIcon.className="fa-solid fa-pause center-play"; resetInt();}
-            else{vid.pause(); playIcon.className="fa-solid fa-play center-play"; ui.classList.remove('hidden');} 
+            if(vid.paused){vid.play(); playIcon.className="fa-solid fa-pause center-play interactive"; resetInt();}
+            else{vid.pause(); playIcon.className="fa-solid fa-play center-play interactive"; ui.classList.remove('hidden');} 
         }
-        
         function seek(e) { const r = progressArea.getBoundingClientRect(); vid.currentTime = ((e.clientX - r.left)/r.width)*vid.duration; e.stopPropagation(); }
         function fmt(s) { const m=Math.floor(s/60); let sc=Math.floor(s%60); return `${m}:${sc<10?'0'+sc:sc}`; }
         
@@ -346,17 +311,7 @@
             l.scrollTop = sp;
         }
 
-        // PC: Mostrar controles al mover mouse
         ui.onmousemove = () => { ui.classList.remove('hidden'); resetInt(); };
-
-        // Fullscreen
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(()=>{});
-            } else {
-                if (document.exitFullscreen) { document.exitFullscreen(); }
-            }
-        }
     </script>
 </body>
 </html>
