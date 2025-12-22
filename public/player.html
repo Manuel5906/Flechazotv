@@ -17,14 +17,13 @@
             user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* Contenedor Principal */
         .video-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: flex; align-items: center; justify-content: center;
-            cursor: default; /* Cursor por defecto */
+            cursor: default;
         }
         
-        /* CLASE PRO: Ocultar cursor cuando la UI se va */
+        /* Ocultar cursor */
         .video-container.hide-cursor { cursor: none; }
 
         video, #yt-placeholder { width: 100%; height: 100%; object-fit: contain; position: absolute; z-index: 0; }
@@ -53,17 +52,15 @@
         .feedback-icon { font-size: 2.5rem; color: #ff3366; margin-bottom: 10px; }
         .feedback-text { font-size: 1.2rem; font-weight: 800; }
 
-        /* --- UI LAYER (CONTROLES) --- */
+        /* --- UI LAYER --- */
         .ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 50; display: flex; flex-direction: column; justify-content: space-between;
-            transition: opacity 0.5s ease-in-out; /* Transición suave PRO */
+            transition: opacity 0.4s ease-in-out;
             pointer-events: none;
         }
         
-        /* Estado oculto */
         .ui-layer.hidden-ui { opacity: 0; }
-        
         .ui-layer > * { pointer-events: auto; }
 
         /* Top Bar */
@@ -71,7 +68,6 @@
             padding: max(15px, env(safe-area-inset-top)) 20px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             display: flex; align-items: center; gap: 15px;
-            transition: transform 0.3s;
         }
         .video-info { flex: 1; overflow: hidden; }
         .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
@@ -128,16 +124,22 @@
         
         .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: absolute; width: 100%; }
         .progress-buffer { width: 0%; height: 4px; background: rgba(255,255,255,0.5); border-radius: 2px; position: absolute; left: 0; transition: width 0.2s; }
-        
         .progress-fill { height: 4px; width: 0%; background: #ff3366; border-radius: 2px; position: absolute; left: 0; z-index: 2; }
+        
         .progress-fill::after { 
             content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; 
             background: white; border-radius: 50%; transform: scale(0); transition: transform 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
-        /* Solo mostrar bolita cuando UI visible */
         .ui-layer:not(.hidden-ui) .progress-fill::after { transform: scale(1); }
 
-        .controls-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        /* Layout Fila Inferior */
+        .controls-row { 
+            display: flex; justify-content: space-between; align-items: center; margin-top: 5px; 
+        }
+        
+        /* Grupo Izquierdo (Play + Tiempo) */
+        .left-controls { display: flex; align-items: center; gap: 20px; }
+
         .time-text { font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #ddd; text-shadow: 0 1px 2px black; }
 
         /* --- DRAWERS --- */
@@ -244,10 +246,15 @@
                     <div class="progress-bg"></div>
                     <div id="progBuffer" class="progress-buffer"></div> <div id="progFill" class="progress-fill"></div>
                 </div>
+                
                 <div class="controls-row">
-                    <div class="time-text" id="timeDisplay">00:00 / 00:00</div>
+                    <div class="left-controls">
+                        <i id="bottomPlayBtn" class="fa-solid fa-play icon-btn" onclick="togglePlay()" style="font-size:1.3rem;"></i>
+                        <div class="time-text" id="timeDisplay">00:00 / 00:00</div>
+                    </div>
                     <i class="fa-solid fa-expand icon-btn" onclick="toggleFS()" style="font-size:1.4rem;"></i>
                 </div>
+
             </div>
         </div>
     </div>
@@ -401,12 +408,16 @@
             
             html5Player.src = INTRO_URL;
             html5Player.muted = true;
+            updateBottomIcon(true); // Icono Pausa
             
             var playPromise = html5Player.play();
 
             if (playPromise !== undefined) {
                 playPromise.then(_ => { console.log("Intro iniciada auto"); })
-                .catch(error => { document.getElementById('bigPlay').classList.add('show-play'); });
+                .catch(error => { 
+                    document.getElementById('bigPlay').classList.add('show-play'); 
+                    updateBottomIcon(false); // Icono Play si falla
+                });
             }
         }
 
@@ -417,6 +428,7 @@
                 if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
             } else if(isSerie) {
                 showNextButton();
+                updateBottomIcon(false); // Video terminó, mostrar play
             }
         }
 
@@ -442,11 +454,14 @@
                 html5Player.muted = false;
 
                 html5Player.play().catch(e=>console.log(e));
+                updateBottomIcon(true); // Icono Pausa
                 
                 html5Player.onplaying = () => {
                     document.getElementById('spinner').style.display = 'none';
-                    resetUiTimer(); // Iniciar timer al reproducir
+                    resetUiTimer();
+                    updateBottomIcon(true);
                 };
+                html5Player.onpause = () => updateBottomIcon(false);
                 html5Player.onwaiting = () => document.getElementById('spinner').style.display = 'block';
                 html5Player.ontimeupdate = updateProgressLoop;
             }
@@ -479,7 +494,7 @@
             // SWIPE START
             layer.addEventListener('touchstart', (e) => {
                 if(isLocked) return;
-                resetUiTimer(); // Tocar pantalla despierta UI
+                resetUiTimer();
                 touchStartY = e.touches[0].clientY;
                 const x = e.touches[0].clientX;
                 const w = window.innerWidth;
@@ -491,7 +506,7 @@
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
                 if (e.cancelable) e.preventDefault();
-                resetUiTimer(); // Mover dedo mantiene UI despierta
+                resetUiTimer();
                 
                 const y = e.touches[0].clientY;
                 const delta = touchStartY - y;
@@ -547,7 +562,7 @@
             
             if(isLocked) {
                 ui.classList.add('hidden-ui');
-                container.classList.add('hide-cursor'); // Ocultar cursor al bloquear
+                container.classList.add('hide-cursor');
                 lockBtn.style.display = 'flex';
                 showFeedback('fa-lock', 'Bloqueado');
             } else {
@@ -558,31 +573,36 @@
             setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 1000);
         }
 
-        // --- [LOGICA PRO] AUTO-OCULTAR UI ---
+        // --- FUNCIONES UI PRO ---
         function resetUiTimer() {
             if(isLocked) return;
             
             const ui = document.getElementById('uiLayer');
             const container = document.getElementById('mainContainer');
             
-            // 1. Mostrar UI inmediatamente
             ui.classList.remove('hidden-ui');
             container.classList.remove('hide-cursor');
             
             clearTimeout(uiTimeout);
             
-            // 2. Comprobar si está reproduciendo
             const isPlaying = (playerType === 'html5' && !html5Player.paused && !html5Player.ended) || 
                               (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
             
-            // 3. Solo iniciar temporizador si está reproduciendo
-            // Si está pausado, la UI se queda visible para siempre (comportamiento PRO)
             if(isPlaying) {
                 uiTimeout = setTimeout(() => {
                     ui.classList.add('hidden-ui');
-                    container.classList.add('hide-cursor'); // Adiós cursor
+                    container.classList.add('hide-cursor');
                     closeDrawers();
-                }, 3000); // 3 segundos de espera
+                }, 3000);
+            }
+        }
+
+        function updateBottomIcon(isPlaying) {
+            const btn = document.getElementById('bottomPlayBtn');
+            if(isPlaying) {
+                btn.className = "fa-solid fa-pause icon-btn";
+            } else {
+                btn.className = "fa-solid fa-play icon-btn";
             }
         }
 
@@ -599,22 +619,26 @@
                 if(html5Player.paused) { 
                     html5Player.play(); 
                     bigPlay.classList.remove('show-play'); 
-                    resetUiTimer(); // Al dar play, inicia el timer para ocultar
+                    updateBottomIcon(true);
+                    resetUiTimer();
                 } 
                 else { 
                     html5Player.pause(); 
                     bigPlay.classList.add('show-play'); 
-                    resetUiTimer(); // Al pausar, el resetUiTimer detectará la pausa y NO ocultará la UI
+                    updateBottomIcon(false);
+                    resetUiTimer(); 
                 }
             } else if(playerType === 'youtube' && ytPlayer) {
                 if(ytPlayer.getPlayerState() === 1) { 
                     ytPlayer.pauseVideo(); 
                     bigPlay.classList.add('show-play'); 
+                    updateBottomIcon(false);
                     resetUiTimer();
                 }
                 else { 
                     ytPlayer.playVideo(); 
                     bigPlay.classList.remove('show-play'); 
+                    updateBottomIcon(true);
                     resetUiTimer();
                 }
             }
@@ -751,7 +775,20 @@
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%', videoId: videoId,
                 playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'start': Math.floor(start), 'playsinline': 1, 'fs': 0 },
-                events: { 'onReady': (e)=>{e.target.setPlaybackRate(currentSpeed); e.target.playVideo(); setInterval(updateProgressLoop, 500);}, 'onStateChange': (e)=>{ if(e.data===YT.PlayerState.PLAYING){document.getElementById('spinner').style.display='none'; resetUiTimer();} if(e.data===YT.PlayerState.PAUSED)document.getElementById('bigPlay').classList.add('show-play'); if(e.data===YT.PlayerState.ENDED && isSerie)showNextButton(); } }
+                events: { 'onReady': (e)=>{e.target.setPlaybackRate(currentSpeed); e.target.playVideo(); setInterval(updateProgressLoop, 500);}, 
+                'onStateChange': (e)=>{ 
+                    if(e.data===YT.PlayerState.PLAYING){
+                        document.getElementById('spinner').style.display='none'; 
+                        resetUiTimer();
+                        updateBottomIcon(true);
+                    } 
+                    if(e.data===YT.PlayerState.PAUSED){
+                        document.getElementById('bigPlay').classList.add('show-play'); 
+                        updateBottomIcon(false);
+                    }
+                    if(e.data===YT.PlayerState.ENDED && isSerie)showNextButton(); 
+                } 
+            }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
