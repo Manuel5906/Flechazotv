@@ -73,44 +73,77 @@ router.get('/search', (req, res) => {
     });
 });
 
-// --- 5. RUTAS DE YOUTUBE (SCRAPING / SIN API KEY) ---
+// --- 5. RUTAS DE YOUTUBE (SCRAPING AVANZADO) ---
 
-// A) Obtener videos de un canal específico
-// Uso: /youtube/channel?id=UCxxxxxxx
+// A) Obtener videos de un canal (Acepta URL completa o ID)
+// Uso: /youtube/channel?url=https://youtube.com/@primetvoficial
 router.get('/youtube/channel', async (req, res) => {
-    const channelId = req.query.id; 
+    // Aceptamos 'url' o 'id' por compatibilidad
+    let inputUrl = req.query.url || req.query.id;
 
-    if (!channelId) {
-        return res.status(400).json({ error: 'Falta el ID del canal (?id=UC...)' });
+    if (!inputUrl) {
+        return res.status(400).json({ error: 'Falta el link del canal (?url=...)' });
     }
 
     try {
-        // Truco: Convertir ID de Canal (UC...) a ID de Playlist de Subidas (UU...)
-        // Esto permite sacar todos los videos sin buscar, ahorrando recursos.
-        const uploadsId = channelId.replace(/^UC/, 'UU');
+        let channelId = '';
 
-        // limit: 20 trae los ultimos 20 videos. Puedes subirlo hasta 100.
+        // PASO 1: Detectar si es un Link/Handle (@) o un ID directo
+        if (inputUrl.includes('youtube.com') || inputUrl.includes('@')) {
+            // Limpiamos la URL para buscar el nombre exacto
+            const cleanQuery = inputUrl.split('?')[0]; 
+            console.log(`Buscando ID para: ${cleanQuery}`);
+            
+            // Buscamos el canal usando yt-search
+            const searchResult = await yts(cleanQuery);
+            
+            // Filtramos para encontrar el objeto tipo 'channel'
+            const channel = searchResult.channels && searchResult.channels.length > 0 
+                ? searchResult.channels[0] 
+                : searchResult.all.find(item => item.type === 'channel');
+
+            if (!channel) {
+                return res.status(404).json({ error: 'No se encontró el canal con ese enlace.' });
+            }
+            
+            // Extraemos el ID de la url que devuelve la búsqueda
+            // channel.url suele ser ".../channel/UCxxxx"
+            channelId = channel.url.split('/').pop(); 
+        } else {
+            // Si ya es un ID (ej: UC123...)
+            channelId = inputUrl;
+        }
+
+        // PASO 2: Convertir ID de Canal (UC...) a Playlist de Subidas (UU...)
+        // Esto es necesario para usar ytpl y sacar la lista de videos
+        const uploadsId = channelId.startsWith('UC') ? channelId.replace('UC', 'UU') : channelId;
+
+        // PASO 3: Obtener los videos
+        // limit: 20 trae los últimos 20. Puedes subirlo hasta 100 si quieres más.
         const playlist = await ytpl(uploadsId, { limit: 20 });
 
+        // PASO 4: Formatear los datos
         const videos = playlist.items.map(item => ({
-            id: item.id, // ID del video
+            id: item.id,
             title: item.title,
-            thumbnail: item.bestThumbnail.url,
+            thumbnail: item.bestThumbnail.url, // La mejor calidad disponible
             url: item.shortUrl,
             duration: item.duration,
-            views: item.shortViewCount, // Vistas formateadas (ej: "1.2M")
-            isShort: item.durationSec < 60 // Detección simple de Short
+            views: item.shortViewCount,
+            isShort: item.durationSec < 60 // True si dura menos de 1 min
         }));
 
         res.json({
-            channelName: playlist.author.name,
-            channelUrl: playlist.author.url,
+            channel_name: playlist.author.name,
+            channel_url: playlist.author.url,
+            channel_avatar: playlist.author.bestAvatar.url,
+            total_videos_found: playlist.estimatedItemCount,
             videos: videos
         });
 
     } catch (error) {
-        console.error("Error YouTube Channel:", error.message);
-        res.status(500).json({ error: 'No se pudo obtener información del canal. Verifica el ID.' });
+        console.error("Error API YouTube:", error.message);
+        res.status(500).json({ error: 'Error obteniendo videos. Verifica el link o intenta más tarde.' });
     }
 });
 
@@ -126,7 +159,7 @@ router.get('/youtube/search', async (req, res) => {
     try {
         const r = await yts(query);
         
-        // Filtramos para devolver solo videos (quitamos canales o listas)
+        // Filtramos para devolver solo videos
         const videos = r.videos.slice(0, 15).map(v => ({
             title: v.title,
             videoId: v.videoId,
