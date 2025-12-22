@@ -1,3 +1,24 @@
-[
-  { "id": 1, "title": "El Regreso del CEO", "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa para buscarla y casarse con ella.", "img": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg", "cat": "Romance", "videoUrl": "https://iframe.mediadelivery.net/embed/568829/8f9fba95-6f0e-4e60-8c97-0526c2dc6562?autoplay=true" }
-]
+const contenido = [
+  {
+    "id": 1,
+    "tipo": "serie",  // <--- INDICA QUE TIENE EPISODIOS
+    "title": "El Regreso del CEO",
+    "desc": "Un CEO envenenado es salvado por una humilde vendedora...",
+    "img": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg",
+    "cat": "Romance",
+    "episodios": [
+      { "numero": 1, "titulo": "El encuentro", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" },
+      { "numero": 2, "titulo": "La revelación", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" }, 
+      { "numero": 3, "titulo": "El final", "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" }
+    ]
+  },
+  {
+    "id": 2,
+    "tipo": "pelicula", // <--- INDICA QUE ES UN SOLO VIDEO
+    "title": "Navidad Eterna",
+    "desc": "Una historia de amor de 2 horas sin interrupciones.",
+    "img": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg",
+    "cat": "Drama",
+    "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4" // Solo un link
+  }
+];
