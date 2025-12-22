@@ -5,430 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flechazo TV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* --- 1. VARIABLES --- */
-        :root {
-            --bg-dark: #0f1014;
-            --bg-card: #1d1e26;
-            --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%);
-            --text: #ffffff;
-            --text-gray: #8b8d96;
-        }
-
+        :root { --bg-dark: #0f1014; --text: #ffffff; --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 90px; overflow-x: hidden; user-select: none; }
-
-        /* --- UI GENERAL (Igual que antes) --- */
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 90px; }
+        
+        /* UI Básica */
+        .header { padding: 20px; display: flex; justify-content: center; position: relative; }
         .logo-heart { font-size: 1.8rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .search-btn { font-size: 1.4rem; color: white; margin-left: auto; }
+        .search-btn { position: absolute; right: 20px; top: 25px; font-size: 1.4rem; color: white; }
 
-        /* HERO CARD */
-        .hero-container { padding: 20px; width: 100%; }
+        /* Hero */
+        .hero-container { padding: 20px; }
         .hero-card { width: 100%; height: 250px; border-radius: 25px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, transparent 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
-        .hero-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
-        .btn-ver { background: var(--primary-grad); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+        .btn-ver { background: var(--primary-grad); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
-        /* CATEGORÍAS */
+        /* Categorías y Listas */
         .circles-row { display: flex; justify-content: space-around; padding: 20px; }
-        .circle-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .circle { width: 65px; height: 65px; border-radius: 50%; background: #1a1b21; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: #ff5e9a; position: relative; border: 1px solid #333; }
-        .circle-label { font-size: 0.85rem; color: var(--text-gray); }
-
-        /* LISTAS */
-        .section-title { padding-left: 20px; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; }
-        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 20px 20px; scrollbar-width: none; }
-        .slider::-webkit-scrollbar { display: none; }
-        .poster { min-width: 110px; height: 160px; border-radius: 15px; overflow: hidden; position: relative; }
+        .circle { width: 60px; height: 60px; border-radius: 50%; background: #1a1b21; display: flex; justify-content: center; align-items: center; border: 1px solid #333; color: #ff3366; font-size: 1.4rem; }
+        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
+        .poster { min-width: 110px; height: 160px; border-radius: 15px; overflow: hidden; }
         .poster img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* BOTTOM NAV */
-        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 70px; background: #181920; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; text-decoration: none; font-size: 0.75rem; gap: 5px; }
-        .nav-item.active { color: #ff3366; }
-
-        /* --- 2. REPRODUCTOR PERSONALIZADO (Nuevo Diseño) --- */
-        #playerModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 5000; display: none; 
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-
-        /* Contenedor relativo para posicionar controles sobre el video */
-        .video-wrapper {
-            position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            background: #000;
-        }
+        h3 { padding: 0 20px; margin: 20px 0 10px 0; }
         
-        video { width: 100%; max-height: 100vh; }
-
-        /* Overlay de Controles */
-        .controls-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); /* Oscuro suave */
-            display: flex; flex-direction: column; justify-content: space-between;
-            opacity: 1; transition: opacity 0.3s;
-            z-index: 10;
-        }
-        .controls-overlay.hidden { opacity: 0; pointer-events: none; }
-
-        /* Header del Player */
-        .player-top {
-            padding: 20px; display: flex; align-items: center; gap: 15px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-        .back-icon { font-size: 1.5rem; color: white; cursor: pointer; }
-        .player-title { font-size: 1rem; font-weight: 600; color: white; text-shadow: 0 1px 3px black; }
-
-        /* Centro (Play Gigante) */
-        .player-center {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-        }
-        .play-btn-big {
-            font-size: 4rem; color: rgba(255,255,255,0.8); cursor: pointer;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-        }
-
-        /* Footer del Player */
-        .player-bottom {
-            padding: 20px; padding-bottom: 40px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            position: relative;
-        }
-
-        /* Botón Flotante Siguiente Episodio */
-        .next-ep-float {
-            position: absolute; top: -50px; right: 20px;
-            background: rgba(255,255,255,0.2); backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white; padding: 8px 16px; border-radius: 20px;
-            font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px;
-            transition: background 0.3s;
-        }
-        .next-ep-float:hover { background: rgba(255,255,255,0.4); }
-
-        /* Barra de Progreso */
-        .progress-container {
-            width: 100%; height: 5px; background: rgba(255,255,255,0.3);
-            border-radius: 5px; margin-bottom: 10px; cursor: pointer; position: relative;
-        }
-        .progress-fill {
-            height: 100%; width: 0%;
-            background: var(--primary-grad);
-            border-radius: 5px; position: relative;
-        }
-        /* Bolita del progreso */
-        .progress-fill::after {
-            content: ''; position: absolute; right: -6px; top: -3px;
-            width: 12px; height: 12px; background: #a033ff; border: 2px solid white;
-            border-radius: 50%; box-shadow: 0 0 10px rgba(160, 51, 255, 0.8);
-        }
-
-        /* Info Tiempo y Botones Extra */
-        .controls-row {
-            display: flex; justify-content: space-between; align-items: center; color: #ddd; font-size: 0.9rem;
-        }
-        .ep-list-icon { font-size: 1.5rem; cursor: pointer; }
-
-        /* --- 3. PANEL LATERAL DE EPISODIOS (Dentro del Player) --- */
-        .episodes-drawer {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 60%;
-            background: #181920; border-top-left-radius: 20px; border-top-right-radius: 20px;
-            z-index: 20; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 20px; display: flex; flex-direction: column;
-            box-shadow: 0 -5px 30px rgba(0,0,0,0.8);
-        }
-        .episodes-drawer.open { transform: translateY(0); }
-        
-        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .drawer-title { font-size: 1.1rem; font-weight: bold; color: white; }
-        .close-drawer { font-size: 1.5rem; cursor: pointer; color: #888; }
-        
-        .ep-list-scroll { overflow-y: auto; flex: 1; }
-        .ep-item {
-            display: flex; align-items: center; gap: 10px; padding: 12px;
-            border-radius: 10px; margin-bottom: 8px; background: #222; cursor: pointer;
-        }
-        .ep-item.active { background: #333; border: 1px solid #ff3366; }
-        .ep-num { font-weight: bold; color: #ff3366; font-size: 1.2rem; min-width: 30px; }
-        .ep-name { color: white; font-size: 0.95rem; }
-
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 70px; background: #181920; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-item { color: #666; font-size: 1.5rem; } .nav-item.active { color: #ff3366; }
     </style>
 </head>
 <body>
-
     <header class="header">
-        <div style="width: 20px;"></div>
         <div class="logo-heart"><i class="fa-solid fa-heart"></i></div>
         <i class="fa-solid fa-magnifying-glass search-btn"></i>
     </header>
 
     <div id="heroContainer" class="hero-container"></div>
-
+    
     <div class="circles-row">
-        <div class="circle-item"><div class="circle"><i class="fa-brands fa-tiktok"></i></div><span class="circle-label">Shorts</span></div>
-        <div class="circle-item"><div class="circle"><i class="fa-solid fa-heart"></i></div><span class="circle-label">Romance</span></div>
-        <div class="circle-item"><div class="circle"><i class="fa-solid fa-person-rifle"></i></div><span class="circle-label">Acción</span></div>
+        <div class="circle"><i class="fa-brands fa-tiktok"></i></div>
+        <div class="circle"><i class="fa-solid fa-heart"></i></div>
+        <div class="circle"><i class="fa-solid fa-fire"></i></div>
     </div>
 
-    <h3 class="section-title">Populares</h3>
+    <h3>Populares</h3>
     <div class="slider" id="popularesSlider"></div>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Inicio</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-compass"></i>Explorar</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-bookmark"></i>Mi Lista</a>
-        <a href="#" class="nav-item"><i class="fa-regular fa-user"></i>Perfil</a>
+        <i class="fa-solid fa-house nav-item active"></i>
+        <i class="fa-regular fa-compass nav-item"></i>
+        <i class="fa-regular fa-bookmark nav-item"></i>
+        <i class="fa-regular fa-user nav-item"></i>
     </nav>
 
-    <div id="playerModal">
-        <div class="video-wrapper">
-            <video id="videoScreen" playsinline></video>
-            
-            <div id="controlsOverlay" class="controls-overlay">
-                
-                <div class="player-top">
-                    <i class="fa-solid fa-arrow-left back-icon" onclick="cerrarPlayer()"></i>
-                    <span id="playerTitle" class="player-title">Cargando...</span>
-                </div>
-
-                <div class="player-center">
-                    <i id="centerPlayBtn" class="fa-solid fa-play play-btn-big" onclick="togglePlay()"></i>
-                </div>
-
-                <div class="player-bottom">
-                    <div id="btnNextEp" class="next-ep-float" onclick="siguienteEpisodio()">
-                        Siguiente Episodio <i class="fa-solid fa-chevron-right"></i>
-                    </div>
-
-                    <div class="progress-container" id="progressBarContainer">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-
-                    <div class="controls-row">
-                        <span id="timeDisplay">00:00 / 00:00</span>
-                        
-                        <div onclick="toggleDrawer()">
-                            <span style="margin-right:5px; font-size:0.8rem;">Episodios</span>
-                            <i class="fa-solid fa-layer-group ep-list-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="episodesDrawer" class="episodes-drawer">
-                <div class="drawer-header">
-                    <span class="drawer-title">Lista de Episodios</span>
-                    <i class="fa-solid fa-xmark close-drawer" onclick="toggleDrawer()"></i>
-                </div>
-                <div id="drawerList" class="ep-list-scroll">
-                    </div>
-            </div>
-
-        </div>
-    </div>
-
     <script>
-        const API_URL = '/api/movies';
-        let contenido = [];
-        let currentItem = null;
-        let currentEpIndex = 0;
-        let controlsTimeout;
-
-        // --- INICIO ---
-        window.onload = async () => {
-            await cargarDatos();
-        };
-
-        async function cargarDatos() {
-            try {
-                const res = await fetch(API_URL);
-                contenido = await res.json();
-                if(contenido.length > 0) {
-                    renderHero(contenido);
-                    renderPopulares(contenido);
-                }
-            } catch (e) { console.error(e); }
+        // REDIRECCIÓN: Aquí enviamos el ID al otro archivo HTML
+        function irAlPlayer(id) {
+            window.location.href = `player.html?id=${id}`;
         }
 
-        function renderHero(datos) {
-            const item = datos[Math.floor(Math.random() * datos.length)];
-            const imgUrl = item.imagenes ? item.imagenes.banner : item.img;
+        window.onload = async () => {
+            const res = await fetch('/api/movies');
+            const data = await res.json();
+            
+            // Hero
+            const hero = data[Math.floor(Math.random() * data.length)];
             document.getElementById('heroContainer').innerHTML = `
-                <div class="hero-card" onclick="prepararPlayer(${item.id})">
-                    <img src="${imgUrl}" class="hero-img">
+                <div class="hero-card" onclick="irAlPlayer(${hero.id})">
+                    <img src="${hero.imagenes ? hero.imagenes.banner : hero.img}" class="hero-img">
                     <div class="hero-overlay">
-                        <h2 class="hero-title">${item.title}</h2>
+                        <h2>${hero.title}</h2>
                         <button class="btn-ver">Ver Ahora</button>
                     </div>
                 </div>`;
-        }
 
-        function renderPopulares(datos) {
+            // Lista
             const slider = document.getElementById('popularesSlider');
-            slider.innerHTML = '';
-            datos.forEach(item => {
-                const imgUrl = item.imagenes ? item.imagenes.poster : item.img;
-                const div = document.createElement('div');
-                div.className = 'poster';
-                div.onclick = () => prepararPlayer(item.id);
-                div.innerHTML = `<img src="${imgUrl}" loading="lazy">`;
-                slider.appendChild(div);
+            data.forEach(item => {
+                const img = item.imagenes ? item.imagenes.poster : item.img;
+                slider.innerHTML += `<div class="poster" onclick="irAlPlayer(${item.id})"><img src="${img}"></div>`;
             });
-        }
-
-        // --- LÓGICA DEL REPRODUCTOR ---
-        const video = document.getElementById('videoScreen');
-        const modal = document.getElementById('playerModal');
-        const controls = document.getElementById('controlsOverlay');
-        const playBtn = document.getElementById('centerPlayBtn');
-        const progressFill = document.getElementById('progressFill');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const btnNext = document.getElementById('btnNextEp');
-        const drawer = document.getElementById('episodesDrawer');
-
-        // 1. Abrir Player
-        function prepararPlayer(id) {
-            currentItem = contenido.find(c => c.id === id);
-            if(!currentItem) return;
-            
-            // Determinar si es serie o peli
-            if(currentItem.tipo === 'serie' && currentItem.episodios) {
-                currentEpIndex = 0; // Empezar desde el 1
-                cargarVideo(currentItem.episodios[0]);
-                renderDrawerList();
-                btnNext.style.display = 'flex';
-            } else {
-                cargarVideo({ titulo: currentItem.title, url: currentItem.url });
-                btnNext.style.display = 'none'; // Ocultar sig ep si es peli
-                document.getElementById('drawerList').innerHTML = "<p style='color:#666; padding:10px;'>Es una película.</p>";
-            }
-
-            modal.style.display = 'flex';
-            resetControlsTimer();
-        }
-
-        function cargarVideo(datosEpisodio) {
-            // Actualizar Titulo
-            let titulo = currentItem.title;
-            if(currentItem.tipo === 'serie') {
-                titulo += ` - Ep. ${datosEpisodio.numero || (currentEpIndex + 1)}`;
-            }
-            document.getElementById('playerTitle').innerText = titulo;
-
-            video.src = datosEpisodio.url;
-            video.play();
-            updatePlayIcon();
-        }
-
-        function cerrarPlayer() {
-            video.pause();
-            modal.style.display = 'none';
-            drawer.classList.remove('open');
-        }
-
-        // 2. Controles Play/Pause
-        function togglePlay() {
-            if(video.paused) video.play();
-            else video.pause();
-            updatePlayIcon();
-        }
-
-        function updatePlayIcon() {
-            if(video.paused) {
-                playBtn.classList.remove('fa-pause');
-                playBtn.classList.add('fa-play');
-            } else {
-                playBtn.classList.remove('fa-play');
-                playBtn.classList.add('fa-pause');
-            }
-        }
-
-        // 3. Barra de Progreso y Tiempo
-        video.addEventListener('timeupdate', () => {
-            if(isNaN(video.duration)) return;
-            const percent = (video.currentTime / video.duration) * 100;
-            progressFill.style.width = percent + '%';
-            timeDisplay.innerText = formatTime(video.currentTime) + " / " + formatTime(video.duration);
-        });
-
-        // Click en la barra para adelantar
-        document.getElementById('progressBarContainer').addEventListener('click', (e) => {
-            const rect = e.target.closest('.progress-container').getBoundingClientRect();
-            const pos = (e.clientX - rect.left) / rect.width;
-            video.currentTime = pos * video.duration;
-        });
-
-        function formatTime(s) {
-            const min = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            return `${min}:${sec < 10 ? '0' + sec : sec}`;
-        }
-
-        // 4. Mostrar/Ocultar Controles al tocar
-        document.querySelector('.video-wrapper').addEventListener('click', (e) => {
-            // Si clicamos en controles, no hacer nada (dejar que el botón funcione)
-            if(e.target.closest('.player-bottom') || e.target.closest('.player-top') || e.target.closest('.episodes-drawer')) return;
-            
-            // Toggle
-            if(controls.classList.contains('hidden')) {
-                controls.classList.remove('hidden');
-                resetControlsTimer();
-            } else {
-                controls.classList.add('hidden');
-            }
-        });
-
-        function resetControlsTimer() {
-            clearTimeout(controlsTimeout);
-            controlsTimeout = setTimeout(() => {
-                if(!video.paused) controls.classList.add('hidden');
-            }, 3000); // 3 segundos y se oculta
-        }
-
-        // 5. Siguiente Episodio
-        function siguienteEpisodio() {
-            if(!currentItem.episodios) return;
-            if(currentEpIndex + 1 < currentItem.episodios.length) {
-                currentEpIndex++;
-                cargarVideo(currentItem.episodios[currentEpIndex]);
-                renderDrawerList(); // Actualizar activo en la lista
-            } else {
-                alert("Es el último episodio");
-            }
-        }
-
-        // 6. Panel de Lista de Episodios
-        function toggleDrawer() {
-            drawer.classList.toggle('open');
-        }
-
-        function renderDrawerList() {
-            const list = document.getElementById('drawerList');
-            list.innerHTML = '';
-            
-            if(currentItem.episodios) {
-                currentItem.episodios.forEach((ep, index) => {
-                    const div = document.createElement('div');
-                    div.className = `ep-item ${index === currentEpIndex ? 'active' : ''}`;
-                    div.innerHTML = `
-                        <span class="ep-num">${ep.numero}</span>
-                        <span class="ep-name">${ep.titulo || 'Episodio ' + ep.numero}</span>
-                    `;
-                    div.onclick = () => {
-                        currentEpIndex = index;
-                        cargarVideo(ep);
-                        renderDrawerList(); // Refrescar selección
-                        toggleDrawer(); // Cerrar panel
-                    };
-                    list.appendChild(div);
-                });
-            }
-        }
-
+        };
     </script>
 </body>
 </html>
