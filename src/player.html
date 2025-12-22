@@ -2,63 +2,138 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reproductor - Flechazo TV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #ff3366; --grad: linear-gradient(135deg, #ff3366, #a033ff); }
-        body { margin: 0; background: black; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        :root { 
+            --primary: #ff3366; 
+            --grad: linear-gradient(135deg, #ff3366, #a033ff); 
+        }
+        
+        /* 1. CONFIGURACIÓN PANTALLA COMPLETA */
+        body { 
+            margin: 0; 
+            background: black; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            height: 100vh; /* Altura completa */
+            width: 100vw;  /* Anchura completa */
+            overflow: hidden; /* Sin scroll */
+            display: flex; 
+            flex-direction: column;
+        }
 
-        /* Contenedor Video */
-        .video-wrapper { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16/9; }
-        video { width: 100%; height: 100%; background: #000; }
+        /* 2. CONTENEDOR VIDEO (Ocupa todo) */
+        .video-wrapper { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            flex: 1;
+            background: #000;
+        }
 
-        /* Capa Controles */
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* Muestra el video completo centrado */
+        }
+
+        /* 3. CAPA DE CONTROLES (Overlay Vertical) */
         .controls { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; 
-            padding: 20px; transition: opacity 0.3s; 
+            background: rgba(0,0,0,0.3); /* Fondo un poco más transparente */
+            display: flex; flex-direction: column; justify-content: space-between; 
+            padding: 20px; 
+            transition: opacity 0.3s; 
+            z-index: 5;
         }
         .hidden { opacity: 0; pointer-events: none; }
 
-        /* Top Bar */
-        .top-bar { display: flex; align-items: center; gap: 15px; }
+        /* BARRA SUPERIOR (Título y Volver) */
+        .top-bar { 
+            display: flex; align-items: center; gap: 15px; 
+            padding-top: 10px; /* Espacio para la barra de estado del cel */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
         .back-btn { font-size: 1.5rem; cursor: pointer; color: white; text-decoration: none; }
-        
-        /* Play Centro */
-        .center-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; cursor: pointer; filter: drop-shadow(0 0 10px black); }
+        #title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Bottom Bar */
-        .bottom-bar { display: flex; flex-direction: column; gap: 10px; position: relative; }
-        
-        /* Botón Siguiente Episodio (Oculto por defecto) */
-        #btnNext { 
-            display: none; /* SE ACTIVA SOLO SI ES SERIE */
-            position: absolute; top: -40px; right: 0; 
-            background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; 
-            font-size: 0.9rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
+        /* PLAY EN EL CENTRO */
+        .center-play { 
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 4rem; cursor: pointer; 
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); 
+            opacity: 0.8;
         }
 
-        .progress { width: 100%; height: 5px; background: rgba(255,255,255,0.3); border-radius: 5px; cursor: pointer; position: relative; }
-        .fill { height: 100%; width: 0%; background: var(--grad); border-radius: 5px; position: relative; }
-        .fill::after { content:''; position: absolute; right: -5px; top: -3px; width: 12px; height: 12px; background: white; border-radius: 50%; }
-
-        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 5px; }
+        /* BARRA INFERIOR (Controles) */
+        .bottom-bar { 
+            display: flex; flex-direction: column; gap: 15px; 
+            position: relative; 
+            padding-bottom: 20px; /* Espacio abajo para dedos */
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            margin: -20px -20px 0 -20px; /* Extender al borde */
+            padding: 40px 20px 30px 20px;
+        }
         
-        /* Botón Lista Episodios (Oculto por defecto) */
-        #btnEpList { display: none; cursor: pointer; align-items: center; gap: 5px; } /* SE ACTIVA SOLO SI ES SERIE */
+        /* Botón Siguiente (Flotante encima de la barra) */
+        #btnNext { 
+            display: none; /* JS lo activa */
+            align-self: flex-end; /* A la derecha */
+            background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(5px);
+            padding: 8px 16px; border-radius: 20px; 
+            font-size: 0.9rem; cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 5px;
+        }
 
-        /* Panel Lateral (Drawer) */
+        /* Línea de Tiempo */
+        .progress { 
+            width: 100%; height: 4px; 
+            background: rgba(255,255,255,0.3); 
+            border-radius: 5px; cursor: pointer; position: relative; 
+        }
+        .fill { 
+            height: 100%; width: 0%; 
+            background: var(--grad); 
+            border-radius: 5px; position: relative; 
+        }
+        /* Bolita del timeline */
+        .fill::after { 
+            content:''; position: absolute; right: -6px; top: -4px; 
+            width: 12px; height: 12px; 
+            background: white; border-radius: 50%; 
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
+        }
+
+        .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 5px; color: #ddd; }
+        
+        #btnEpList { display: none; cursor: pointer; align-items: center; gap: 8px; }
+
+        /* 4. PANEL LATERAL (DRAWER VERTICAL) */
         .drawer {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 60vh; 
-            background: #181818; border-radius: 20px 20px 0 0; z-index: 10;
-            transform: translateY(105%); transition: transform 0.3s; padding: 20px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70vh; /* Más alto */
+            background: #181818; 
+            border-radius: 25px 25px 0 0; 
+            z-index: 20;
+            transform: translateY(110%); 
+            transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1); 
+            padding: 25px;
             display: flex; flex-direction: column;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
         }
         .drawer.open { transform: translateY(0); }
-        .ep-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; gap: 10px; }
+        
+        .ep-item { 
+            padding: 15px; 
+            border-bottom: 1px solid #333; 
+            cursor: pointer; display: flex; gap: 15px; align-items: center;
+        }
         .ep-item:hover { background: #222; }
-        .ep-num { color: var(--primary); font-weight: bold; }
+        .ep-num { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -75,9 +150,13 @@
             <i id="playIcon" class="fa-solid fa-play center-play" onclick="togglePlay()"></i>
 
             <div class="bottom-bar" onclick="event.stopPropagation()">
-                <div id="btnNext" onclick="nextEp()">Siguiente <i class="fa-solid fa-forward"></i></div>
+                <div id="btnNext" onclick="nextEp()">
+                    Siguiente Ep <i class="fa-solid fa-forward"></i>
+                </div>
 
-                <div class="progress" onclick="seek(event)"><div id="fill" class="fill"></div></div>
+                <div class="progress" onclick="seek(event)">
+                    <div id="fill" class="fill"></div>
+                </div>
                 
                 <div class="info-row">
                     <span id="time">00:00</span>
@@ -90,11 +169,11 @@
     </div>
 
     <div id="drawer" class="drawer">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h3>Episodios</h3>
-            <i class="fa-solid fa-xmark" style="font-size:1.5rem;" onclick="toggleDrawer()"></i>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <h3 style="margin:0;">Episodios</h3>
+            <i class="fa-solid fa-xmark" style="font-size:1.5rem; cursor:pointer;" onclick="toggleDrawer()"></i>
         </div>
-        <div id="list" style="overflow-y:auto;"></div>
+        <div id="list" style="overflow-y:auto; flex:1;"></div>
     </div>
 
     <script>
@@ -104,10 +183,12 @@
         
         let itemData = null;
         let currentEp = 0;
+        let hideTimeout;
+        
         const vid = document.getElementById('vid');
         const ui = document.getElementById('ui');
 
-        // 2. Cargar Datos desde tu API
+        // 2. Cargar Datos
         window.onload = async () => {
             try {
                 const res = await fetch(`/api/movies/${id}`);
@@ -119,32 +200,31 @@
         };
 
         function iniciarReproductor() {
-            // LÓGICA INTELIGENTE: ¿Serie o Película?
-            
+            // DETECCIÓN INTELIGENTE
             if (itemData.tipo === 'pelicula') {
-                // ES PELÍCULA: Ocultamos botones de series
+                // MODO PELÍCULA
                 document.getElementById('title').innerText = itemData.title;
                 vid.src = itemData.url;
                 
-                // Aseguramos que NO se vean los controles de episodios
                 document.getElementById('btnNext').style.display = 'none';
                 document.getElementById('btnEpList').style.display = 'none';
             
             } else {
-                // ES SERIE: Mostramos botones y cargamos episodios
-                document.getElementById('btnNext').style.display = 'flex'; // Mostrar botón siguiente
-                document.getElementById('btnEpList').style.display = 'flex'; // Mostrar lista
+                // MODO SERIE
+                document.getElementById('btnNext').style.display = 'flex';
+                document.getElementById('btnEpList').style.display = 'flex';
                 
-                cargarEpisodio(0); // Cargar el primero
+                cargarEpisodio(0);
                 generarLista();
             }
             
             vid.play();
+            resetTimer(); // Ocultar controles automáticamente
         }
 
-        // --- Funciones de Serie ---
+        // --- Funciones Lógicas ---
         function cargarEpisodio(index) {
-            if(!itemData.episodios[index]) return;
+            if(!itemData.episodios || !itemData.episodios[index]) return;
             currentEp = index;
             const ep = itemData.episodios[index];
             
@@ -154,10 +234,10 @@
         }
 
         function nextEp() {
-            if (currentEp + 1 < itemData.episodios.length) {
+            if (itemData.episodios && currentEp + 1 < itemData.episodios.length) {
                 cargarEpisodio(currentEp + 1);
             } else {
-                alert("Fin de la temporada");
+                alert("Último episodio");
             }
         }
 
@@ -173,14 +253,35 @@
             });
         }
 
-        // --- Controles Generales ---
+        // --- UI Interactions ---
         function togglePlay() {
-            if(vid.paused) { vid.play(); document.getElementById('playIcon').className = "fa-solid fa-pause center-play"; }
-            else { vid.pause(); document.getElementById('playIcon').className = "fa-solid fa-play center-play"; }
+            if(vid.paused) { 
+                vid.play(); 
+                document.getElementById('playIcon').className = "fa-solid fa-pause center-play"; 
+            } else { 
+                vid.pause(); 
+                document.getElementById('playIcon').className = "fa-solid fa-play center-play"; 
+            }
+            resetTimer();
         }
 
         function toggleControls() {
-            ui.classList.toggle('hidden');
+            if(ui.classList.contains('hidden')){
+                ui.classList.remove('hidden');
+                resetTimer();
+            } else {
+                ui.classList.add('hidden');
+            }
+        }
+
+        function resetTimer() {
+            clearTimeout(hideTimeout);
+            // Solo ocultar automático si está reproduciendo
+            if(!vid.paused) {
+                hideTimeout = setTimeout(() => {
+                    ui.classList.add('hidden');
+                }, 3000);
+            }
         }
 
         function toggleDrawer() {
@@ -193,7 +294,6 @@
             e.stopPropagation();
         }
 
-        // Barra de progreso
         vid.ontimeupdate = () => {
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
@@ -201,6 +301,12 @@
             let m = Math.floor(vid.currentTime / 60);
             let s = Math.floor(vid.currentTime % 60);
             document.getElementById('time').innerText = `${m}:${s<10?'0'+s:s}`;
+        };
+        
+        // Al terminar video, mostrar controles
+        vid.onended = () => {
+            ui.classList.remove('hidden');
+            document.getElementById('playIcon').className = "fa-solid fa-rotate-right center-play";
         };
 
     </script>
