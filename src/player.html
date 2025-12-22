@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
     <title>Reproductor Universal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,15 +13,33 @@
             --overlay-bg: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.6) 100%);
         }
         
-        body { 
-            margin: 0; background: #000; color: white; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100dvh; width: 100vw; overflow: hidden; 
-            display: flex; flex-direction: column; user-select: none;
+        /* --- CORRECCIÓN DEL "SALTO" DE PANTALLA --- */
+        html {
+            height: 100%;
+            overflow: hidden; /* Evita cualquier scroll en el documento */
         }
 
+        body { 
+            margin: 0; 
+            background: #000; 
+            color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            /* TRUCO MAESTRO: position: fixed evita que el navegador redimensione el body al mostrar la barra URL */
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* El contenedor ahora llena el body fijo */
         .video-wrapper { 
-            position: relative; width: 100%; height: 100%; background: #000; 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; 
             display: flex; align-items: center; justify-content: center; 
         }
 
@@ -32,6 +51,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--overlay-bg);
             display: flex; flex-direction: column; justify-content: space-between;
+            /* Áreas seguras para notches de iPhone */
             padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
             z-index: 10; transition: opacity 0.3s ease; pointer-events: none;
         }
@@ -39,7 +59,7 @@
         .hidden { opacity: 0; }
 
         /* TOP BAR */
-        .top-bar { display: flex; align-items: center; gap: 15px; }
+        .top-bar { display: flex; align-items: center; gap: 15px; z-index: 20; }
         .back-btn { font-size: 1.5rem; color: white; text-decoration: none; filter: drop-shadow(0 2px 4px black); }
         #title { 
             font-size: 1rem; font-weight: 600; text-shadow: 0 2px 4px black; 
@@ -55,23 +75,18 @@
         .center-play:active { transform: translate(-50%, -50%) scale(0.9); }
 
         /* BOTTOM BAR */
-        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px; position: relative; }
+        .bottom-bar { display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px; position: relative; z-index: 20; }
 
-        /* --- BOTÓN SIGUIENTE (ANIMADO) --- */
+        /* BOTÓN SIGUIENTE */
         #btnNext { 
             align-self: flex-end; 
             background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
             padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600;
             border: 1px solid rgba(255,255,255,0.3); 
             display: flex; align-items: center; gap: 8px;
-            
-            /* Animación de entrada */
-            transform: translateX(150%); /* Empieza fuera de la pantalla */
-            opacity: 0;
+            transform: translateX(150%); opacity: 0;
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
         }
-        
-        /* Clase para mostrarlo */
         #btnNext.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
         #btnNext:active { background: rgba(255,255,255,0.4); }
 
@@ -83,16 +98,16 @@
         .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #ddd; }
         #btnEpList { display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; }
 
-        /* --- PANEL LATERAL (DRAWER) MEJORADO --- */
+        /* --- PANEL LATERAL (DRAWER) --- */
         .drawer-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 15; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.7); z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 
         .drawer {
             position: fixed; bottom: 0; left: 0; width: 100%; max-height: 75vh; 
-            background: #1e1e1e; border-radius: 25px 25px 0 0; z-index: 20;
+            background: #1e1e1e; border-radius: 25px 25px 0 0; z-index: 30;
             transform: translateY(110%); transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1); 
             display: flex; flex-direction: column; box-shadow: 0 -10px 40px black;
         }
@@ -104,10 +119,10 @@
             border-radius: 25px 25px 0 0;
         }
         
-        /* Lista ajustada */
         .ep-list { 
             overflow-y: auto; flex: 1; padding: 15px 20px; 
-            padding-bottom: max(30px, env(safe-area-inset-bottom)); /* Espacio extra abajo */
+            padding-bottom: max(30px, env(safe-area-inset-bottom));
+            overscroll-behavior: contain; /* Evita que el scroll de la lista mueva el body */
         }
         
         .ep-item { 
@@ -115,22 +130,16 @@
             cursor: pointer; display: flex; gap: 15px; align-items: center; transition: background 0.2s;
         }
         .ep-item:active { transform: scale(0.98); }
-        
-        /* Episodio Activo */
-        .ep-item.active { 
-            background: #2a2a2a; border: 1px solid #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
-        }
+        .ep-item.active { background: #2a2a2a; border: 1px solid #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
         .ep-num { color: #888; font-weight: bold; font-size: 1.1rem; min-width: 25px; }
         .ep-item.active .ep-num { color: #ff3366; }
         
-        /* Animación de "Reproduciendo" */
         .playing-indicator {
             width: 10px; height: 10px; background: #ff3366; border-radius: 50%;
             margin-left: auto; box-shadow: 0 0 10px #ff3366; animation: blink 1.5s infinite;
             display: none;
         }
         .ep-item.active .playing-indicator { display: block; }
-        
         @keyframes blink { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
     </style>
@@ -150,7 +159,6 @@
             <i id="playIcon" class="fa-solid fa-play center-play interactive" onclick="togglePlay()"></i>
 
             <div class="bottom-bar">
-                
                 <div id="btnNext" class="interactive" onclick="nextEp()">
                     Siguiente Episodio <i class="fa-solid fa-forward"></i>
                 </div>
@@ -186,7 +194,6 @@
         let hideTimer;
         let isSerie = false;
 
-        // DOM Elements
         const vid = document.getElementById('vid');
         const iframe = document.getElementById('embedFrame');
         const ui = document.getElementById('ui');
@@ -209,7 +216,6 @@
         function iniciarSistema() {
             if (itemData.tipo === 'serie') {
                 isSerie = true;
-                // Mostrar controles de serie pero OCULTAR el botón siguiente inicialmente
                 document.getElementById('btnEpList').style.display = 'flex';
                 cargarEpisodio(0);
                 generarLista();
@@ -225,14 +231,10 @@
             if(!itemData.episodios || !itemData.episodios[index]) return;
             currentEp = index;
             const ep = itemData.episodios[index];
-            
             document.getElementById('title').innerText = `Ep ${ep.numero}: ${ep.titulo || ''}`;
-            
-            // Ocultar botón "Siguiente" al cambiar de cap
             btnNext.classList.remove('show');
-            
             detectarFuente(ep.url);
-            generarLista(); // Actualizar UI activa
+            generarLista();
         }
 
         function detectarFuente(url) {
@@ -252,10 +254,7 @@
             progressArea.style.display = 'flex';
             timeLabel.style.display = 'block';
             
-            // INTERACCIÓN CAPA UI
-            ui.onclick = (e) => {
-                if(e.target === ui) toggleUI();
-            };
+            ui.onclick = (e) => { if(e.target === ui) toggleUI(); };
         }
 
         function activarModoEmbed(url) {
@@ -267,41 +266,27 @@
             timeLabel.style.display = 'none';
             ui.onclick = null;
 
-            // PARA EMBEDS: Mostrar botón "Siguiente" después de 5 segundos
-            // porque no podemos saber cuándo termina el video.
             if(isSerie && haySiguienteEp()) {
-                setTimeout(() => {
-                    btnNext.classList.add('show');
-                }, 5000);
+                setTimeout(() => { btnNext.classList.add('show'); }, 5000);
             }
         }
 
-        // --- LÓGICA DE TIEMPO (MAGIA AQUÍ) ---
         vid.ontimeupdate = () => {
             if(isNaN(vid.duration)) return;
-            
-            // Barra Progreso
             const perc = (vid.currentTime / vid.duration) * 100;
             document.getElementById('fill').style.width = perc + "%";
             timeLabel.innerText = `${formatTime(vid.currentTime)} / ${formatTime(vid.duration)}`;
 
-            // LÓGICA BOTÓN SIGUIENTE
-            // Si es serie, hay siguiente cap, y faltan menos de 60 seg
             if(isSerie && haySiguienteEp()) {
                 const timeLeft = vid.duration - vid.currentTime;
-                if(timeLeft <= 60) {
-                    btnNext.classList.add('show');
-                } else {
-                    btnNext.classList.remove('show');
-                }
+                if(timeLeft <= 60) btnNext.classList.add('show');
+                else btnNext.classList.remove('show');
             }
         };
 
         vid.onended = () => {
             ui.classList.remove('hidden');
-            if(isSerie && haySiguienteEp()) {
-                btnNext.classList.add('show'); // Asegurar que se vea al final
-            }
+            if(isSerie && haySiguienteEp()) btnNext.classList.add('show');
         };
 
         function haySiguienteEp() {
@@ -309,12 +294,9 @@
         }
 
         function nextEp() {
-            if (haySiguienteEp()) {
-                cargarEpisodio(currentEp + 1);
-            }
+            if (haySiguienteEp()) cargarEpisodio(currentEp + 1);
         }
 
-        // --- UI & DRAWER ---
         function toggleUI() {
             ui.classList.toggle('hidden');
             if(!ui.classList.contains('hidden')) resetInteraction();
@@ -334,7 +316,9 @@
 
         function generarLista() {
             const list = document.getElementById('list');
+            const scrollPos = list.scrollTop; // Guardar posición
             list.innerHTML = '';
+            
             itemData.episodios.forEach((ep, i) => {
                 const div = document.createElement('div');
                 div.className = `ep-item ${i === currentEp ? 'active' : ''}`;
@@ -349,15 +333,9 @@
                 div.onclick = () => { cargarEpisodio(i); toggleDrawer(); };
                 list.appendChild(div);
             });
-            
-            // Auto-scroll al episodio activo
-            setTimeout(() => {
-                const active = list.querySelector('.active');
-                if(active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
+            list.scrollTop = scrollPos; // Restaurar posición
         }
 
-        // Helpers
         function togglePlay() {
             if(!vid.classList.contains('active-player')) return;
             if(vid.paused) { vid.play(); playIcon.className = "fa-solid fa-pause center-play interactive"; resetInteraction(); }
@@ -373,8 +351,6 @@
             let sec = Math.floor(s % 60);
             return `${m}:${sec<10?'0'+sec:sec}`;
         }
-        
-        // Mouse Move en PC
         ui.onmousemove = () => { ui.classList.remove('hidden'); resetInteraction(); };
 
     </script>
