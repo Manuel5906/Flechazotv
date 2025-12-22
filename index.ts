@@ -24,9 +24,8 @@ app.use('/api', apirest)
 
 // RUTAS DE PÁGINAS (HTML)
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'src', 'index.html')))
-app.get('/inicio', (req, res) => res.sendFile(path.join(__dirname, 'src', 'inicio.html'))) 
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'src', 'admin.html')))
-app.get('/vip', (req, res) => res.sendFile(path.join(__dirname, 'src', 'vip.html')))
+
+
 
 // ARRANCAR
 const PORT = process.env.PORT || 3000
