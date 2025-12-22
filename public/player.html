@@ -25,21 +25,19 @@
         
         .video-container.hide-cursor { cursor: none; }
 
-        /* Estilos para el Zoom/Fit */
         video, #yt-placeholder { 
             width: 100%; height: 100%; 
-            object-fit: contain; /* Por defecto ajustado (barras negras si es necesario) */
+            object-fit: contain; 
             position: absolute; z-index: 0; 
             transition: transform 0.3s ease, object-fit 0.3s ease;
         }
         
-        /* Cuando activamos el ZOOM (Llenar pantalla) */
         .video-zoomed video { object-fit: cover !important; }
-        .video-zoomed #yt-placeholder { transform: scale(1.35); } /* Truco para Zoom en YouTube */
+        .video-zoomed #yt-placeholder { transform: scale(1.35); } 
 
         .hidden { opacity: 0; pointer-events: none; }
 
-        /* --- CAPAS VISUALES --- */
+        /* --- VISUAL LAYERS --- */
         #brightness-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: black; opacity: 0; pointer-events: none; z-index: 10;
@@ -51,7 +49,7 @@
             z-index: 20; touch-action: none; 
         }
 
-        /* --- SMART SEEK LAYERS (ESTILO NETFLIX) --- */
+        /* Smart Seek Layers */
         .seek-layer {
             position: absolute; top: 0; bottom: 0; width: 35%; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -100,7 +98,6 @@
         .ui-layer.hidden-ui { opacity: 0; }
         .ui-layer > * { pointer-events: auto; }
 
-        /* Top Bar */
         .top-bar {
             padding: max(15px, env(safe-area-inset-top)) 20px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
@@ -110,7 +107,6 @@
         .video-title { font-weight: 700; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .video-subtitle { font-size: 0.85rem; color: #ccc; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-top: 2px; }
         
-        /* Badge de Calidad */
         .quality-badge {
             background: rgba(255,255,255,0.2); color: #fff; padding: 2px 6px; 
             border-radius: 4px; font-size: 0.7rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.4);
@@ -121,7 +117,6 @@
         .icon-btn { cursor: pointer; filter: drop-shadow(0 2px 2px black); transition: color 0.2s, transform 0.1s; color: white; }
         .icon-btn:active { color: #ff3366; transform: scale(0.9); }
 
-        /* Skip Intro */
         .skip-intro {
             position: absolute; bottom: 100px; left: 20px;
             background: white; color: black; padding: 10px 20px; border-radius: 8px;
@@ -131,7 +126,6 @@
         }
         .skip-intro.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-        /* Botón Desbloquear */
         #unlockBtn {
             position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 51, 102, 0.9); padding: 12px 30px; border-radius: 30px;
@@ -140,7 +134,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Bottom Controls */
         .bottom-area {
             background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             padding: 0 20px max(20px, env(safe-area-inset-bottom));
@@ -183,20 +176,21 @@
         .menu-item i { margin-right: 15px; width: 20px; text-align: center; color: #aaa; }
         .menu-value { color: #ff3366; font-weight: 600; font-size: 0.9rem; }
 
-        /* Grid de Velocidad */
+        /* Submenús Grid */
         .submenu { display: none; padding: 20px; }
         .submenu.active { display: block; }
-        .speed-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .speed-btn { background: #333; padding: 15px; border-radius: 12px; text-align: center; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-        .speed-btn.active { background: #ff3366; color: white; }
+        .grid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .option-btn { background: #333; padding: 15px; border-radius: 12px; text-align: center; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .option-btn.active { background: #ff3366; color: white; }
+        
+        /* Grid especial para calidad (más ancho) */
+        .grid-quality { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
-        /* Lista Episodios */
         .ep-list { overflow-y: auto; padding: 10px 20px; max-height: 50vh; }
         .ep-item { padding: 15px; margin-bottom: 8px; border-radius: 10px; background: #252525; display: flex; gap: 15px; cursor: pointer; align-items: center; }
         .ep-item.active { border: 1px solid #ff3366; background: #2a1a1a; }
         .ep-num { color: #ff3366; font-weight: 900; font-size: 1.2rem; }
 
-        /* Spinner */
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #ff3366; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; position: absolute; z-index: 5; display: none; pointer-events: none; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -259,9 +253,9 @@
                 </div>
 
                 <div class="top-icons">
-                    <i class="fa-solid fa-clone icon-btn" onclick="togglePiP()" title="Picture in Picture"></i>
+                    <i class="fa-solid fa-clone icon-btn" onclick="togglePiP()" title="PiP"></i>
                     <i class="fa-solid fa-gear icon-btn" onclick="openSettings()" title="Ajustes"></i>
-                    <i class="fa-solid fa-lock icon-btn" onclick="toggleLock()" title="Bloquear Pantalla"></i>
+                    <i class="fa-solid fa-lock icon-btn" onclick="toggleLock()" title="Bloquear"></i>
                 </div>
             </div>
 
@@ -304,14 +298,15 @@
             <span>Ajustes</span>
             <i class="fa-solid fa-xmark" onclick="closeDrawers()"></i>
         </div>
+        
         <div class="menu-list" id="mainMenu">
             <div class="menu-item" onclick="showSubmenu('speed')">
                 <div><i class="fa-solid fa-gauge-high"></i> Velocidad</div>
                 <div class="menu-value" id="speedValueLabel">Normal</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="showSubmenu('quality')">
                 <div><i class="fa-solid fa-sliders"></i> Calidad</div>
-                <div class="menu-value">Auto (1080p)</div>
+                <div class="menu-value" id="qualityValueLabel">Auto</div>
             </div>
             <div class="menu-item">
                 <div><i class="fa-solid fa-closed-captioning"></i> Subtítulos</div>
@@ -323,12 +318,26 @@
             <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="showMainMenu()">
                 <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
             </div>
-            <div class="speed-grid">
-                <div class="speed-btn" onclick="setSpeed(0.5)">0.5x</div>
-                <div class="speed-btn active" id="sp-1" onclick="setSpeed(1)">Normal</div>
-                <div class="speed-btn" onclick="setSpeed(1.25)">1.25x</div>
-                <div class="speed-btn" onclick="setSpeed(1.5)">1.5x</div>
-                <div class="speed-btn" onclick="setSpeed(2)">2.0x</div>
+            <div class="grid-options">
+                <div class="option-btn" onclick="setSpeed(0.5)">0.5x</div>
+                <div class="option-btn active" id="sp-1" onclick="setSpeed(1)">1x</div>
+                <div class="option-btn" onclick="setSpeed(1.25)">1.25x</div>
+                <div class="option-btn" onclick="setSpeed(1.5)">1.5x</div>
+                <div class="option-btn" onclick="setSpeed(2)">2.0x</div>
+            </div>
+        </div>
+
+        <div class="submenu" id="submenu-quality">
+            <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="showMainMenu()">
+                <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
+            </div>
+            <div class="grid-quality">
+                <div class="option-btn active" id="qual-auto" onclick="setQuality('default')">Auto</div>
+                <div class="option-btn" id="qual-highres" onclick="setQuality('highres')">4K</div>
+                <div class="option-btn" id="qual-hd1080" onclick="setQuality('hd1080')">1080p</div>
+                <div class="option-btn" id="qual-hd720" onclick="setQuality('hd720')">720p</div>
+                <div class="option-btn" id="qual-large" onclick="setQuality('large')">480p</div>
+                <div class="option-btn" id="qual-medium" onclick="setQuality('medium')">360p</div>
             </div>
         </div>
     </div>
@@ -355,9 +364,8 @@
         let currentSpeed = 1;
         let currentVol = 1;
         let currentBright = 1;
-        let isZoomed = false; // Estado del Zoom
+        let isZoomed = false;
 
-        // Gestos
         let touchStartY = 0;
         let activeGesture = null;
         let seekAccumulator = 0;
@@ -376,59 +384,41 @@
         window.onload = async () => {
             initGestures();
             
-            html5Player.onerror = () => {
-                if(isPlayingIntro) { handleHtml5Ended(); return; }
-                tryNextSource();
-            };
+            html5Player.onerror = () => { if(isPlayingIntro) { handleHtml5Ended(); return; } tryNextSource(); };
             html5Player.onended = handleHtml5Ended;
 
-            // 1. YouTube Directo
             if (directUrl) {
                 try {
                     document.getElementById('ui-title').innerText = "Cargando...";
                     const res = await fetch(`/api/youtube/video?url=${encodeURIComponent(directUrl)}`);
                     if (!res.ok) throw new Error("API YT Error");
-                    
                     itemData = await res.json();
-                    
                     document.getElementById('ui-title').innerText = itemData.title || "Video";
                     document.getElementById('ui-subtitle').innerText = "YouTube • " + (itemData.cat || "Stream");
-                    document.getElementById('qualityBadge').innerText = "PRO";
-
-                    if(itemData.imagenes && itemData.imagenes.banner) {
-                        html5Player.poster = itemData.imagenes.banner;
-                    }
+                    document.getElementById('qualityBadge').innerText = "YT";
+                    if(itemData.imagenes && itemData.imagenes.banner) html5Player.poster = itemData.imagenes.banner;
                     buildSourceQueue(itemData);
                     startPlaybackSequence();
-                } catch (e) {
-                    console.error("YT Error:", e);
-                    alert("Error cargando video");
-                }
+                } catch (e) { console.error("YT Error:", e); alert("Error cargando video"); }
                 return;
             } 
 
-            // 2. DB Local
             if (id) {
                 try {
                     const res = await fetch(`/api/movies/${id}`);
                     if (!res.ok) throw new Error("DB Error");
                     itemData = await res.json();
-
                     if(itemData.tipo === 'serie') {
-                        isSerie = true;
-                        document.getElementById('btnEpList').style.display = 'flex';
-                        prepareEp(0);
+                        isSerie = true; document.getElementById('btnEpList').style.display = 'flex'; prepareEp(0);
                     } else {
                         document.getElementById('ui-title').innerText = itemData.title;
                         if(itemData.imagenes && itemData.imagenes.banner) html5Player.poster = itemData.imagenes.banner;
-                        buildSourceQueue(itemData);
-                        startPlaybackSequence();
+                        buildSourceQueue(itemData); startPlaybackSequence();
                     }
                 } catch(e) { console.error(e); }
                 return;
             }
 
-            // 3. Demo
             document.getElementById('ui-title').innerText = "Flechazo Demo";
             sourceQueue = ["https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"];
             startPlaybackSequence();
@@ -437,56 +427,71 @@
         // --- FUNCIONES PREMIUM ---
         async function togglePiP() {
             if (playerType === 'html5' && html5Player) {
-                try {
-                    if (document.pictureInPictureElement) await document.exitPictureInPicture();
-                    else await html5Player.requestPictureInPicture();
-                } catch (err) { showFeedback('fa-circle-exclamation', 'No Soportado'); }
+                try { if (document.pictureInPictureElement) await document.exitPictureInPicture(); else await html5Player.requestPictureInPicture(); } 
+                catch (err) { showFeedback('fa-circle-exclamation', 'No Soportado'); }
             } else { showFeedback('fa-youtube', 'Usar App YT'); }
         }
 
-        // --- FUNCION ZOOM (CORREGIDA) ---
         function toggleFit() {
             isZoomed = !isZoomed;
             const container = document.getElementById('mainContainer');
             const icon = document.getElementById('fitBtn');
-            
-            if(isZoomed) {
-                container.classList.add('video-zoomed');
-                icon.className = "fa-solid fa-compress icon-btn"; // Icono "Restaurar"
-                showFeedback('fa-crop-simple', 'Zoom: Llenar');
-            } else {
-                container.classList.remove('video-zoomed');
-                icon.className = "fa-solid fa-crop-simple icon-btn"; // Icono "Recortar"
-                showFeedback('fa-image', 'Zoom: Normal');
-            }
+            if(isZoomed) { container.classList.add('video-zoomed'); icon.className = "fa-solid fa-compress icon-btn"; showFeedback('fa-crop-simple', 'Llenar'); } 
+            else { container.classList.remove('video-zoomed'); icon.className = "fa-solid fa-crop-simple icon-btn"; showFeedback('fa-image', 'Normal'); }
         }
 
-        function openSettings() {
-            if(isLocked) return;
-            toggleDrawer('settings'); showMainMenu();
-        }
+        // --- AJUSTES Y CALIDAD ---
+        function openSettings() { if(isLocked) return; toggleDrawer('settings'); showMainMenu(); }
         function showMainMenu() {
             document.getElementById('mainMenu').style.display = 'block';
-            document.getElementById('submenu-speed').classList.remove('active');
+            document.querySelectorAll('.submenu').forEach(el => el.classList.remove('active'));
         }
         function showSubmenu(id) {
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('submenu-'+id).classList.add('active');
         }
 
-        // --- GESTOS ---
+        function setQuality(level) {
+            // Actualizar UI
+            document.querySelectorAll('.grid-quality .option-btn').forEach(btn => btn.classList.remove('active'));
+            // Seleccionar el botón clickeado o el correspondiente (truco simple)
+            const btnId = 'qual-' + (level === 'default' ? 'auto' : level);
+            const btn = document.getElementById(btnId);
+            if(btn) btn.classList.add('active');
+
+            // Actualizar Texto Menu
+            const label = btn ? btn.innerText : 'Auto';
+            document.getElementById('qualityValueLabel').innerText = label;
+
+            // Aplicar lógica real
+            if(playerType === 'youtube' && ytPlayer && ytPlayer.setPlaybackQuality) {
+                ytPlayer.setPlaybackQuality(level);
+                showFeedback('fa-sliders', 'Calidad: ' + label);
+            } else {
+                showFeedback('fa-circle-info', 'Auto (HTML5)');
+            }
+            showMainMenu();
+        }
+
+        function setSpeed(rate) {
+            currentSpeed = rate;
+            if(html5Player) html5Player.playbackRate = rate;
+            if(ytPlayer) ytPlayer.setPlaybackRate(rate);
+            document.querySelectorAll('.grid-options .option-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('speedValueLabel').innerText = rate + 'x';
+            showMainMenu();
+        }
+
+        // --- GESTOS Y PLAYER LOGIC --- (Igual que antes)
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
             layer.addEventListener('click', (e) => {
                 if(isLocked) { animateLockBtn(); return; }
-                const w = window.innerWidth;
-                const x = e.clientX;
+                const w = window.innerWidth; const x = e.clientX;
                 if(x < w * 0.30) performSmartSeek(-10, 'left');
                 else if(x > w * 0.70) performSmartSeek(10, 'right');
-                else {
-                    const ui = document.getElementById('uiLayer');
-                    ui.classList.contains('hidden-ui') ? resetUiTimer() : togglePlay();
-                }
+                else { const ui = document.getElementById('uiLayer'); ui.classList.contains('hidden-ui') ? resetUiTimer() : togglePlay(); }
             });
             layer.addEventListener('touchstart', (e) => {
                 if(isLocked) return; resetUiTimer();
@@ -512,29 +517,18 @@
         }
 
         function performSmartSeek(seconds, side) {
-            if (lastTapSide !== side) {
-                seekAccumulator = 0; lastTapSide = side;
-                document.getElementById('seekLeft').classList.remove('visible');
-                document.getElementById('seekRight').classList.remove('visible');
-            }
+            if (lastTapSide !== side) { seekAccumulator = 0; lastTapSide = side; document.getElementById('seekLeft').classList.remove('visible'); document.getElementById('seekRight').classList.remove('visible'); }
             clearTimeout(seekOverlayTimer); seekAccumulator += seconds;
-            
             if(playerType === 'html5') html5Player.currentTime += seconds;
             else if(playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + seconds, true);
-
             const overlayId = side === 'left' ? 'seekLeft' : 'seekRight';
             const textId = side === 'left' ? 'seekLeftText' : 'seekRightText';
             document.getElementById(textId).innerText = Math.abs(seekAccumulator) + "s";
             document.getElementById(overlayId).classList.add('visible');
-
-            seekOverlayTimer = setTimeout(() => {
-                document.getElementById(overlayId).classList.remove('visible');
-                seekAccumulator = 0; lastTapSide = null;
-            }, 800);
+            seekOverlayTimer = setTimeout(() => { document.getElementById(overlayId).classList.remove('visible'); seekAccumulator = 0; lastTapSide = null; }, 800);
             resetUiTimer();
         }
 
-        // --- PLAYBACK ---
         function buildSourceQueue(data) {
             sourceQueue = [];
             if(data.url) sourceQueue.push(data.url);
@@ -542,16 +536,12 @@
             if(data.mirrors) sourceQueue = sourceQueue.concat(data.mirrors);
             if(sourceQueue.length === 0) sourceQueue.push("");
         }
-        function tryNextSource() {
-            currentSourceIndex++;
-            if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]);
-        }
+        function tryNextSource() { currentSourceIndex++; if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]); }
         function startPlaybackSequence() { currentSourceIndex = 0; playIntro(); }
         function playIntro() {
             isPlayingIntro = true; playerType = 'intro';
             html5Player.classList.remove('hidden'); document.getElementById('yt-placeholder').classList.add('hidden');
-            html5Player.src = INTRO_URL; html5Player.muted = true;
-            updateBottomIcon(true);
+            html5Player.src = INTRO_URL; html5Player.muted = true; updateBottomIcon(true);
             html5Player.play().catch(() => { document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); });
         }
         function handleHtml5Ended() {
@@ -572,12 +562,10 @@
             } else {
                 playerType = 'html5';
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-                document.getElementById('yt-placeholder').classList.add('hidden');
-                html5Player.classList.remove('hidden');
+                document.getElementById('yt-placeholder').classList.add('hidden'); html5Player.classList.remove('hidden');
                 html5Player.src = url; html5Player.currentTime = parseFloat(savedTime);
                 html5Player.playbackRate = currentSpeed; html5Player.muted = false;
-                html5Player.play().catch(e=>console.log(e));
-                updateBottomIcon(true);
+                html5Player.play().catch(e=>console.log(e)); updateBottomIcon(true);
                 html5Player.onplaying = () => { document.getElementById('spinner').style.display = 'none'; resetUiTimer(); updateBottomIcon(true); };
                 html5Player.onpause = () => updateBottomIcon(false);
                 html5Player.onwaiting = () => document.getElementById('spinner').style.display = 'block';
@@ -585,7 +573,6 @@
             }
         }
 
-        // --- HELPERS ---
         function setVolume(val) {
             currentVol = Math.max(0, Math.min(1, val));
             if(html5Player) { html5Player.volume = currentVol; if(val>0) html5Player.muted=false; }
@@ -605,27 +592,18 @@
         }
         function toggleLock() {
             isLocked = !isLocked;
-            const ui = document.getElementById('uiLayer');
-            const lockBtn = document.getElementById('unlockBtn');
-            const container = document.getElementById('mainContainer');
-            if(isLocked) {
-                ui.classList.add('hidden-ui'); container.classList.add('hide-cursor');
-                lockBtn.style.display = 'flex'; showFeedback('fa-lock', 'Bloqueado');
-            } else {
-                lockBtn.style.display = 'none'; resetUiTimer(); showFeedback('fa-lock-open', 'Desbloqueado');
-            }
+            const ui = document.getElementById('uiLayer'); const lockBtn = document.getElementById('unlockBtn'); const container = document.getElementById('mainContainer');
+            if(isLocked) { ui.classList.add('hidden-ui'); container.classList.add('hide-cursor'); lockBtn.style.display = 'flex'; showFeedback('fa-lock', 'Bloqueado'); } 
+            else { lockBtn.style.display = 'none'; resetUiTimer(); showFeedback('fa-lock-open', 'Desbloqueado'); }
             setTimeout(() => document.getElementById('centerFeedback').classList.remove('visible'), 1000);
         }
         function resetUiTimer() {
             if(isLocked) return;
-            const ui = document.getElementById('uiLayer');
-            const container = document.getElementById('mainContainer');
+            const ui = document.getElementById('uiLayer'); const container = document.getElementById('mainContainer');
             ui.classList.remove('hidden-ui'); container.classList.remove('hide-cursor');
             clearTimeout(uiTimeout);
             const isPlaying = (playerType === 'html5' && !html5Player.paused && !html5Player.ended) || (playerType === 'youtube' && ytPlayer && ytPlayer.getPlayerState() === 1);
-            if(isPlaying) {
-                uiTimeout = setTimeout(() => { ui.classList.add('hidden-ui'); container.classList.add('hide-cursor'); closeDrawers(); }, 3500);
-            }
+            if(isPlaying) { uiTimeout = setTimeout(() => { ui.classList.add('hidden-ui'); container.classList.add('hide-cursor'); closeDrawers(); }, 3500); }
         }
         function togglePlay() {
             if(isLocked) return;
@@ -638,102 +616,34 @@
                 else { ytPlayer.playVideo(); bigPlay.classList.remove('show-play'); updateBottomIcon(true); }
             }
         }
-        function updateBottomIcon(isPlaying) {
-            const btn = document.getElementById('bottomPlayBtn');
-            btn.className = isPlaying ? "fa-solid fa-pause icon-btn" : "fa-solid fa-play icon-btn";
-        }
+        function updateBottomIcon(isPlaying) { document.getElementById('bottomPlayBtn').className = isPlaying ? "fa-solid fa-pause icon-btn" : "fa-solid fa-play icon-btn"; }
         function updateProgressLoop() {
             if(isPlayingIntro) return;
             let cur = 0, dur = 0, buff = 0;
-            if(playerType === 'html5') {
-                cur = html5Player.currentTime; dur = html5Player.duration;
-                if (html5Player.buffered.length > 0) buff = html5Player.buffered.end(html5Player.buffered.length - 1);
-            } else if(ytPlayer && ytPlayer.getCurrentTime) {
-                cur = ytPlayer.getCurrentTime(); dur = ytPlayer.getDuration();
-                buff = ytPlayer.getVideoLoadedFraction() * dur;
-            }
+            if(playerType === 'html5') { cur = html5Player.currentTime; dur = html5Player.duration; if (html5Player.buffered.length > 0) buff = html5Player.buffered.end(html5Player.buffered.length - 1); } 
+            else if(ytPlayer && ytPlayer.getCurrentTime) { cur = ytPlayer.getCurrentTime(); dur = ytPlayer.getDuration(); buff = ytPlayer.getVideoLoadedFraction() * dur; }
             if(dur > 0) {
-                document.getElementById('progFill').style.width = (cur/dur)*100 + '%';
-                document.getElementById('progBuffer').style.width = (buff/dur)*100 + '%';
+                document.getElementById('progFill').style.width = (cur/dur)*100 + '%'; document.getElementById('progBuffer').style.width = (buff/dur)*100 + '%';
                 document.getElementById('timeDisplay').innerText = formatTime(cur) + " / " + formatTime(dur);
                 checkSkipIntro(cur);
                 const storageKey = id ? `flechazo_time_${id}_${currentEp}` : `flechazo_time_yt_${sourceQueue[0]}`;
                 if(Math.floor(cur)%5 === 0) localStorage.setItem(storageKey, cur);
             }
         }
-        function handleSeekClick(e) {
-            if(isLocked) return;
-            const rect = e.currentTarget.getBoundingClientRect();
-            const pct = (e.clientX - rect.left) / rect.width;
-            if(playerType === 'html5' && html5Player.duration) html5Player.currentTime = html5Player.duration * pct;
-            else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
-        }
-        function formatTime(s) {
-            if(!s || isNaN(s)) return "00:00";
-            const m = Math.floor(s/60); const sec = Math.floor(s%60);
-            return `${m}:${sec<10?'0'+sec:sec}`;
-        }
-        function checkSkipIntro(cur) {
-            const btn = document.getElementById('skipIntroBtn');
-            if(cur > 10 && cur < 90) btn.classList.add('visible'); else btn.classList.remove('visible');
-        }
+        function handleSeekClick(e) { if(isLocked) return; const rect = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - rect.left) / rect.width; if(playerType === 'html5' && html5Player.duration) html5Player.currentTime = html5Player.duration * pct; else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true); }
+        function formatTime(s) { if(!s || isNaN(s)) return "00:00"; const m = Math.floor(s/60); const sec = Math.floor(s%60); return `${m}:${sec<10?'0'+sec:sec}`; }
+        function checkSkipIntro(cur) { const btn = document.getElementById('skipIntroBtn'); if(cur > 10 && cur < 90) btn.classList.add('visible'); else btn.classList.remove('visible'); }
         function skipIntro() { performSmartSeek(85, 'right'); showFeedback('fa-forward-step', 'Intro Saltada'); }
-        function animateLockBtn() {
-            const btn = document.getElementById('unlockBtn');
-            btn.style.transform = "translateX(-50%) scale(1.1)";
-            setTimeout(() => btn.style.transform = "translateX(-50%) scale(1)", 200);
-        }
-        
-        function toggleDrawer(id) {
-            if(isLocked) return; closeDrawers();
-            document.getElementById('drawer-'+id).classList.add('open');
-            document.getElementById('drawerOverlay').classList.add('open');
-            if(id === 'eps') renderEpList();
-        }
-        function closeDrawers() {
-            document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
-            document.getElementById('drawerOverlay').classList.remove('open');
-            resetUiTimer();
-        }
-        function setSpeed(rate) {
-            currentSpeed = rate;
-            if(html5Player) html5Player.playbackRate = rate;
-            if(ytPlayer) ytPlayer.setPlaybackRate(rate);
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('speedValueLabel').innerText = rate + 'x';
-            showMainMenu();
-        }
-        function renderEpList() {
-            const list = document.getElementById('epList'); list.innerHTML = '';
-            itemData.episodios.forEach((ep, i) => {
-                const div = document.createElement('div');
-                div.className = `ep-item ${i===currentEp ? 'active' : ''}`;
-                div.innerHTML = `<div class="ep-num">${ep.numero}</div><div>${ep.titulo || 'Episodio '+ep.numero}</div>`;
-                div.onclick = () => { prepareEp(i); closeDrawers(); };
-                list.appendChild(div);
-            });
-        }
-        function prepareEp(i) {
-            if(!itemData.episodios[i]) return;
-            currentEp = i;
-            document.getElementById('ui-title').innerText = `Episodio ${itemData.episodios[i].numero}`;
-            buildSourceQueue(itemData.episodios[i]);
-            startPlaybackSequence();
-        }
+        function animateLockBtn() { const btn = document.getElementById('unlockBtn'); btn.style.transform = "translateX(-50%) scale(1.1)"; setTimeout(() => btn.style.transform = "translateX(-50%) scale(1)", 200); }
+        function toggleDrawer(id) { if(isLocked) return; closeDrawers(); document.getElementById('drawer-'+id).classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); if(id === 'eps') renderEpList(); }
+        function closeDrawers() { document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open')); document.getElementById('drawerOverlay').classList.remove('open'); resetUiTimer(); }
+        function renderEpList() { const list = document.getElementById('epList'); list.innerHTML = ''; itemData.episodios.forEach((ep, i) => { const div = document.createElement('div'); div.className = `ep-item ${i===currentEp ? 'active' : ''}`; div.innerHTML = `<div class="ep-num">${ep.numero}</div><div>${ep.titulo || 'Episodio '+ep.numero}</div>`; div.onclick = () => { prepareEp(i); closeDrawers(); }; list.appendChild(div); }); }
+        function prepareEp(i) { if(!itemData.episodios[i]) return; currentEp = i; document.getElementById('ui-title').innerText = `Episodio ${itemData.episodios[i].numero}`; buildSourceQueue(itemData.episodios[i]); startPlaybackSequence(); }
         function nextEp() { if(isSerie && currentEp+1 < itemData.episodios.length) prepareEp(currentEp+1); }
-
-        function toggleFS() { 
-            if(!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else if(document.exitFullscreen) document.exitFullscreen();
-        }
+        function toggleFS() { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else if(document.exitFullscreen) document.exitFullscreen(); }
         function goBack() { window.history.back(); }
 
-        function getYouTubeId(url) {
-            if (!url) return null;
-            const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
-            return (m && m[2].length === 11) ? m[2] : null;
-        }
+        function getYouTubeId(url) { if (!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
         function initYouTubePlayer(videoId, start) {
             if (!window.YT || !window.YT.Player) { setTimeout(() => initYouTubePlayer(videoId, start), 100); return; }
             if (ytPlayer) { document.getElementById('yt-placeholder').classList.remove('hidden'); ytPlayer.loadVideoById(videoId, start); return; }
@@ -741,12 +651,7 @@
                 height: '100%', width: '100%', videoId: videoId,
                 playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'start': Math.floor(start), 'playsinline': 1, 'fs': 0, 'modestbranding': 1 },
                 events: { 'onReady': (e)=>{e.target.setPlaybackRate(currentSpeed); e.target.playVideo(); setInterval(updateProgressLoop, 500);}, 
-                'onStateChange': (e)=>{ 
-                    if(e.data===YT.PlayerState.PLAYING){ document.getElementById('spinner').style.display='none'; resetUiTimer(); updateBottomIcon(true); } 
-                    if(e.data===YT.PlayerState.PAUSED){ document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); }
-                    if(e.data===YT.PlayerState.ENDED && isSerie) nextEp(); 
-                } 
-            }
+                'onStateChange': (e)=>{ if(e.data===YT.PlayerState.PLAYING){ document.getElementById('spinner').style.display='none'; resetUiTimer(); updateBottomIcon(true); } if(e.data===YT.PlayerState.PAUSED){ document.getElementById('bigPlay').classList.add('show-play'); updateBottomIcon(false); } if(e.data===YT.PlayerState.ENDED && isSerie) nextEp(); } }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
