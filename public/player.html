@@ -32,7 +32,7 @@
             transition: opacity 0.1s;
         }
 
-        /* IMPORTANTE: touch-action: none permite que el dedo controle el volumen sin mover la pantalla */
+        /* touch-action: none permite que el dedo controle el volumen sin mover la pantalla */
         #gestureLayer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20; touch-action: none; 
@@ -68,7 +68,7 @@
         .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-subtitle { font-size: 0.8rem; color: #ccc; }
         
-        /* Reloj y Batería (NUEVO) */
+        /* Reloj y Batería */
         .system-info {
             display: flex; align-items: center; gap: 10px; font-size: 0.8rem; 
             color: #ddd; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 15px;
@@ -118,7 +118,7 @@
         
         .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: absolute; width: 100%; }
         
-        /* Barra de Buffer (NUEVO) */
+        /* Barra de Buffer */
         .progress-buffer { width: 0%; height: 4px; background: rgba(255,255,255,0.5); border-radius: 2px; position: absolute; left: 0; transition: width 0.2s; }
         
         .progress-fill { height: 4px; width: 0%; background: #ff3366; border-radius: 2px; position: absolute; left: 0; z-index: 2; }
@@ -218,9 +218,6 @@
             </div>
 
             <div class="sidebar">
-                <div class="side-circle" onclick="togglePiP()" id="pipBtn" style="display:none;">
-                    <i class="fa-solid fa-clone"></i>
-                </div>
                 <div class="side-circle" onclick="toggleDrawer('eps')" id="btnEpList" style="display:none;">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
@@ -293,7 +290,6 @@
         let currentSourceIndex = 0;
         
         // --- URL INTRO ---
-        // Se recomienda verificar que este enlace funcione.
         const INTRO_URL = "https://ia601709.us.archive.org/4/items/gemini_generated_video_B83D69A3/gemini_generated_video_B83D69A3.mp4";
         
         const params = new URLSearchParams(window.location.search);
@@ -302,12 +298,10 @@
         // --- INICIO ---
         window.onload = async () => {
             initGestures();
-            initSystemInfo(); // Reloj y Batería
+            initSystemInfo();
             
-            if (document.pictureInPictureEnabled) {
-                document.getElementById('pipBtn').style.display = 'flex';
-            }
-
+            // ELIMINADA: Lógica de inicialización de PiP
+            
             html5Player.onerror = () => {
                 if(isPlayingIntro) { handleHtml5Ended(); return; }
                 tryNextSource();
@@ -341,7 +335,6 @@
 
         // --- SISTEMA RELOJ Y BATERIA ---
         function initSystemInfo() {
-            // Reloj
             setInterval(() => {
                 const now = new Date();
                 const h = now.getHours().toString().padStart(2,'0');
@@ -349,7 +342,6 @@
                 document.getElementById('sysTime').innerText = `${h}:${m}`;
             }, 1000);
 
-            // Batería (API Web)
             if(navigator.getBattery) {
                 navigator.getBattery().then(batt => {
                     updateBattery(batt);
@@ -387,13 +379,12 @@
             if(currentSourceIndex < sourceQueue.length) loadMainVideo(sourceQueue[currentSourceIndex]);
         }
 
-        // --- PLAYBACK SEQUENCE ---
+        // --- PLAYBACK ---
         function startPlaybackSequence() {
             currentSourceIndex = 0;
             playIntro();
         }
 
-        // --- [CORREGIDO] LÓGICA DE INTRO SEGURA ---
         function playIntro() {
             isPlayingIntro = true;
             playerType = 'intro';
@@ -402,22 +393,16 @@
             document.getElementById('yt-placeholder').classList.add('hidden');
             
             html5Player.src = INTRO_URL;
-            
-            // 1. Iniciamos mudo para satisfacer políticas de navegadores
             html5Player.muted = true;
             
-            // 2. Intentamos reproducir con promesa
             var playPromise = html5Player.play();
 
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
-                    // Autoplay exitoso (video mudo)
                     console.log("Intro iniciada automáticamente (Muted)");
                 })
                 .catch(error => {
-                    // Autoplay bloqueado por el navegador
                     console.log("Autoplay bloqueado. Esperando toque usuario.");
-                    // Mostramos el botón Play grande
                     document.getElementById('bigPlay').classList.add('show-play');
                 });
             }
@@ -426,8 +411,6 @@
         function handleHtml5Ended() {
             if(isPlayingIntro) {
                 isPlayingIntro = false;
-                // Al terminar intro, cargamos video principal
-                // Desmuteamos por si acaso
                 html5Player.muted = false; 
                 if(sourceQueue.length > 0) loadMainVideo(sourceQueue[0]);
             } else if(isSerie) {
@@ -454,8 +437,6 @@
                 html5Player.src = url;
                 html5Player.currentTime = parseFloat(savedTime);
                 html5Player.playbackRate = currentSpeed;
-                
-                // Aseguramos que el video principal tenga sonido
                 html5Player.muted = false;
 
                 html5Player.play().catch(e=>console.log(e));
@@ -469,11 +450,11 @@
             }
         }
 
-        // --- GESTOS LOGIC ---
+        // --- GESTOS ---
         function initGestures() {
             const layer = document.getElementById('gestureLayer');
             
-            // CLICK & DOUBLE TAP
+            // CLICK
             layer.addEventListener('click', (e) => {
                 if(isLocked) { animateLockBtn(); return; }
                 const now = new Date().getTime();
@@ -506,8 +487,6 @@
             // SWIPE MOVE
             layer.addEventListener('touchmove', (e) => {
                 if(isLocked || !activeGesture) return;
-                
-                // PREVENIR SCROLL
                 if (e.cancelable) e.preventDefault();
                 
                 const y = e.touches[0].clientY;
@@ -516,10 +495,8 @@
                 if(Math.abs(delta) > 5) {
                     const sensitivity = 2;
                     const step = (delta / window.innerHeight) * sensitivity;
-                    
                     if(activeGesture === 'vol') setVolume(currentVol + step);
                     if(activeGesture === 'bright') setBrightness(currentBright + step);
-                    
                     touchStartY = y;
                 }
             });
@@ -534,7 +511,6 @@
             currentVol = Math.max(0, Math.min(1, val));
             if(html5Player) {
                 html5Player.volume = currentVol;
-                // Si movemos volumen, asegurar que no esté en mute
                 if(val > 0) html5Player.muted = false; 
             }
             if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(currentVol * 100);
@@ -591,29 +567,18 @@
             }
         }
 
-        // --- [CORREGIDO] TOGGLE PLAY INTELIGENTE ---
         function togglePlay() {
             if(isLocked) return;
             resetUiTimer();
             const bigPlay = document.getElementById('bigPlay');
             
             if(playerType === 'html5') {
-                // DETALLE IMPORTANTE:
-                // Si la intro estaba corriendo en silencio (muted), al tocar quitamos el silencio
                 if(isPlayingIntro && html5Player.muted) {
                     html5Player.muted = false;
-                    // Mostramos feedback visual de que el sonido se activó
                     showFeedback('fa-volume-high', 'Sonido On');
                 }
-
-                if(html5Player.paused) { 
-                    html5Player.play(); 
-                    bigPlay.classList.remove('show-play'); 
-                } 
-                else { 
-                    html5Player.pause(); 
-                    bigPlay.classList.add('show-play'); 
-                }
+                if(html5Player.paused) { html5Player.play(); bigPlay.classList.remove('show-play'); } 
+                else { html5Player.pause(); bigPlay.classList.add('show-play'); }
             } else if(playerType === 'youtube' && ytPlayer) {
                 if(ytPlayer.getPlayerState() === 1) { ytPlayer.pauseVideo(); bigPlay.classList.add('show-play'); }
                 else { ytPlayer.playVideo(); bigPlay.classList.remove('show-play'); }
@@ -737,7 +702,7 @@
             if(!document.fullscreenElement) document.documentElement.requestFullscreen();
             else if(document.exitFullscreen) document.exitFullscreen();
         }
-        function togglePiP() { if(html5Player.requestPictureInPicture) html5Player.requestPictureInPicture(); }
+        // ELIMINADA: togglePiP()
         function goBack() { window.history.back(); }
 
         // YOUTUBE
