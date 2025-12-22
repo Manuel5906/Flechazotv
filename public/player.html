@@ -18,6 +18,39 @@
             user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- INTRO CINEMATOGRÁFICA --- */
+        .intro-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+        .intro-content { text-align: center; animation: fadeInUp 1s ease-out; }
+        
+        .intro-logo { 
+            font-size: 4rem; color: #ff3366; margin-bottom: 10px;
+            animation: heartBeat 1.5s infinite;
+        }
+        .intro-brand { 
+            font-size: 2rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px;
+            text-transform: uppercase;
+            background: -webkit-linear-gradient(#fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .intro-watching { 
+            font-size: 0.8rem; color: #ff3366; letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; opacity: 0;
+            animation: fadeIn 1s forwards 0.5s; 
+        }
+        .intro-title { 
+            font-size: 1.5rem; color: white; font-weight: 300; opacity: 0; padding: 0 20px;
+            animation: fadeIn 1s forwards 1s; 
+        }
+        .intro-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.1); } 28% { transform: scale(1); } 42% { transform: scale(1.1); } 70% { transform: scale(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
         /* --- VIDEO CONTAINER --- */
         .video-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -30,7 +63,7 @@
         }
         .hidden { visibility: hidden; opacity: 0; pointer-events: none; z-index: -1; }
 
-        /* --- CAPA TÁCTIL (GESTOS) --- */
+        /* --- CAPA TÁCTIL --- */
         .center-touch-area {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10; cursor: pointer;
@@ -76,9 +109,9 @@
         .video-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .video-subtitle { font-size: 0.8rem; color: #ccc; }
 
-        /* --- SIDEBAR & BOTÓN SIGUIENTE --- */
+        /* --- SIDEBAR & BOTONES --- */
         .sidebar {
-            position: absolute; right: 15px; bottom: 100px; /* Subido para dejar espacio a controles */
+            position: absolute; right: 15px; bottom: 100px;
             display: flex; flex-direction: column; gap: 20px; align-items: center;
             pointer-events: auto;
         }
@@ -98,19 +131,16 @@
         #btnNext .side-btn { background: rgba(255, 51, 102, 0.9); border: none; }
         #btnNext.show { transform: translateX(0); opacity: 1; }
 
-        /* --- ZONA INFERIOR (Progreso, Tiempo, Fullscreen) --- */
+        /* --- ZONA INFERIOR --- */
         .bottom-controls-area {
             width: 100%;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             padding-bottom: max(10px, env(safe-area-inset-bottom));
-            display: flex; flex-direction: column;
-            pointer-events: auto;
+            display: flex; flex-direction: column; pointer-events: auto;
         }
 
-        /* Barra de Progreso */
         .progress-container {
-            width: 100%; height: 20px; 
-            display: flex; align-items: center;
+            width: 100%; height: 20px; display: flex; align-items: center;
             cursor: pointer; margin-bottom: 5px;
         }
         .progress-track { width: 100%; height: 3px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s; }
@@ -122,18 +152,15 @@
         .progress-container:active .progress-track { height: 5px; }
         .progress-container:active .progress-fill::after { transform: scale(1.5); }
 
-        /* Fila de controles (Tiempo y Fullscreen) */
         .controls-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
         }
         .time-display {
             font-size: 0.85rem; font-family: monospace; font-weight: 600;
             color: #e0e0e0; text-shadow: 0 1px 2px black;
         }
         .fullscreen-btn {
-            font-size: 1.2rem; color: white; padding: 5px; cursor: pointer;
-            transition: transform 0.2s;
+            font-size: 1.2rem; color: white; padding: 5px; cursor: pointer; transition: transform 0.2s;
         }
         .fullscreen-btn:active { transform: scale(0.8); color: #ff3366; }
 
@@ -158,7 +185,7 @@
         .ep-num { font-size: 1.1rem; font-weight: bold; color: #666; }
         .ep-item.active .ep-num { color: #ff3366; }
 
-        /* --- ANIMACIONES --- */
+        /* --- ANIMACIONES EXTRA --- */
         .seek-anim {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(0,0,0,0.6); padding: 15px; border-radius: 50%;
@@ -172,6 +199,16 @@
     </style>
 </head>
 <body oncontextmenu="return false;">
+
+    <div id="introLayer" class="intro-layer">
+        <div class="intro-content">
+            <i class="fa-solid fa-heart intro-logo"></i>
+            <div class="intro-brand">FLECHAZO TV</div>
+            
+            <div class="intro-watching">ESTÁS VIENDO:</div>
+            <div id="introTitle" class="intro-title">Cargando...</div>
+        </div>
+    </div>
 
     <div id="errorMsg"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 15px; color: #ff3366;"></i><br><span id="errorText">Error al cargar</span></div>
 
@@ -219,7 +256,6 @@
                 
                 <div class="controls-row">
                     <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
-                    
                     <div class="fullscreen-btn" onclick="toggleFullScreen()">
                         <i id="fs-icon" class="fa-solid fa-expand"></i>
                     </div>
@@ -254,18 +290,19 @@
         // --- 2. INICIALIZACIÓN (CONEXIÓN API REAL) ---
         window.onload = async () => {
             if (!id) {
-                // MODO DEMO SI NO HAY ID (Para probar visualmente)
-                document.getElementById('ui-title').innerText = "Modo Demo: Flechazo TV";
-                document.getElementById('ui-subtitle').innerText = "Reproductor UI Test";
+                // MODO DEMO
+                const demoTitle = "Amor Prohibido: El Encuentro";
+                updateIntro(demoTitle);
+                document.getElementById('ui-title').innerText = demoTitle;
+                document.getElementById('ui-subtitle').innerText = "Capítulo 1";
+                startIntroSequence();
                 return;
             }
 
             try {
-                // LLAMADA A TU API REAL
+                // LLAMADA A TU API
                 const res = await fetch(`/api/movies/${id}`);
-                
-                if (!res.ok) throw new Error("Error en la respuesta de la API");
-                
+                if (!res.ok) throw new Error("Error API");
                 itemData = await res.json();
 
                 if(itemData.tipo === 'serie') {
@@ -273,21 +310,38 @@
                     document.getElementById('btnEpList').style.display = 'block';
                     loadEp(0);
                 } else {
+                    updateIntro(itemData.title); // ACTUALIZA INTRO
                     document.getElementById('ui-title').innerText = itemData.title;
                     loadVideo(itemData.url);
                 }
+                
+                // INICIAR SECUENCIA DE INTRO
+                startIntroSequence();
 
             } catch(e) {
                 console.error(e);
-                showError("No se pudo cargar el video");
+                showError("No se pudo cargar");
+                document.getElementById('introLayer').style.display = 'none'; // Quitar intro si falla
             }
         };
+
+        // --- NUEVA FUNCION: SECUENCIA DE INTRO ---
+        function updateIntro(title) {
+            document.getElementById('introTitle').innerText = title;
+        }
+
+        function startIntroSequence() {
+            // Espera 3.5 segundos para mostrar la animación completa y luego desvanece
+            setTimeout(() => {
+                const layer = document.getElementById('introLayer');
+                layer.classList.add('intro-hidden');
+            }, 3500);
+        }
 
         function showError(msg) {
             document.getElementById('errorText').innerText = msg;
             document.getElementById('errorMsg').style.display = 'block';
             document.getElementById('spinner').style.display = 'none';
-            document.getElementById('ui-title').innerText = "Error";
         }
 
         // --- 3. LÓGICA DE SERIES ---
@@ -295,12 +349,18 @@
             if (!itemData.episodios || !itemData.episodios[i]) return;
             
             currentEp = i;
-            document.getElementById('ui-title').innerText = `Episodio ${itemData.episodios[i].numero}`;
-            document.getElementById('ui-subtitle').innerText = itemData.episodios[i].titulo || "";
+            let epTitle = `Episodio ${itemData.episodios[i].numero}`;
+            if(itemData.episodios[i].titulo) epTitle += `: ${itemData.episodios[i].titulo}`;
             
-            // Reset botones
+            // Actualiza Intro si es el primer load
+            if(document.getElementById('introLayer').style.opacity !== '0') {
+                updateIntro(epTitle);
+            }
+
+            document.getElementById('ui-title').innerText = epTitle;
+            document.getElementById('ui-subtitle').innerText = itemData.title; // Nombre serie abajo
+            
             document.getElementById('btnNext').classList.remove('show');
-            
             loadVideo(itemData.episodios[i].url);
             renderList();
         }
@@ -328,7 +388,7 @@
             });
         }
 
-        // --- 4. MOTOR DE VIDEO (HÍBRIDO) ---
+        // --- 4. MOTOR DE VIDEO ---
         function loadVideo(url) {
             const spinner = document.getElementById('spinner');
             spinner.style.display = 'block';
@@ -337,13 +397,11 @@
             const ytId = getYouTubeId(url);
 
             if (ytId) {
-                // MODO YOUTUBE
                 playerType = 'youtube';
                 html5Player.classList.add('hidden');
                 html5Player.pause();
                 initYouTubePlayer(ytId);
             } else {
-                // MODO MP4
                 playerType = 'html5';
                 if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
                 document.getElementById('yt-placeholder').classList.add('hidden');
@@ -362,7 +420,7 @@
             }
         }
 
-        // --- 5. YOUTUBE API HANDLING ---
+        // --- 5. YOUTUBE API ---
         function getYouTubeId(url) {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -375,23 +433,16 @@
                 setTimeout(() => initYouTubePlayer(videoId), 100);
                 return;
             }
-
             if (ytPlayer) {
                 document.getElementById('yt-placeholder').classList.remove('hidden');
                 ytPlayer.loadVideoById(videoId);
                 return;
             }
-
             ytPlayer = new YT.Player('yt-placeholder', {
                 height: '100%', width: '100%',
                 videoId: videoId,
-                playerVars: {
-                    'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1, 'fs': 0
-                },
-                events: {
-                    'onReady': onYtReady,
-                    'onStateChange': onYtStateChange
-                }
+                playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1, 'fs': 0 },
+                events: { 'onReady': onYtReady, 'onStateChange': onYtStateChange }
             });
             document.getElementById('yt-placeholder').classList.remove('hidden');
         }
@@ -406,31 +457,27 @@
             if (event.data == YT.PlayerState.PLAYING) {
                 document.getElementById('spinner').style.display = 'none';
                 updatePlayUI(true);
-            } else if (event.data == YT.PlayerState.PAUSED) {
-                updatePlayUI(false);
-            } else if (event.data == YT.PlayerState.BUFFERING) {
-                document.getElementById('spinner').style.display = 'block';
-            } else if (event.data == YT.PlayerState.ENDED) {
+            } else if (event.data == YT.PlayerState.PAUSED) updatePlayUI(false);
+            else if (event.data == YT.PlayerState.BUFFERING) document.getElementById('spinner').style.display = 'block';
+            else if (event.data == YT.PlayerState.ENDED) {
                 updatePlayUI(false);
                 if (isSerie) document.getElementById('btnNext').classList.add('show');
             }
         }
 
-        // --- 6. CONTROLES UNIFICADOS ---
+        // --- 6. CONTROLES ---
         let lastClick = 0;
         function handleMainClick(e) {
             const now = new Date().getTime();
             const width = window.innerWidth;
             const x = e.clientX;
 
-            if (now - lastClick < 300) { // Doble Tap
+            if (now - lastClick < 300) { 
                 if (x < width / 3) { seek(-10); animSeek('seekLeft'); }
                 else if (x > (width / 3) * 2) { seek(10); animSeek('seekRight'); }
                 else { togglePlay(); }
-            } else { // Single Tap
-                setTimeout(() => {
-                    if (new Date().getTime() - lastClick > 300) togglePlay();
-                }, 350);
+            } else { 
+                setTimeout(() => { if (new Date().getTime() - lastClick > 300) togglePlay(); }, 350);
             }
             lastClick = now;
         }
@@ -450,23 +497,16 @@
         }
 
         function seek(sec) {
-            if (playerType === 'youtube' && ytPlayer && ytPlayer.getCurrentTime) {
-                ytPlayer.seekTo(ytPlayer.getCurrentTime() + sec, true);
-            } else if (playerType === 'html5') {
-                html5Player.currentTime += sec;
-            }
+            if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + sec, true);
+            else if (playerType === 'html5') html5Player.currentTime += sec;
         }
 
         function handleSeek(e) {
             e.stopPropagation();
             const rect = e.currentTarget.getBoundingClientRect();
             const pct = (e.clientX - rect.left) / rect.width;
-            
-            if (playerType === 'youtube' && ytPlayer) {
-                ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
-            } else {
-                html5Player.currentTime = html5Player.duration * pct;
-            }
+            if (playerType === 'youtube' && ytPlayer) ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
+            else html5Player.currentTime = html5Player.duration * pct;
         }
 
         function animSeek(id) {
@@ -475,9 +515,7 @@
             setTimeout(() => el.classList.remove('show-seek'), 600);
         }
 
-        // --- 7. BUCLE DE PROGRESO Y LÓGICA DE TIEMPO ---
-        
-        // Función auxiliar para formatear segundos a MM:SS
+        // --- 7. TIEMPO Y PROGRESO ---
         function formatTime(seconds) {
             if (!seconds || isNaN(seconds)) return "00:00";
             let m = Math.floor(seconds / 60);
@@ -493,7 +531,7 @@
                     const dur = ytPlayer.getDuration();
                     if(dur > 0) {
                         updateProgressBar((cur/dur)*100);
-                        updateTimeDisplay(cur, dur); // Actualizar texto
+                        updateTimeDisplay(cur, dur);
                         checkNextButton(cur, dur);
                     }
                 }
@@ -503,43 +541,26 @@
         function updateProgressHTML5() {
             if (html5Player.duration) {
                 updateProgressBar((html5Player.currentTime / html5Player.duration) * 100);
-                updateTimeDisplay(html5Player.currentTime, html5Player.duration); // Actualizar texto
+                updateTimeDisplay(html5Player.currentTime, html5Player.duration);
                 checkNextButton(html5Player.currentTime, html5Player.duration);
             }
         }
 
-        function updateProgressBar(pct) {
-            document.getElementById('prog-fill').style.width = pct + '%';
-        }
+        function updateProgressBar(pct) { document.getElementById('prog-fill').style.width = pct + '%'; }
+        function updateTimeDisplay(cur, total) { document.getElementById('timeDisplay').innerText = `${formatTime(cur)} / ${formatTime(total)}`; }
+        function checkNextButton(cur, dur) { if (isSerie && (dur - cur < 60)) document.getElementById('btnNext').classList.add('show'); }
 
-        function updateTimeDisplay(current, total) {
-            document.getElementById('timeDisplay').innerText = `${formatTime(current)} / ${formatTime(total)}`;
-        }
-
-        function checkNextButton(current, duration) {
-            if (isSerie && (duration - current < 60)) { 
-                document.getElementById('btnNext').classList.add('show');
-            }
-        }
-
-        // --- 8. FUNCIONALIDAD PANTALLA COMPLETA ---
+        // --- 8. FULLSCREEN ---
         function toggleFullScreen() {
             const doc = window.document;
             const docEl = doc.documentElement;
-
             const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
             const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
 
             if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-                if(requestFullScreen) {
-                    requestFullScreen.call(docEl);
-                    document.getElementById('fs-icon').className = "fa-solid fa-compress"; // Cambiar icono
-                }
+                if(requestFullScreen) { requestFullScreen.call(docEl); document.getElementById('fs-icon').className = "fa-solid fa-compress"; }
             } else {
-                if(cancelFullScreen) {
-                    cancelFullScreen.call(doc);
-                    document.getElementById('fs-icon').className = "fa-solid fa-expand"; // Restaurar icono
-                }
+                if(cancelFullScreen) { cancelFullScreen.call(doc); document.getElementById('fs-icon').className = "fa-solid fa-expand"; }
             }
         }
 
