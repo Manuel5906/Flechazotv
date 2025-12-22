@@ -3,9 +3,12 @@
     "id": 1,
     "tipo": "serie",
     "title": "El Regreso del CEO",
-    "desc": "Un CEO envenenado es salvado por una humilde vendedora...",
-    "img": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg",
+    "desc": "Un CEO envenenado es salvado por una humilde vendedora. 5 años después, él regresa...",
     "cat": "Romance",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/a8/32/38/a83238da2fb967406a1205167b5791c6.jpg",
+      "banner": "https://img.youtube.com/vi/YkduVUMZwbQ/maxresdefault.jpg"
+    },
     "episodios": [
       {
         "numero": 1,
@@ -16,11 +19,6 @@
         "numero": 2,
         "titulo": "La revelación",
         "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
-      },
-      {
-        "numero": 3,
-        "titulo": "El final",
-        "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
       }
     ]
   },
@@ -29,8 +27,11 @@
     "tipo": "pelicula",
     "title": "Navidad Eterna",
     "desc": "Una historia de amor de 2 horas sin interrupciones.",
-    "img": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg",
     "cat": "Drama",
+    "imagenes": {
+      "poster": "https://i.pinimg.com/564x/fd/50/25/fd50254b8d745423854580665a6c4293.jpg",
+      "banner": "https://img.youtube.com/vi/OTRO_ID/maxresdefault.jpg"
+    },
     "url": "https://archive.org/download/20251222_20251222_0540/v1c044g50000d4vnjafog65st4rqse50.mp4"
   }
 ]
