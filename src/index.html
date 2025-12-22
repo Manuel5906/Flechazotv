@@ -7,312 +7,511 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- ESTILOS BASE --- */
+        /* --- ESTILOS BASE Y VARIABLES --- */
         :root { 
-            --bg-dark: #0f1014; 
-            --card-bg: #1e1e24;
+            --bg-dark: #09090b; 
+            --bg-card: #18181b;
             --text: #ffffff; 
+            --text-muted: #a1a1aa;
             --primary: #ff3366;
-            --primary-grad: linear-gradient(135deg, #ff3366 0%, #a033ff 100%); 
+            --primary-grad: linear-gradient(135deg, #ff3366 0%, #b333ff 100%); 
+            --glass: rgba(24, 24, 27, 0.8);
+            --border: #27272a;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
             background-color: var(--bg-dark); 
             color: var(--text); 
-            padding-bottom: 90px; /* Espacio para menú */
+            padding-bottom: 80px; /* Espacio para menú */
             overflow-x: hidden;
         }
 
-        /* --- SISTEMA DE PESTAÑAS (SPA) --- */
+        /* --- ANIMACIONES --- */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* --- TABS --- */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- HEADER --- */
         .header { 
             padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; 
-            position: sticky; top: 0; z-index: 50; background: rgba(15,16,20,0.95); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50; background: rgba(9,9,11,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .logo-heart { font-size: 1.6rem; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* BUSCADOR */
-        .search-bar-container {
-            position: fixed; top: 60px; left: 0; width: 100%; padding: 10px 20px;
-            background: var(--bg-dark); z-index: 40; display: none; border-bottom: 1px solid #222;
-        }
-        .search-bar-container.show { display: block; animation: slideDown 0.2s; }
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .logo-heart { font-size: 1.5rem; font-weight: 800; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        .header-icons i { font-size: 1.2rem; margin-left: 15px; cursor: pointer; color: var(--text); transition: color 0.2s; }
+        .header-icons i:hover { color: var(--primary); }
 
-        .search-input {
-            width: 100%; background: #2a2a30; border: none; padding: 12px 40px 12px 20px; 
-            border-radius: 12px; color: white; font-size: 1rem; outline: none;
+        /* --- CHIPS (CATEGORÍAS) --- */
+        .chip-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; }
+        .chip { 
+            white-space: nowrap; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; 
+            background: #27272a; color: #ccc; border: 1px solid transparent; transition: all 0.2s; cursor: pointer;
         }
+        .chip.active { background: #3f3f46; color: white; border-color: var(--primary); }
 
-        /* --- ESTILOS COMUNES --- */
-        .hero-container { padding: 20px; }
+        /* --- HERO --- */
+        .hero-container { padding: 0 20px 20px 20px; }
         .hero-card { 
-            width: 100%; height: 380px; border-radius: 25px; overflow: hidden; position: relative; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer;
+            width: 100%; height: 420px; border-radius: 24px; overflow: hidden; position: relative; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); cursor: pointer;
         }
-        .hero-img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
         .hero-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); 
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
+            position: absolute; inset: 0; 
+            background: linear-gradient(to top, rgba(9,9,11,1) 0%, rgba(9,9,11,0.2) 60%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;
         }
-        .btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; margin-right: 10px; }
-        .btn-primary { background: white; color: black; }
-        .btn-glass { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(5px); }
-
-        .slider { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; margin-bottom: 20px; }
-        .section-title { padding: 0 20px; margin: 20px 0 10px 0; font-weight: 700; font-size: 1.2rem; }
+        .hero-badge { 
+            background: var(--primary-grad); padding: 4px 10px; border-radius: 6px; 
+            font-size: 0.7rem; font-weight: bold; width: fit-content; margin-bottom: 10px; text-transform: uppercase;
+        }
+        .hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .hero-meta { color: #ddd; font-size: 0.9rem; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
         
-        .poster-card { min-width: 120px; position: relative; cursor: pointer; }
-        .poster-img { width: 120px; height: 180px; border-radius: 12px; object-fit: cover; background: #222; }
+        /* --- SLIDERS --- */
+        .slider-container { margin-bottom: 30px; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px 15px 20px; }
+        .section-title { font-weight: 700; font-size: 1.3rem; color: white; }
+        .section-more { color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        
+        .slider { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
+        .poster-card { min-width: 110px; cursor: pointer; transition: transform 0.2s; }
+        .poster-card:active { transform: scale(0.95); }
+        .poster-img { width: 110px; height: 165px; border-radius: 12px; object-fit: cover; background: #222; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .poster-title { font-size: 0.8rem; margin-top: 6px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; color: #e4e4e7; }
 
-        /* --- GRID (Para Explorar y Mi Lista) --- */
+        /* --- GRID --- */
         .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 15px; padding: 20px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; padding: 0 20px 20px 20px;
         }
-        .empty-msg { text-align: center; color: #666; margin-top: 50px; font-size: 0.9rem; }
+        .grid-item { position: relative; }
+        .grid-img { width: 100%; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; background: #222; }
 
         /* --- PERFIL --- */
-        .profile-header { text-align: center; padding: 40px 20px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff3366; margin-bottom: 15px; }
-        .stats-row { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 1.5rem; font-weight: bold; color: white; }
-        .stat-label { font-size: 0.8rem; color: #888; }
-
-        /* --- MENU INFERIOR --- */
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; 
-            background: rgba(15,16,20,0.98); border-top: 1px solid #222;
-            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+        .profile-header { 
+            text-align: center; padding: 40px 20px; background: radial-gradient(circle at center, #2a1b2e 0%, var(--bg-dark) 70%);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; cursor: pointer; }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
-        .nav-item.active { color: white; }
-        .nav-item.active i { color: #ff3366; }
+        .avatar-container { position: relative; width: 100px; height: 100px; margin: 0 auto 15px auto; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #18181b; box-shadow: 0 0 0 3px var(--primary); object-fit: cover; }
+        .vip-badge { 
+            position: absolute; bottom: 0; right: 0; background: #ffd700; color: black; 
+            font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; border: 2px solid #18181b;
+        }
+        .stats-row { display: flex; justify-content: center; gap: 40px; margin-top: 25px; }
+        .stat-num { font-size: 1.4rem; font-weight: 800; color: white; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .menu-list { padding: 20px; }
+        .menu-item { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 18px; background: var(--bg-card); border-radius: 16px; margin-bottom: 10px; cursor: pointer;
+        }
+        .menu-left { display: flex; align-items: center; gap: 15px; font-weight: 500; }
+        .menu-left i { width: 20px; color: var(--text-muted); }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
+            background: rgba(9,9,11,0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: 10px;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #71717a; font-size: 0.65rem; cursor: pointer; transition: color 0.3s; flex: 1; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 5px; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-2px); }
 
         /* --- BOTTOM SHEET (INFO) --- */
-        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
-        .sheet-overlay.active { display: block; }
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        
         .bottom-sheet {
-            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 80vh;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 85vh;
             background: #18181b; border-radius: 25px 25px 0 0; z-index: 200;
-            transform: translateY(110%); transition: transform 0.3s; overflow-y: auto;
-            padding-bottom: 20px;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); overflow-y: auto;
         }
         .bottom-sheet.active { transform: translateY(0); }
-        .sheet-banner { width: 100%; height: 200px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .sheet-content { padding: 0 25px; margin-top: -50px; position: relative; }
-        .sheet-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-        .sheet-btns { display: flex; gap: 10px; margin: 20px 0; }
-        .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-play-big { background: white; color: black; }
-        .btn-list-big { background: #333; color: white; }
+        
+        .sheet-header-img { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
+        .sheet-content { padding: 0 25px 100px 25px; margin-top: -60px; position: relative; }
+        
+        .sheet-tags { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .sheet-tag { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 5px; font-size: 0.7rem; color: #ccc; }
+        
+        .sheet-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; line-height: 1.1; }
+        .sheet-info-row { color: #888; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+        
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+        .btn-play { 
+            flex: 2; background: white; color: black; border: none; padding: 14px; border-radius: 15px; 
+            font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;
+        }
+        .btn-icon { 
+            flex: 1; background: #27272a; color: white; border: none; padding: 14px; border-radius: 15px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; gap: 5px;
+        }
 
+        /* Lista de Episodios en Sheet */
+        .episodes-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; }
+        .episode-list { display: flex; flex-direction: column; gap: 10px; }
+        .episode-item { 
+            display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 10px; 
+            background: rgba(255,255,255,0.03); transition: background 0.2s;
+        }
+        .episode-item:active { background: rgba(255,255,255,0.1); }
+        .ep-number { font-size: 2rem; font-weight: 700; color: #444; width: 40px; text-align: center; }
+        .ep-info { flex: 1; }
+        .ep-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .ep-dur { font-size: 0.75rem; color: #777; }
+        .ep-play { color: var(--primary); }
+
+        /* --- BUSCADOR --- */
+        .search-modal {
+            position: fixed; inset: 0; background: var(--bg-dark); z-index: 60; display: none; padding: 20px;
+        }
+        .search-modal.active { display: block; animation: fadeIn 0.2s; }
+        .search-header { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
+        .search-input-box {
+            flex: 1; background: #27272a; border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; gap: 10px;
+        }
+        .search-input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 1rem; }
     </style>
 </head>
 <body>
 
     <header class="header">
         <div class="logo-heart"><i class="fa-solid fa-heart"></i> FLECHAZO</div>
-        <i class="fa-solid fa-magnifying-glass" style="font-size: 1.2rem; cursor: pointer;" onclick="toggleSearch()"></i>
+        <div class="header-icons">
+            <i class="fa-solid fa-bell"></i>
+            <i class="fa-solid fa-magnifying-glass" onclick="toggleSearch(true)"></i>
+        </div>
     </header>
 
-    <div id="searchBar" class="search-bar-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar..." onkeyup="handleSearch(this.value)">
-    </div>
-
     <div id="tab-home" class="tab-content active">
-        <div id="heroContainer" class="hero-container"></div> <div class="section-title">Populares</div>
-        <div class="slider" id="homeSlider1"></div>
+        <div class="chip-scroll">
+            <div class="chip active">Todos</div>
+            <div class="chip">Romance</div>
+            <div class="chip">Venganza</div>
+            <div class="chip">CEO</div>
+            <div class="chip">Drama</div>
+            <div class="chip">Misterio</div>
+        </div>
+
+        <div id="heroContainer" class="hero-container">
+            </div>
+
+        <div class="slider-container">
+            <div class="section-header">
+                <div class="section-title">Populares en Perú</div>
+                <div class="section-more">Ver todo</div>
+            </div>
+            <div class="slider" id="homeSlider1"></div>
+        </div>
         
-        <div class="section-title">Nuevos</div>
-        <div class="slider" id="homeSlider2"></div>
+        <div class="slider-container">
+            <div class="section-header">
+                <div class="section-title">Recién Agregados</div>
+                <div class="section-more">Ver todo</div>
+            </div>
+            <div class="slider" id="homeSlider2"></div>
+        </div>
     </div>
 
     <div id="tab-explore" class="tab-content">
-        <div class="section-title" id="exploreTitle">Explorar Todo</div>
+        <div class="section-header" style="margin-top: 20px;">
+            <div class="section-title">Catálogo Completo</div>
+        </div>
         <div id="exploreGrid" class="grid-container"></div>
     </div>
 
     <div id="tab-mylist" class="tab-content">
-        <div class="section-title">Mi Lista Guardada</div>
+        <div class="section-header" style="margin-top: 20px;">
+            <div class="section-title">Tu Biblioteca</div>
+        </div>
         <div id="myListGrid" class="grid-container">
-            <div class="empty-msg">Aún no has guardado nada.</div>
+            <p style="color:#666; width:300px; text-align:center; padding:20px;">Tu lista está vacía.</p>
         </div>
     </div>
 
     <div id="tab-profile" class="tab-content">
         <div class="profile-header">
-            <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" class="avatar">
-            <h2>Usuario Invitado</h2>
-            <p style="color:#888;">Plan Gratuito</p>
+            <div class="avatar-container">
+                <img src="https://i.pinimg.com/236x/c5/42/5d/c5425d97f3944747209774653a25b290.jpg" class="avatar">
+                <div class="vip-badge">VIP</div>
+            </div>
+            <h2>Manuel Anthony</h2>
+            <p style="color:#a1a1aa; font-size:0.9rem;">@ElTioSpoiler</p>
             
             <div class="stats-row">
-                <div class="stat-item"><div class="stat-num" id="statVistos">0</div><div class="stat-label">Vistos</div></div>
-                <div class="stat-item"><div class="stat-num" id="statLista">0</div><div class="stat-label">En Lista</div></div>
+                <div class="stat-item"><div class="stat-num">124</div><div class="stat-label">Vistos</div></div>
+                <div class="stat-item"><div class="stat-num" id="profileCount">0</div><div class="stat-label">Lista</div></div>
+                <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Años</div></div>
             </div>
         </div>
-        <div style="padding: 20px;">
-            <button class="btn" style="width:100%; background:#333; color:white; padding:15px; margin-bottom:10px;">Editar Perfil</button>
-            <button class="btn" style="width:100%; background:#222; color:#ff3366; padding:15px;">Cerrar Sesión</button>
+
+        <div class="menu-list">
+            <div class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-download"></i> Descargas</div>
+                <i class="fa-solid fa-chevron-right" style="color:#444;"></i>
+            </div>
+            <div class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-wallet"></i> Suscripción</div>
+                <span style="color:var(--primary); font-size:0.8rem; font-weight:bold;">ACTIVO</span>
+            </div>
+            <div class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-gear"></i> Configuración</div>
+                <i class="fa-solid fa-chevron-right" style="color:#444;"></i>
+            </div>
         </div>
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)">
-            <i class="fa-solid fa-house"></i> Inicio
+            <i class="fa-solid fa-house"></i>Inicio
         </div>
         <div class="nav-item" onclick="switchTab('explore', this)">
-            <i class="fa-solid fa-compass"></i> Explorar
+            <i class="fa-solid fa-compass"></i>Explorar
         </div>
         <div class="nav-item" onclick="switchTab('mylist', this)">
-            <i class="fa-solid fa-bookmark"></i> Mi Lista
+            <i class="fa-solid fa-bookmark"></i>Lista
         </div>
         <div class="nav-item" onclick="switchTab('profile', this)">
-            <i class="fa-solid fa-user"></i> Perfil
+            <i class="fa-solid fa-user"></i>Perfil
         </div>
     </nav>
 
     <div id="sheetOverlay" class="sheet-overlay" onclick="closeSheet()"></div>
     <div id="infoSheet" class="bottom-sheet">
-        <img id="sheetImg" class="sheet-banner">
+        <img id="sheetImg" class="sheet-header-img">
         <div class="sheet-content">
+            <div id="sheetTags" class="sheet-tags"></div>
             <h1 id="sheetTitle" class="sheet-title">Titulo</h1>
-            <p id="sheetDesc" style="color:#ccc; margin-bottom:20px;">Descripción...</p>
-            <div class="sheet-btns">
-                <button class="btn-big btn-play-big" id="btnPlaySheet"><i class="fa-solid fa-play"></i> Reproducir</button>
-                <button class="btn-big btn-list-big" id="btnAddSheet" onclick="toggleMyList()"><i class="fa-solid fa-plus"></i> Lista</button>
+            <div class="sheet-info-row">
+                <span style="color:#4ade80;">98% Match</span>
+                <span>2024</span>
+                <span id="sheetEpsCount">0 Eps</span>
             </div>
+            
+            <p id="sheetDesc" style="color:#ccc; margin-bottom:20px; line-height:1.5;">Descripción...</p>
+            
+            <div class="action-buttons">
+                <button class="btn-play" onclick="playVideo()"><i class="fa-solid fa-play"></i> Reproducir</button>
+                <button class="btn-icon" id="btnAddSheet" onclick="toggleMyList()">
+                    <i class="fa-solid fa-plus"></i> <span>Lista</span>
+                </button>
+                <button class="btn-icon">
+                    <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                </button>
+            </div>
+
+            <div class="episodes-title">Episodios</div>
+            <div id="episodesList" class="episode-list">
+                </div>
         </div>
     </div>
 
-    <script>
-        // DATOS GLOBALES
-        let allMovies = [];
-        let myFavorites = JSON.parse(localStorage.getItem('flechazo_favs')) || [];
-        let currentMovieId = null;
+    <div id="searchModal" class="search-modal">
+        <div class="search-header">
+            <div class="search-input-box">
+                <i class="fa-solid fa-magnifying-glass" style="color:#888;"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar series, actores..." onkeyup="handleSearch(this.value)">
+            </div>
+            <span style="color:var(--primary); font-weight:bold; cursor:pointer;" onclick="toggleSearch(false)">Cancelar</span>
+        </div>
+        <div style="color:#666; font-size:0.9rem; margin-bottom:10px;">Resultados</div>
+        <div id="searchResults" class="episode-list"></div>
+    </div>
 
-        // 1. CARGA INICIAL
-        window.onload = async () => {
-            try {
-                const res = await fetch('/api/movies');
-                allMovies = await res.json();
-                
-                renderHome();
-                renderExplore(allMovies);
-                renderMyList();
-                updateStats();
-            } catch(e) { console.log("Error cargando datos"); }
+    <script>
+        // --- BASE DE DATOS LOCAL (MOCK DATA) ---
+        // Esto simula tu API para que funcione de inmediato
+        const mockDB = [
+            { 
+                id: 1, 
+                title: "La Venganza del CEO", 
+                tags: ["CEO", "Venganza", "Romance"],
+                desc: "Tras ser humillada, ella regresa 5 años después con una nueva identidad para recuperar lo que le pertenece.",
+                img: "https://image.tmdb.org/t/p/w500/u3bZgnGQ9TWAZQv92dpa6lM9pUv.jpg",
+                banner: "https://image.tmdb.org/t/p/original/t5zCBSB5xMDKkDqe91qahCOUYVV.jpg",
+                episodes: 24 
+            },
+            { 
+                id: 2, 
+                title: "Amor Inesperado", 
+                tags: ["Romance", "Comedia"],
+                desc: "Un matrimonio por contrato que termina convirtiéndose en amor verdadero.",
+                img: "https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg",
+                banner: "https://image.tmdb.org/t/p/original/8rpDcsfLJypbO6vREc0547TJqqQ.jpg",
+                episodes: 12 
+            },
+            { 
+                id: 3, 
+                title: "Reina de las Sombras", 
+                tags: ["Drama", "Suspenso"],
+                desc: "En un mundo de traiciones, ella debe elegir entre el poder o el amor.",
+                img: "https://image.tmdb.org/t/p/w500/kdPMUMJzyYAc4roD52qavX0nLIC.jpg",
+                banner: "https://image.tmdb.org/t/p/original/etj8E2o0Bud0HkONVQPjyCkIvpv.jpg",
+                episodes: 40 
+            },
+            { 
+                id: 4, 
+                title: "Destino Cruzado", 
+                tags: ["Fantasia", "Romance"],
+                desc: "Dos almas de mundos diferentes colisionan.",
+                img: "https://image.tmdb.org/t/p/w500/ui4drTngfS1t1aBMOzT6lD6UItM.jpg",
+                banner: "https://image.tmdb.org/t/p/original/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
+                episodes: 16 
+            },
+            { 
+                id: 5, 
+                title: "Secretos de Familia", 
+                tags: ["CEO", "Drama"],
+                desc: "Una herencia millonaria desata la guerra interna.",
+                img: "https://image.tmdb.org/t/p/w500/lyP4Wzm381IXc60QxHe50wMPJSF.jpg",
+                banner: "https://image.tmdb.org/t/p/original/4HodWWzbHsDwe09fK55Bq0Xf4tW.jpg",
+                episodes: 30 
+            }
+        ];
+
+        // --- ESTADO DE LA APP ---
+        let myFavorites = JSON.parse(localStorage.getItem('flechazo_favs')) || [];
+        let currentMovie = null;
+
+        // --- INICIALIZACIÓN ---
+        window.onload = () => {
+            renderHome();
+            renderGrid('exploreGrid', mockDB);
+            renderMyList();
         };
 
-        // 2. SISTEMA DE PESTAÑAS (TAB SWITCHER)
-        function switchTab(tabName, btnElement) {
-            // Ocultar todas las tabs
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Mostrar la seleccionada
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            
-            // Actualizar iconos menú
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
-
-            // Si entra a perfil, actualizar stats
-            if(tabName === 'profile') updateStats();
-            // Si entra a lista, refrescar
-            if(tabName === 'mylist') renderMyList();
-        }
-
-        // 3. RENDERIZADORES
+        // --- RENDERIZADO HOME ---
         function renderHome() {
-            if(allMovies.length === 0) return;
-            const hero = allMovies[0]; // O random
-            const imgHero = hero.imagenes ? hero.imagenes.banner : hero.img;
-            
-            // Hero
+            // Hero: Usamos el primero de la lista
+            const hero = mockDB[0];
             document.getElementById('heroContainer').innerHTML = `
                 <div class="hero-card" onclick="openSheet(${hero.id})">
-                    <img src="${imgHero}" class="hero-img">
+                    <img src="${hero.banner}" class="hero-img">
                     <div class="hero-overlay">
-                        <h2>${hero.title}</h2>
-                        <button class="btn btn-primary">Ver Ahora</button>
+                        <div class="hero-badge">Nº 1 en Tendencias</div>
+                        <div class="hero-title">${hero.title}</div>
+                        <div class="hero-meta">
+                            <span>${hero.tags[0]}</span> • <span>${hero.episodes} Eps</span>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-play" style="padding:10px 20px; font-size:0.9rem; border-radius:30px;">
+                                <i class="fa-solid fa-play"></i> Ver Ahora
+                            </button>
+                            <button style="background:rgba(255,255,255,0.2); backdrop-filter:blur(5px); border:none; color:white; width:45px; height:45px; border-radius:50%; font-size:1.1rem;">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>`;
+                </div>
+            `;
 
             // Sliders
             const s1 = document.getElementById('homeSlider1');
             const s2 = document.getElementById('homeSlider2');
-            s1.innerHTML = allMovies.map(m => cardHTML(m)).join('');
-            s2.innerHTML = [...allMovies].reverse().map(m => cardHTML(m)).join('');
-        }
-
-        function renderExplore(lista) {
-            const grid = document.getElementById('exploreGrid');
-            if(lista.length === 0) {
-                grid.innerHTML = '<div class="empty-msg">No hay resultados</div>';
-                return;
-            }
-            grid.innerHTML = lista.map(m => cardHTML(m)).join('');
-        }
-
-        function renderMyList() {
-            const grid = document.getElementById('myListGrid');
-            const favs = allMovies.filter(m => myFavorites.includes(m.id));
             
-            if(favs.length === 0) {
-                grid.innerHTML = '<div class="empty-msg">Aún no has agregado nada a tu lista.</div>';
-            } else {
-                grid.innerHTML = favs.map(m => cardHTML(m)).join('');
-            }
-            // Actualizar contador perfil
-            document.getElementById('statLista').innerText = favs.length;
+            s1.innerHTML = mockDB.map(m => cardHTML(m)).join('');
+            // Simulamos datos diferentes invirtiendo el array
+            s2.innerHTML = [...mockDB].reverse().map(m => cardHTML(m)).join('');
         }
 
+        // --- COMPONENTE TARJETA ---
         function cardHTML(m) {
-            const img = m.imagenes ? m.imagenes.poster : m.img;
-            return `<div class="poster-card" onclick="openSheet(${m.id})"><img src="${img}" class="poster-img"></div>`;
+            return `
+                <div class="poster-card" onclick="openSheet(${m.id})">
+                    <img src="${m.img}" class="poster-img">
+                    <div class="poster-title">${m.title}</div>
+                </div>
+            `;
         }
 
-        // 4. FUNCIONALIDAD BUSCADOR
-        function toggleSearch() {
-            const bar = document.getElementById('searchBar');
-            bar.classList.toggle('show');
-            if(bar.classList.contains('show')) document.getElementById('searchInput').focus();
+        function renderGrid(elementId, data) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = data.map(m => `
+                <div class="grid-item" onclick="openSheet(${m.id})">
+                    <img src="${m.img}" class="grid-img">
+                </div>
+            `).join('');
         }
 
-        function handleSearch(text) {
-            const term = text.toLowerCase();
-            const results = allMovies.filter(m => m.title.toLowerCase().includes(term));
+        // --- NAVEGACIÓN TABS ---
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
             
-            // Auto cambiar a pestaña explorar
-            switchTab('explore', document.querySelectorAll('.nav-item')[1]);
-            document.getElementById('exploreTitle').innerText = term ? `Resultados: "${text}"` : "Explorar Todo";
-            renderExplore(results);
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+
+            if(tabId === 'mylist') renderMyList();
         }
 
-        // 5. FUNCIONALIDAD BOTTOM SHEET (INFO)
+        // --- SEARCH ---
+        function toggleSearch(show) {
+            const modal = document.getElementById('searchModal');
+            if(show) {
+                modal.classList.add('active');
+                document.getElementById('searchInput').focus();
+            } else {
+                modal.classList.remove('active');
+            }
+        }
+
+        function handleSearch(val) {
+            const results = document.getElementById('searchResults');
+            if(val.length < 2) { results.innerHTML = ""; return; }
+            
+            const filtered = mockDB.filter(m => m.title.toLowerCase().includes(val.toLowerCase()));
+            results.innerHTML = filtered.map(m => `
+                <div class="episode-item" onclick="openSheet(${m.id}); toggleSearch(false);">
+                    <img src="${m.img}" style="width:50px; height:70px; border-radius:6px; object-fit:cover;">
+                    <div class="ep-info">
+                        <div class="ep-title">${m.title}</div>
+                        <div class="ep-dur">${m.tags.join(', ')}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color:#666;"></i>
+                </div>
+            `).join('');
+        }
+
+        // --- SHEET & DETAILS ---
         function openSheet(id) {
-            const m = allMovies.find(x => x.id === id);
+            const m = mockDB.find(x => x.id === id);
             if(!m) return;
-            currentMovieId = m.id;
+            currentMovie = m;
 
-            document.getElementById('sheetImg').src = m.imagenes ? m.imagenes.banner : m.img;
+            document.getElementById('sheetImg').src = m.banner;
             document.getElementById('sheetTitle').innerText = m.title;
-            document.getElementById('sheetDesc').innerText = m.desc || "Sin descripción.";
+            document.getElementById('sheetDesc').innerText = m.desc;
+            document.getElementById('sheetEpsCount').innerText = m.episodes + " Eps";
             
-            // Botón Play
-            document.getElementById('btnPlaySheet').onclick = () => window.location.href = `player.html?id=${id}`;
-            
-            // Estado Botón Lista
-            updateListBtn();
+            // Tags
+            document.getElementById('sheetTags').innerHTML = m.tags.map(t => `<span class="sheet-tag">${t}</span>`).join('');
 
+            // Generar lista de episodios
+            let epsHtml = "";
+            for(let i=1; i<= (m.episodes > 5 ? 5 : m.episodes); i++) {
+                epsHtml += `
+                    <div class="episode-item">
+                        <div class="ep-number">${i}</div>
+                        <div class="ep-info">
+                            <div class="ep-title">Episodio ${i}</div>
+                            <div class="ep-dur">2 min • Estreno</div>
+                        </div>
+                        <i class="fa-regular fa-circle-play ep-play"></i>
+                    </div>
+                `;
+            }
+            if(m.episodes > 5) epsHtml += `<div style="text-align:center; padding:10px; color:#666;">Ver ${m.episodes - 5} episodios más...</div>`;
+            document.getElementById('episodesList').innerHTML = epsHtml;
+
+            updateListButton();
             document.getElementById('sheetOverlay').classList.add('active');
             document.getElementById('infoSheet').classList.add('active');
         }
@@ -322,35 +521,60 @@
             document.getElementById('infoSheet').classList.remove('active');
         }
 
-        // 6. LÓGICA MI LISTA (LOCALSTORAGE)
+        function playVideo() {
+            alert("Aquí se abriría el reproductor de video para: " + currentMovie.title);
+        }
+
+        // --- MI LISTA ---
         function toggleMyList() {
-            if(myFavorites.includes(currentMovieId)) {
-                myFavorites = myFavorites.filter(id => id !== currentMovieId);
+            if(!currentMovie) return;
+            const idx = myFavorites.indexOf(currentMovie.id);
+            
+            if(idx > -1) {
+                myFavorites.splice(idx, 1); // Quitar
             } else {
-                myFavorites.push(currentMovieId);
+                myFavorites.push(currentMovie.id); // Agregar
             }
+            
             localStorage.setItem('flechazo_favs', JSON.stringify(myFavorites));
-            updateListBtn();
-            renderMyList(); // Actualizar pestaña oculta
+            updateListButton();
+            renderMyList();
         }
 
-        function updateListBtn() {
+        function updateListButton() {
             const btn = document.getElementById('btnAddSheet');
-            if(myFavorites.includes(currentMovieId)) {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Agregado';
-                btn.style.background = '#ff3366';
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('span');
+            
+            if(myFavorites.includes(currentMovie.id)) {
+                icon.className = "fa-solid fa-check";
+                icon.style.color = "var(--primary)";
+                text.innerText = "Listo";
             } else {
-                btn.innerHTML = '<i class="fa-solid fa-plus"></i> Mi Lista';
-                btn.style.background = '#333';
+                icon.className = "fa-solid fa-plus";
+                icon.style.color = "white";
+                text.innerText = "Lista";
             }
+            
+            // Actualizar contador perfil
+            document.getElementById('profileCount').innerText = myFavorites.length;
         }
 
-        function updateStats() {
-            // Simulación de estadísticas
-            document.getElementById('statVistos').innerText = Math.floor(Math.random() * 20); // Dummy
-            document.getElementById('statLista').innerText = myFavorites.length;
+        function renderMyList() {
+            const favsData = mockDB.filter(m => myFavorites.includes(m.id));
+            const grid = document.getElementById('myListGrid');
+            
+            if(favsData.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#666;">Tu lista está vacía</div>';
+            } else {
+                grid.innerHTML = favsData.map(m => `
+                    <div class="grid-item" onclick="openSheet(${m.id})">
+                        <img src="${m.img}" class="grid-img">
+                    </div>
+                `).join('');
+            }
+            document.getElementById('profileCount').innerText = favsData.length;
         }
-
     </script>
 </body>
 </html>
