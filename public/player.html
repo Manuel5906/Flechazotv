@@ -24,10 +24,11 @@
             background: #000;
         }
         video, iframe { 
-            width: 100%; height: 100%; object-fit: contain; border: none; 
-            pointer-events: none; 
+            width: 100%; height: 100%; border: none; 
+            pointer-events: none; /* Se reactiva para embeds en JS */
         }
-        .active-player { display: block !important; pointer-events: auto; }
+        iframe { object-fit: contain; }
+        .active-player { display: block !important; }
         .hidden { display: none !important; }
 
         /* --- MARCA DE AGUA --- */
@@ -94,7 +95,7 @@
         }
         .back-icon { 
             font-size: 1.5rem; color: white; filter: drop-shadow(0 2px 4px black); 
-            cursor: pointer; padding: 10px; /* Área táctil más grande */
+            cursor: pointer; padding: 10px;
         }
         .video-info { flex: 1; overflow: hidden; }
         .video-title { font-size: 1rem; font-weight: 700; text-shadow: 0 1px 3px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -164,16 +165,13 @@
         .ep-num { font-size: 1.1rem; font-weight: bold; color: #666; }
         .ep-item.active .ep-num { color: #ff3366; }
 
-        /* SEGURIDAD & ERRORES */
-        #securityMsg {
+        /* ERRORES */
+        #securityMsg, #errorMsg {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 30px; border-radius: 10px;
             z-index: 9999; display: none; font-weight: bold; box-shadow: 0 5px 20px black;
         }
-        #errorMsg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; color: #ccc; display: none; z-index: 2;
-        }
+        #errorMsg { background: transparent; box-shadow: none; color: #ccc; z-index: 2; text-align: center; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -183,7 +181,7 @@
 
     <div class="video-container">
         <video id="vid" playsinline loop></video>
-        <iframe id="embedFrame" allowfullscreen allow="autoplay"></iframe>
+        <iframe id="embedFrame" allowfullscreen allow="autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
 
         <div id="spinner" class="loading-spinner"></div>
 
@@ -202,7 +200,6 @@
         <div class="ui-layer">
             <div class="top-bar">
                 <i class="fa-solid fa-arrow-left back-icon" onclick="goHome()"></i>
-                
                 <div class="video-info">
                     <div id="title" class="video-title">Cargando...</div>
                     <div id="subtitle" class="video-subtitle"></div>
@@ -214,7 +211,6 @@
                     <div class="side-btn"><i class="fa-solid fa-layer-group"></i></div>
                     <span class="btn-label">Episodios</span>
                 </div>
-
                 <div id="btnNext" style="text-align:center;" onclick="nextEp()">
                     <div class="side-btn"><i class="fa-solid fa-forward"></i></div>
                     <span class="btn-label">Siguiente</span>
@@ -237,55 +233,38 @@
     </div>
 
     <script>
-        // --- 1. FUNCIÓN REGRESAR MEJORADA ---
-        function goHome() {
-            // Intenta ir al inicio definido o a la raíz
-            window.location.href = '/'; 
-        }
+        function goHome() { window.location.href = '/'; }
 
-        // --- 2. DOBLE TAP (LÓGICA) ---
+        // --- LÓGICA TÁCTIL (Solo para MP4) ---
         let lastClick = 0;
-        
         function handleTouch(e) {
+            // Si el iframe está activo, no hacemos nada aquí
+            if (!iframe.classList.contains('hidden')) return;
+
             const now = new Date().getTime();
             const width = window.innerWidth;
             const x = e.clientX;
 
-            // Detectar Doble Tap (< 300ms)
             if (now - lastClick < 300) {
-                if (x < width / 3) {
-                    skip(-10); // Izquierda
-                    showSeekAnim('seekLeft');
-                } else if (x > (width / 3) * 2) {
-                    skip(10); // Derecha
-                    showSeekAnim('seekRight');
-                } else {
-                    togglePlay(); // Centro (Play/Pause forzado)
-                }
+                if (x < width / 3) { skip(-10); showSeekAnim('seekLeft'); } 
+                else if (x > (width / 3) * 2) { skip(10); showSeekAnim('seekRight'); } 
+                else { togglePlay(); }
             } else {
-                // Toque Simple (Esperar un poco para confirmar que no es doble)
                 setTimeout(() => {
-                    if (new Date().getTime() - lastClick > 300) {
-                        // Es un toque simple, Toggle Play
-                        // (Opcional: Si quieres que el simple tap oculte UI, pon lógica aquí)
-                        togglePlay(); 
-                    }
+                    if (new Date().getTime() - lastClick > 300) togglePlay(); 
                 }, 350);
             }
             lastClick = now;
         }
 
-        function skip(sec) {
-            if(!vid.classList.contains('hidden')) vid.currentTime += sec;
-        }
-
+        function skip(sec) { if(!vid.classList.contains('hidden')) vid.currentTime += sec; }
         function showSeekAnim(id) {
             const el = document.getElementById(id);
             el.classList.add('show-seek');
             setTimeout(() => el.classList.remove('show-seek'), 600);
         }
 
-        // --- 3. LÓGICA PRINCIPAL ---
+        // --- INICIALIZACIÓN ---
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         let itemData = null, currentEp = 0, isSerie = false;
@@ -301,8 +280,18 @@
 
         window.onload = async () => {
             try {
-                const res = await fetch(`/api/movies/${id}`);
-                itemData = await res.json();
+                // AQUÍ SIMULO LA API, TU CÓDIGO REAL DEBE IR A TU ENDPOINT
+                // const res = await fetch(`/api/movies/${id}`);
+                // itemData = await res.json();
+                
+                // --- EJEMPLO MANUAL PARA TESTING (BORRAR EN PRODUCCIÓN) ---
+                itemData = {
+                    title: "Demo YouTube",
+                    url: "https://youtu.be/eEh6mqsXZyk", // URL CORTA DE YOUTUBE DE PRUEBA
+                    tipo: "pelicula"
+                };
+                // --------------------------------------------------------
+
                 if(itemData.tipo === 'serie') {
                     isSerie = true;
                     document.getElementById('btnEpList').style.display = 'block';
@@ -326,30 +315,56 @@
             renderList();
         }
 
-        function loadSource(url) {
-            spinner.style.display = 'block'; // Mostrar carga
+        // --- NUEVA FUNCIÓN: FORMATO INTELIGENTE DE URL ---
+        function formatUrl(url) {
+            // Regex para detectar YouTube (cortos, largos, embeds)
+            const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const match = url.match(ytRegex);
+
+            if (match && match[1]) {
+                // Es YouTube: Convertir a Embed + Autoplay + Ocultar Relacionados ajenos
+                return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0&playsinline=1&modestbranding=1&controls=1`;
+            }
+            // Si no es YT, devuelve la URL original
+            return url;
+        }
+
+        function loadSource(rawUrl) {
+            spinner.style.display = 'block';
             
-            if(url.match(/\.(mp4|webm|mkv)$/i)) {
-                // MP4
+            // 1. Detectar si es archivo directo de video
+            if(rawUrl.match(/\.(mp4|webm|mkv)$/i)) {
+                // --- MODO NATIVO (MP4) ---
                 iframe.classList.add('hidden'); iframe.src = "";
-                vid.classList.remove('hidden'); vid.src = url; 
+                vid.classList.remove('hidden'); vid.src = rawUrl; 
                 vid.play().then(() => spinner.style.display = 'none').catch(() => spinner.style.display = 'none');
                 
                 document.getElementById('progressContainer').style.display = 'flex';
-                touchArea.style.pointerEvents = 'auto'; 
+                touchArea.style.pointerEvents = 'auto'; // Habilitar gestos personalizados
+                touchArea.style.display = 'flex';
             } else {
-                // Embed
-                vid.classList.add('hidden'); vid.pause();
-                iframe.classList.remove('hidden'); iframe.src = url;
-                iframe.onload = () => spinner.style.display = 'none'; // Ocultar al cargar iframe
+                // --- MODO EMBED (YouTube, Iframe) ---
+                const finalUrl = formatUrl(rawUrl); // Convertir URL
                 
+                vid.classList.add('hidden'); vid.pause();
+                iframe.classList.remove('hidden'); 
+                iframe.src = finalUrl;
+                
+                iframe.onload = () => spinner.style.display = 'none';
+                
+                // Ajustes de UI para Embed
                 document.getElementById('progressContainer').style.display = 'none';
-                touchArea.style.pointerEvents = 'none';
+                
+                // IMPORTANTE: Para que YouTube funcione bien, el usuario debe interactuar con el Iframe
+                // Deshabilitamos nuestro touchArea para que los clicks pasen al Iframe
+                touchArea.style.pointerEvents = 'none'; 
+                touchArea.style.display = 'none'; // Ocultar capa de gestos para dejar libre al iframe
+
                 if(isSerie && hasNext()) setTimeout(() => btnNext.classList.add('show'), 5000);
             }
         }
 
-        /* --- EVENTOS VIDEO (BUFFERING) --- */
+        // --- EL RESTO DE FUNCIONES IGUAL ---
         vid.onwaiting = () => spinner.style.display = 'block';
         vid.onplaying = () => spinner.style.display = 'none';
         vid.onerror = () => { spinner.style.display = 'none'; document.getElementById('errorMsg').style.display = 'block'; };
@@ -391,7 +406,6 @@
             l.scrollTop = sp;
         }
         
-        // Anti-Robo
         document.onkeydown = function(e) { if(e.keyCode == 123) return false; }
         document.addEventListener('dragstart', function(e) { e.preventDefault(); });
     </script>
