@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Netflix Pro Optimizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --n-red: #E50914;
+            --n-dark: #141414;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden; user-select: none;
+        }
+
+        .video-container {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Capa de controles optimizada */
+        .controls-overlay {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.8) 100%);
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: env(safe-area-inset-top) 40px env(safe-area-inset-bottom) 40px;
+            opacity: 1; transition: var(--transition); z-index: 10;
+        }
+
+        .controls-overlay.idle { opacity: 0; cursor: none; }
+
+        /* Barra Superior */
+        .header { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; }
+        .back-info { display: flex; align-items: center; gap: 20px; }
+        .title-text { font-size: 1.1rem; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+
+        /* Centro: Play y Saltos */
+        .main-controls {
+            display: flex; justify-content: center; align-items: center; gap: 80px;
+        }
+        .btn-action {
+            background: none; border: none; color: white; cursor: pointer;
+            font-size: 3.5rem; transition: transform 0.2s;
+        }
+        .btn-action:active { transform: scale(0.9); }
+        .skip-btn { position: relative; font-size: 2.5rem; }
+        .skip-btn span {
+            position: absolute; top: 58%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 0.75rem; font-weight: bold;
+        }
+
+        /* Barra Lateral de Brillo */
+        .brightness-slider {
+            position: absolute; left: 40px; top: 50%; transform: translateY(-50%);
+            width: 30px; height: 160px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .track { width: 4px; height: 100%; background: rgba(255,255,255,0.3); border-radius: 2px; position: relative; }
+        .level { position: absolute; bottom: 0; width: 100%; height: 70%; background: #fff; border-radius: 2px; }
+
+        /* Barra de Progreso Inferior */
+        .footer { width: 100%; padding-bottom: 20px; }
+        .progress-wrapper {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
+        }
+        .seek-bar {
+            flex: 1; height: 4px; background: rgba(255,255,255,0.2);
+            position: relative; cursor: pointer; border-radius: 4px;
+        }
+        .seek-fill { height: 100%; background: var(--n-red); width: 0%; border-radius: 4px; position: relative; }
+        .seek-fill::after {
+            content: ''; position: absolute; right: -6px; top: -5px;
+            width: 14px; height: 14px; background: var(--n-red); border-radius: 50%;
+        }
+
+        /* Botones de navegación */
+        .nav-grid { display: flex; justify-content: space-around; max-width: 800px; margin: 0 auto; }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            font-size: 0.7rem; opacity: 0.7; cursor: pointer;
+        }
+        .nav-btn i { font-size: 1.4rem; }
+        .nav-btn:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div class="video-container" id="player">
+    <video id="v" src="https://www.w3schools.com/html/mov_bbb.mp4" loop></video>
+
+    <div class="controls-overlay" id="ui">
+        <header class="header">
+            <div class="back-info">
+                <i class="fas fa-chevron-left" style="font-size: 1.5rem; cursor:pointer"></i>
+                <span class="title-text">T2:E36 "Por las nalgas de Circe"</span>
+            </div>
+            <div class="actions">
+                <i class="fas fa-cast" style="margin-right:25px"></i>
+                <i class="fas fa-lock" style="margin-right:25px"></i>
+                <i class="fas fa-times" onclick="location.reload()"></i>
+            </div>
+        </header>
+
+        <div class="brightness-slider">
+            <i class="fas fa-sun"></i>
+            <div class="track"><div class="level"></div></div>
+        </div>
+
+        <div class="main-controls">
+            <button class="btn-action skip-btn" onclick="seek(-10)">
+                <i class="fas fa-undo-alt"></i><span>10</span>
+            </button>
+            <button class="btn-action" id="playBtn" onclick="togglePlay()">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="btn-action skip-btn" onclick="seek(10)">
+                <i class="fas fa-redo-alt"></i><span>10</span>
+            </button>
+        </div>
+
+        <footer class="footer">
+            <div class="progress-wrapper">
+                <div class="seek-bar" id="seekObj">
+                    <div class="seek-fill" id="fill"></div>
+                </div>
+                <span id="time">00:00</span>
+            </div>
+            
+            <div class="nav-grid">
+                <div class="nav-btn"><i class="fas fa-scissors"></i><span>Recortar</span></div>
+                <div class="nav-btn"><i class="fas fa-tachometer-alt"></i><span>Velocidad</span></div>
+                <div class="nav-btn"><i class="fas fa-layer-group"></i><span>Episodios</span></div>
+                <div class="nav-btn"><i class="fas fa-comment-dots"></i><span>Audio</span></div>
+                <div class="nav-btn"><i class="fas fa-step-forward"></i><span>Siguiente</span></div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script>
+    const v = document.getElementById('v');
+    const ui = document.getElementById('ui');
+    const playBtn = document.getElementById('playBtn').querySelector('i');
+    const fill = document.getElementById('fill');
+    const timeText = document.getElementById('time');
+    let isIdle = false;
+    let idleTimer;
+
+    // Control de Reproducción
+    function togglePlay() {
+        if (v.paused) {
+            v.play();
+            playBtn.className = 'fas fa-pause';
+        } else {
+            v.pause();
+            playBtn.className = 'fas fa-play';
+        }
+        resetIdleTimer();
+    }
+
+    function seek(sec) {
+        v.currentTime += sec;
+        resetIdleTimer();
+    }
+
+    // Actualización de la barra
+    v.addEventListener('timeupdate', () => {
+        const pct = (v.currentTime / v.duration) * 100;
+        fill.style.width = pct + '%';
+        
+        const m = Math.floor(v.currentTime / 60);
+        const s = Math.floor(v.currentTime % 60);
+        timeText.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+    });
+
+    // Saltar a posición en la barra
+    document.getElementById('seekObj').addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        v.currentTime = pos * v.duration;
+    });
+
+    // Lógica de Ocultar Controles (Idle)
+    function resetIdleTimer() {
+        ui.classList.remove('idle');
+        clearTimeout(idleTimer);
+        if (!v.paused) {
+            idleTimer = setTimeout(() => ui.classList.add('idle'), 3000);
+        }
+    }
+
+    document.getElementById('player').addEventListener('mousemove', resetIdleTimer);
+    document.getElementById('player').addEventListener('touchstart', resetIdleTimer);
+
+    // Teclas rápidas
+    window.addEventListener('keydown', (e) => {
+        if(e.code === 'Space') togglePlay();
+        if(e.code === 'ArrowRight') seek(10);
+        if(e.code === 'ArrowLeft') seek(-10);
+    });
+</script>
+
+</body>
+</html>
