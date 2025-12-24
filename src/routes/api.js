@@ -110,26 +110,44 @@ router.get('/youtube/search', async (req, res) => {
     if (!query) return res.status(400).json({ error: 'Falta el término de búsqueda' });
 
     try {
+        // Realizamos la búsqueda general
         const r = await yts(query);
 
         if (!r.videos || r.videos.length === 0) {
             return res.status(404).json({ error: 'No se encontraron resultados' });
         }
 
-        // Mapeo y limpieza de datos
-        const results = r.videos.slice(0, 15).map(v => ({
+        // 1. Intentamos obtener info del autor/canal específicamente
+        // Buscamos en los resultados de tipo 'accounts' o 'channels' que a veces trae yts
+        const authorInfo = r.accounts ? r.accounts[0] : (r.channels ? r.channels[0] : null);
+
+        // 2. Mapeamos los videos
+        const videos = r.videos.slice(0, 15).map(v => ({
             title: v.title,
             videoId: v.videoId,
             url: v.url,
             thumbnail: v.thumbnail,
             timestamp: v.timestamp,
             views: v.views,
-            author: v.author.name
+            author: {
+                name: v.author.name,
+                url: v.author.url,
+                // Intentamos sacar la imagen del autor. 
+                // Si yts no la da directa, usamos un placeholder o la del canal si existe
+                image: v.author.image || (authorInfo ? authorInfo.image : '')
+            }
         }));
 
-        // OPCIONAL: Intentar encontrar la "mejor coincidencia" (Exact Match)
-        // Si el primer resultado contiene gran parte del query, lo ponemos primero.
-        res.json(results);
+        // Respuesta enriquecida
+        res.json({
+            bestMatchAuthor: authorInfo ? {
+                name: authorInfo.name,
+                image: authorInfo.image,
+                url: authorInfo.url,
+                subscribers: authorInfo.subCountLabel
+            } : null,
+            videos: videos
+        });
 
     } catch (error) {
         console.error('Error en YouTube Search:', error);
