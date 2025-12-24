@@ -107,11 +107,17 @@ router.get('/youtube/channel', async (req, res) => {
 // B) BUSCAR videos (Global)
 router.get('/youtube/search', async (req, res) => {
     const query = req.query.q;
-    if (!query) return res.status(400).json({ error: 'Falta query' });
+    if (!query) return res.status(400).json({ error: 'Falta el término de búsqueda' });
 
     try {
         const r = await yts(query);
-        res.json(r.videos.slice(0, 15).map(v => ({
+
+        if (!r.videos || r.videos.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron resultados' });
+        }
+
+        // Mapeo y limpieza de datos
+        const results = r.videos.slice(0, 15).map(v => ({
             title: v.title,
             videoId: v.videoId,
             url: v.url,
@@ -119,9 +125,15 @@ router.get('/youtube/search', async (req, res) => {
             timestamp: v.timestamp,
             views: v.views,
             author: v.author.name
-        })));
+        }));
+
+        // OPCIONAL: Intentar encontrar la "mejor coincidencia" (Exact Match)
+        // Si el primer resultado contiene gran parte del query, lo ponemos primero.
+        res.json(results);
+
     } catch (error) {
-        res.status(500).json({ error: 'Error búsqueda' });
+        console.error('Error en YouTube Search:', error);
+        res.status(500).json({ error: 'Error al realizar la búsqueda' });
     }
 });
 
